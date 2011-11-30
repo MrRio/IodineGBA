@@ -331,51 +331,51 @@ ARM7TDMI.prototype.executeARM = function () {
 	}
 }
 ARM7TDMI.prototype.executeARMInstruction = function () {
-	switch (this.instruction & 0x0E000000) {
-		case 0x00000000:
-			switch (this.instruction & 0x01F00000) {
+	switch (this.instruction & 0xE000000) {
+		case 0:
+			switch (this.instruction & 0x1F00000) {
 				//Multiply (MUL / MLA)
 				//MUL S=0
-				case 0x00000000:
+				case 0:
 					this.SAVEMUL32(this.MUL32());
 					break;
 				//MUL S=1
-				case 0x00100000:
+				case 0x0100000:
 					this.CALCMUL32(this.MUL32());
 					break;
 				//MLA S=0
-				case 0x00200000:
+				case 0x0200000:
 					this.SAVEMUL32(this.MLA32());
 					break;
 				//MLA S=1
-				case 0x00300000:
+				case 0x0300000:
 					this.CALCMUL32(this.MLA32());
 					break;
 				//Multiply Long (MULL / MLAL)
 				//UMULL S=0
-				case 0x00C00000:
+				case 0x0C00000:
 					this.SAVEMUL64(this.UMULL64());
 					break;
 				//UMULL S=1
-				case 0x00D00000:
+				case 0x0D00000:
 					this.CALCMUL64(this.UMULL64());
 					break;
 				//UMLAL S=0
-				case 0x00E00000:
+				case 0x0E00000:
 					this.SAVEMUL64(this.UMLAL64());
 					break;
 				//UMLAL S=1
-				case 0x00F00000:
+				case 0x0F00000:
 					this.CALCMUL64(this.UMLAL64());
 					break;
 				//SWP Single Data Swap (Word)
-				case 0x01000000:
+				case 0x1000000:
 					this.SWPWord();
 					break;
 				//BX, 
-				case 0x01200000:
+				case 0x1200000:
 					//BX
-					if ((this.instruction & 0x012FFFF0) == 0x012FFF10) {
+					if ((this.instruction & 0x12FFFF0) == 0x12FFF10) {
 						this.branchAndExchange();
 					}
 					else {
@@ -383,35 +383,35 @@ ARM7TDMI.prototype.executeARMInstruction = function () {
 					}
 					break;
 				//SWP Single Data Swap (Byte)
-				case 0x01400000:
+				case 0x1400000:
 					this.SWPByte();
 					break;
 				//Halfword Data Transfer: register offset
 				//Halfword Data Transfer: immediate offset
 			}
 			break;
-		case 0x02000000:
+		case 0x2000000:
 			//Data Processing / PSR Transfer
 			this.performDataProcessing();
 			break;
-		case 0x04000000:
+		case 0x4000000:
 			//Single Data Transfer
 			break;
-		case 0x06000000:
+		case 0x6000000:
 			//Single Data Transfer
 			break;
-		case 0x08000000:
+		case 0x8000000:
 			//Block Data Transfer
 			
 			break;
-		case 0x0A000000:
+		case 0xA000000:
 			//Branch:
 			this.performBranch();
 			break;
-		case 0x0C000000:
+		case 0xC000000:
 			//Coprocessor Data Transfer
 			break;
-		case 0x0E000000:
+		case 0xE000000:
 			if (this.instruction & 0x01000000) {
 				//Software Interrupt
 			}
