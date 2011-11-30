@@ -113,17 +113,17 @@ ARM7TDMI.prototype.checkMOVSPSR = function () {
 }
 ARM7TDMI.prototype.targetRegisterCleanse32 = function (output) {
 	//Make sure we cleanse for the PC assignment:
-	return (this.targetRegister == 15) ? (output & 0xFFFFFFFC) : output;
+	return (this.targetRegister == 15) ? (output & -3) : output;
 }
 ARM7TDMI.prototype.targetRegisterCleanse32Safe = function (output) {
 	//Make sure we cleanse for the PC assignment as well as 32 bit bounding:
-	return (this.targetRegister == 15) ? (output & 0xFFFFFFFC) : (output | 0);
+	return (this.targetRegister == 15) ? (output & -3) : (output | 0);
 }
 ARM7TDMI.prototype.targetRegisterCleanse32andMOVSPSR = function (output) {
 	//Make sure we cleanse for the PC assignment and check for SPSR to CPSR copy:
 	if (this.targetRegister == 15) {
 		this.SPSRtoCPSR();
-		return (output & 0xFFFFFFFC);
+		return (output & -3);
 	}
 	else {
 		return output;
@@ -133,7 +133,7 @@ ARM7TDMI.prototype.targetRegisterCleanse32SafeandMOVSPSR = function (output) {
 	//Make sure we cleanse for the PC assignment and 32 bit bounding and check for SPSR to CPSR copy:
 	if (this.targetRegister == 15) {
 		this.SPSRtoCPSR();
-		return (output & 0xFFFFFFFC);
+		return (output & -3);
 	}
 	else {
 		return (output | 0);
@@ -205,27 +205,27 @@ ARM7TDMI.prototype.branchAndExchange = function () {
 	this.decode = this.fetch = null;
 	if ((this.registers[15] & 0x1) == 0x1) {
 		//THUMB MODE:
-		this.registers[15] &= 0xFFFFFFFE;
+		this.registers[15] &= -2;
 		this.InARM = false;
 	}
 	else {
 		//Stay in ARM mode:
-		this.registers[15] &= 0xFFFFFFFC;
+		this.registers[15] &= -3;
 	}
 }
 ARM7TDMI.prototype.performBranch = function () {
 	//Branch (B)
-	if ((this.instruction & 0x01000000) == 0x01000000) {
+	if ((this.instruction & 0x1000000) == 0x1000000) {
 		//Branch With Link (BL)
 		this.registers[14] = this.registers[15] - 4;	//LR register keeps a copy of the fetch memory address.
 	}
 	if ((this.instruction & 0x800000) == 0x800000) {
 		//Negative Offset:
-		this.registers[15] = (this.registers[15] + ((this.instruction & 0x7FFFFF) << 2) - 0x2000000) & 0xFFFFFFFC;
+		this.registers[15] = (this.registers[15] + ((this.instruction & 0x7FFFFF) << 2) - 0x2000000) & -3;
 	}
 	else {
 		//Positive Offset:
-		this.registers[15] = (this.registers[15] + ((this.instruction & 0x7FFFFF) << 2) & 0xFFFFFFFC;
+		this.registers[15] = (this.registers[15] + ((this.instruction & 0x7FFFFF) << 2) & -3;
 	}
 	//Clear the pipeline:
 	this.decode = this.fetch = null;
@@ -236,7 +236,7 @@ ARM7TDMI.prototype.performDataProcessing = function () {
 	//operand 1 is a value from a register.
 	//operand 2 is an immediate value shifted.
 	this.targetRegister = (this.instruction & 0xF000) >> 12;
-	this.registers[this.targetRegister] = this.dataProcessingImmediate[(this.instruction & 0x01F00000) >> 20](this, this.registers[(this.instruction & 0xF0000) >> 16], this.shiftImmediate(this.instruction & 0xFF, (this.instruction & 0xF00) >> 7));
+	this.registers[this.targetRegister] = this.dataProcessingImmediate[(this.instruction & 0x1F00000) >> 20](this, this.registers[(this.instruction & 0xF0000) >> 16], this.shiftImmediate(this.instruction & 0xFF, (this.instruction & 0xF00) >> 7));
 }
 ARM7TDMI.prototype.conditionCodeTest = function () {
 	switch (this.instruction >> 28) {
@@ -475,10 +475,10 @@ ARM7TDMI.prototype.dataProcessingImmediate = [
 	//SUB S=1
 	function (parentObj, operand1, operand2) {
 		var value = operand1 - operand2;
-		var value_safe = value & 0xFFFFFFFF;
+		var value_safe = value & -1;
 		if (value != value_safe) {
 			parentObj.CPSROverflow = true;
-			parentObj.CPSRCarry = (value > 0xFFFFFFFF || value < -0x100000000);
+			parentObj.CPSRCarry = ((value >>> 0) != (value_safe >>> 0));
 		}
 		else {
 			parentObj.CPSRCarry = parentObj.CPSROverflow = false;
@@ -504,10 +504,10 @@ ARM7TDMI.prototype.dataProcessingImmediate = [
 	//RSB S=1
 	function (parentObj, operand1, operand2) {
 		var value = operand2 - operand1;
-		var value_safe = value & 0xFFFFFFFF;
+		var value_safe = value & -1;
 		if (value != value_safe) {
 			parentObj.CPSROverflow = true;
-			parentObj.CPSRCarry = (value > 0xFFFFFFFF || value < -0x100000000);
+			parentObj.CPSRCarry = ((value >>> 0) != (value_safe >>> 0));
 		}
 		else {
 			parentObj.CPSRCarry = parentObj.CPSROverflow = false;
@@ -533,10 +533,10 @@ ARM7TDMI.prototype.dataProcessingImmediate = [
 	//ADD S=1
 	function (parentObj, operand1, operand2) {
 		var value = operand1 + operand2;
-		var value_safe = value & 0xFFFFFFFF;
+		var value_safe = value & -1;
 		if (value != value_safe) {
 			parentObj.CPSROverflow = true;
-			parentObj.CPSRCarry = (value > 0xFFFFFFFF || value < -0x100000000);
+			parentObj.CPSRCarry = ((value >>> 0) != (value_safe >>> 0));
 		}
 		else {
 			parentObj.CPSRCarry = parentObj.CPSROverflow = false;
@@ -562,10 +562,10 @@ ARM7TDMI.prototype.dataProcessingImmediate = [
 	//ADC S=1
 	function (parentObj, operand1, operand2) {
 		var value = operand1 + operand2 + ((parentObj.CPSRCarry) ? 1 : 0);
-		var value_safe = value & 0xFFFFFFFF;
+		var value_safe = value & -1;
 		if (value != value_safe) {
 			parentObj.CPSROverflow = true;
-			parentObj.CPSRCarry = (value > 0xFFFFFFFF || value < -0x100000000);
+			parentObj.CPSRCarry = ((value >>> 0) != (value_safe >>> 0));
 		}
 		else {
 			parentObj.CPSRCarry = parentObj.CPSROverflow = false;
@@ -591,10 +591,10 @@ ARM7TDMI.prototype.dataProcessingImmediate = [
 	//SBC S=1
 	function (parentObj, operand1, operand2) {
 		var value = operand1 - operand2 - (parentObj.CPSRCarry) ? 0 : 1);
-		var value_safe = value & 0xFFFFFFFF;
+		var value_safe = value & -1;
 		if (value != value_safe) {
 			parentObj.CPSROverflow = true;
-			parentObj.CPSRCarry = (value > 0xFFFFFFFF || value < -0x100000000);
+			parentObj.CPSRCarry = ((value >>> 0) != (value_safe >>> 0));
 		}
 		else {
 			parentObj.CPSRCarry = parentObj.CPSROverflow = false;
@@ -620,10 +620,10 @@ ARM7TDMI.prototype.dataProcessingImmediate = [
 	//RSC S=1
 	function (parentObj, operand1, operand2) {
 		var value = operand2 - operand1 - (parentObj.CPSRCarry) ? 0 : 1);
-		var value_safe = value & 0xFFFFFFFF;
+		var value_safe = value & -1;
 		if (value != value_safe) {
 			parentObj.CPSROverflow = true;
-			parentObj.CPSRCarry = (value > 0xFFFFFFFF || value < -0x100000000);
+			parentObj.CPSRCarry = ((value >>> 0) != (value_safe >>> 0));
 		}
 		else {
 			parentObj.CPSRCarry = parentObj.CPSROverflow = false;
@@ -696,10 +696,10 @@ ARM7TDMI.prototype.dataProcessingImmediate = [
 	//CMP S=1
 	function (parentObj, operand1, operand2) {
 		var value = operand1 - operand2;
-		var value_safe = value & 0xFFFFFFFF;
+		var value_safe = value & -1;
 		if (value != value_safe) {
 			parentObj.CPSROverflow = true;
-			parentObj.CPSRCarry = (value > 0xFFFFFFFF || value < -0x100000000);
+			parentObj.CPSRCarry = ((value >>> 0) != (value_safe >>> 0));
 		}
 		else {
 			parentObj.CPSRCarry = parentObj.CPSROverflow = false;
@@ -726,10 +726,10 @@ ARM7TDMI.prototype.dataProcessingImmediate = [
 	//CMN S=1
 	function (parentObj, operand1, operand2) {
 		var value = operand1 + operand2;
-		var value_safe = value & 0xFFFFFFFF;
+		var value_safe = value & -1;
 		if (value != value_safe) {
 			parentObj.CPSROverflow = true;
-			parentObj.CPSRCarry = (value > 0xFFFFFFFF || value < -0x100000000);
+			parentObj.CPSRCarry = ((value >>> 0) != (value_safe >>> 0));
 		}
 		else {
 			parentObj.CPSRCarry = parentObj.CPSROverflow = false;
