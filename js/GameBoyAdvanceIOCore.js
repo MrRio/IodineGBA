@@ -267,35 +267,64 @@ GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
 		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused
 	];
-	this.compileIODispatch();
+	this.compileIOWriteDispatch();
+	this.compileIOReadDispatch();
 }
-GameBoyAdvanceIO.prototype.compileIODispatch = function () {
+GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.IOWrite = [];
 	//4000000h - DISPCNT - LCD Control (Read/Write)
 	this.IOWrite[0] = function (parentObj, address, data) {
-		parentObj.gfxBGMode = data & 0x07;
-		parentObj.gfxFrameSelect = (data & 0x10) >> 4;
-		parentObj.gfxHBlankIntervalFree = ((data & 0x20) == 0x20);
-		parentObj.gfxVRAMOneDimensional = ((data & 0x40) == 0x40);
-		parentObj.gfxForcedBlank = ((data & 0x80) == 0x80);
+		parentObj.emulatorCore.gfx.BGMode = data & 0x07;
+		parentObj.emulatorCore.gfx.frameSelect = (data & 0x10) >> 4;
+		parentObj.emulatorCore.gfx.HBlankIntervalFree = ((data & 0x20) == 0x20);
+		parentObj.emulatorCore.gfx.VRAMOneDimensional = ((data & 0x40) == 0x40);
+		parentObj.emulatorCore.gfx.forcedBlank = ((data & 0x80) == 0x80);
 	}
 	//4000001h - DISPCNT - LCD Control (Read/Write)
 	this.IOWrite[1] = function (parentObj, address, data) {
-		parentObj.gfxDisplayBG0 = ((data & 0x01) == 0x01);
-		parentObj.gfxDisplayBG1 = ((data & 0x02) == 0x02);
-		parentObj.gfxDisplayBG2 = ((data & 0x04) == 0x04);
-		parentObj.gfxDisplayBG3 = ((data & 0x08) == 0x08);
-		parentObj.gfxDisplayOBJ = ((data & 0x10) == 0x10);
-		parentObj.gfxDisplayWindow0Flag = ((data & 0x20) == 0x20);
-		parentObj.gfxDisplayWindow1Flag = ((data & 0x40) == 0x40);
-		parentObj.gfxDisplayObjectWindowFlag = ((data & 0x80) == 0x80);
+		parentObj.emulatorCore.gfx.displayBG0 = ((data & 0x01) == 0x01);
+		parentObj.emulatorCore.gfx.displayBG1 = ((data & 0x02) == 0x02);
+		parentObj.emulatorCore.gfx.displayBG2 = ((data & 0x04) == 0x04);
+		parentObj.emulatorCore.gfx.displayBG3 = ((data & 0x08) == 0x08);
+		parentObj.emulatorCore.gfx.displayOBJ = ((data & 0x10) == 0x10);
+		parentObj.emulatorCore.gfx.displayWindow0Flag = ((data & 0x20) == 0x20);
+		parentObj.emulatorCore.gfx.displayWindow1Flag = ((data & 0x40) == 0x40);
+		parentObj.emulatorCore.gfx.displayObjectWindowFlag = ((data & 0x80) == 0x80);
 	}
 	//4000002h - Undocumented - Green Swap (R/W)
 	this.IOWrite[2] = function (parentObj, address, data) {
-		parentObj.gfxGreenSwap = ((data & 0x01) == 0x01);
+		parentObj.emulatorCore.gfx.greenSwap = ((data & 0x01) == 0x01);
 	}
 	//4000003h - Nothing:
 	this.IOWrite[3] = this.NOP;
+}
+GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
+	this.IORead = [];
+	//4000000h - DISPCNT - LCD Control (Read/Write)
+	this.IORead[0] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.BGMode |
+		(parentObj.emulatorCore.gfx.frameSelect << 4) |
+		(parentObj.emulatorCore.gfx.HBlankIntervalFree ? 0x20 : 0) | 
+		(parentObj.emulatorCore.gfx.VRAMOneDimensional ? 0x40 : 0) |
+		(parentObj.emulatorCore.gfx.forcedBlank ? 0x80 : 0));
+	}
+	//4000001h - DISPCNT - LCD Control (Read/Write)
+	this.IORead[1] = function (parentObj, address) {
+		return ((parentObj.emulatorCore.gfx.displayBG0 ? 0x1 : 0) |
+		(parentObj.emulatorCore.gfx.displayBG1 ? 0x2 : 0) |
+		(parentObj.emulatorCore.gfx.displayBG2 ? 0x4 : 0) |
+		(parentObj.emulatorCore.gfx.displayBG3 ? 0x8 : 0) |
+		(parentObj.emulatorCore.gfx.displayOBJ ? 0x10 : 0) |
+		(parentObj.emulatorCore.gfx.displayWindow0Flag ? 0x20 : 0) |
+		(parentObj.emulatorCore.gfx.displayWindow1Flag ? 0x40 : 0) |
+		(parentObj.emulatorCore.gfx.displayObjectWindowFlag ? 0x80 : 0));
+	}
+	//4000002h - Undocumented - Green Swap (R/W)
+	this.IORead[2] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.greenSwap ? 0x1 : 0);
+	}
+	//4000003h - Nothing:
+	this.IORead[3] = this.readZero;
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
 	//External WRAM:
@@ -392,6 +421,9 @@ GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address) {
 	else {
 		return parentObj.readUnused(parentObj, address);
 	}
+}
+GameBoyAdvanceIO.prototype.readZero = function (parentObj, address) {
+	return 0;
 }
 GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address) {
 	parentObj.waitStateType = 0;
