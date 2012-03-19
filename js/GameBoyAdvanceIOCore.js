@@ -3,9 +3,10 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.emulatorCore = emulatorCore;
 	//Game Pak Wait State setting:
 	this.waitStateGamePak = 0;
-	//External WRAM Wait State settings:
-	this.waitStateWRAM = 2;					//8 and 16 bit requests
-	this.waitStateWRAMLong = 5;				//32 bit requests (Due to 16 bit data bus)
+	//WRAM Settings:
+	this.waitStateWRAM = 2;					//External WRAM 8 and 16 bit request wait states
+	this.waitStateWRAMLong = 5;				//External WRAM 32 bit request (Due to 16 bit data bus) wait states.
+	this.WRAMConfiguration = [0x20, 0xD];	//WRAM configuration control register current data.
 	//Internal wait state marker for adding clocks later in this core:
 	this.waitStateType = 0;
 }
@@ -129,11 +130,22 @@ GameBoyAdvanceIO.prototype.writeInternalWRAM = function (parentObj, address, dat
 		parentObj.internalRAM[address & 0x7FFF] = data;
 	}
 }
-GameBoyAdvanceIO.prototype.writeIO = function (parentObj, address, data) {
+GameBoyAdvanceIO.prototype.writeInternalWRAMMirrored = function (parentObj, address, data) {
 	parentObj.waitStateType = 0;
-	if (address < 03x008000) {
+	if (address < 0x2040000) {
 		//Internal WRAM:
 		parentObj.internalRAM[address & 0x7FFF] = data;
+	}
+}
+GameBoyAdvanceIO.prototype.writeIO = function (parentObj, address, data) {
+	parentObj.waitStateType = 0;
+	if (address < 0x4000400) {
+		//IO Write:
+		parentObj.internalRAM[address & 0x7FFF](parentObj, address, data);
+	}
+	else if ((address & 0x4FF0800) == 0x4000800) {
+		//WRAM wait state control:
+		parentObj.configureWRAM(address, data);
 	}
 }
 GameBoyAdvanceIO.prototype.writeUnused = function (parentObj, address, data) {
@@ -170,8 +182,21 @@ GameBoyAdvanceIO.prototype.waitStateDelay32 = function () {
 			this.emulatorCore.CPUClocks += this.waitStateWRAMLong;
 	}
 }
-GameBoyAdvanceIO.prototype.setWRAMWaitState = function (data) {
-	//Set by 0x4XX0800:
-	this.waitStateWRAM = data + 1;
-	this.waitStateWRAMLong = (this.waitStateWRAM << 1) + 1
+GameBoyAdvanceIO.prototype.configureWRAM = function (address, data) {
+	switch (address & 0x3) {
+		case 0:
+			this.WRAMConfiguration[0] = data & 0x2F;
+			if ((data & 0x01) == 0) {
+				this.memoryWriter[2] = ((data & 0x20) == 0x20) ? this.writeExternalWRAM : this.writeInternalWRAMMirrored;
+				this.memoryWriter[3] = this.writeInternalWRAM;
+			}
+			else {
+				this.memoryWriter[2] = this.memoryWriter[3] = this.writeUnused;
+			}
+			break;
+		case 3:
+			this.waitStateWRAM = data + 1;
+			this.waitStateWRAMLong = (this.waitStateWRAM << 1) + 1;
+			this.WRAMConfiguration[1] = data;
+	}
 }
