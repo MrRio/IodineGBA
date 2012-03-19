@@ -31,7 +31,7 @@ GameBoyAdvanceIO.prototype.memoryWrite32 = function (address, data) {
 	this.waitStateDelay32();
 }
 GameBoyAdvanceIO.prototype.memoryWrite = function (address, data) {
-	this.memoryWriter[address >> 24](this, address, data);
+	this.memoryWriter[address >>> 24](this, address, data);
 }
 GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 	/*
