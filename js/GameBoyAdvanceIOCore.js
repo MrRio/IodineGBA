@@ -7,6 +7,7 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.waitStateWRAM = 2;					//External WRAM 8 and 16 bit request wait states
 	this.waitStateWRAMLong = 5;				//External WRAM 32 bit request (Due to 16 bit data bus) wait states.
 	this.WRAMConfiguration = [0x20, 0xD];	//WRAM configuration control register current data.
+	this.lastBIOSREAD = [0, 0, 0, 0];		//BIOS read bus last .
 	//Internal wait state marker for adding clocks later in this core:
 	this.waitStateType = 0;
 }
@@ -337,13 +338,15 @@ GameBoyAdvanceIO.prototype.configureWRAM = function (address, data) {
 	}
 }
 GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address, data) {
-	parentObj.waitStateType = 0;
 	if (address < 0x4000) {
+		parentObj.waitStateType = 0;
 		if (parentObj.emulatorCore.register[0x15] < 0x4000) {
+			//If reading from BIOS while executing it:
 			parentObj.lastBIOSREAD[address & 0x3] = parentObj.BIOS[address];
 			return parentObj.BIOS[address];
 		}
 		else {
+			//Not allowed to read from BIOS while executing outside of it:
 			return parentObj.lastBIOSREAD[address & 0x3];
 		}
 	}
