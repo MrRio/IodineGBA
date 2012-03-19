@@ -12,18 +12,18 @@ function GameBoyAdvanceIO(emulatorCore) {
 }
 GameBoyAdvanceIO.prototype.memoryWrite8 = function (address, data) {
 	//Byte Write:
-	this.memoryWrite(address & 0xFFFFFFF, data);
+	this.memoryWrite(address >>> 0, data);
 	this.waitStateDelay8();
 }
 GameBoyAdvanceIO.prototype.memoryWrite16 = function (address, data) {
 	//Half-Word Write:
-	this.memoryWrite(address &= 0xFFFFFFF, data & 0xFF);
+	this.memoryWrite(address >>>= 0, data & 0xFF);
 	this.memoryWrite(address + 1, data >> 8);
 	this.waitStateDelay16();
 }
 GameBoyAdvanceIO.prototype.memoryWrite32 = function (address, data) {
 	//Word Write:
-	this.memoryWrite(address &= 0xFFFFFFF, data & 0xFF);
+	this.memoryWrite(address >>>= 0, data & 0xFF);
 	this.memoryWrite(address + 1, (data >> 8) & 0xFF);
 	this.memoryWrite(address + 2, (data >> 16) & 0xFF);
 	this.memoryWrite(address + 3, data >>> 24);
@@ -107,9 +107,142 @@ GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 		*/
 		this.writeSRAM,
 		/*
-			Unused (0E010000-0FFFFFFF)
+			Unused (0E010000-FFFFFFFF)
 		*/
-		this.writeUnused
+		this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused,
+		this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused, this.writeUnused
+	];
+	this.memoryReader = [
+		/*
+			BIOS Area (00000000-00003FFF)
+			Unused (00004000-01FFFFFF)
+		*/
+		this.readBIOS,
+		/*
+			Unused (00004000-01FFFFFF)
+		*/
+		this.readUnused,
+		/*
+			WRAM - On-board Work RAM (02000000-0203FFFF)
+			Unused (02040000-02FFFFFF)
+		*/
+		this.readExternalWRAM,
+		/*
+			WRAM - In-Chip Work RAM (03000000-03007FFF)
+			Unused (03008000-03FFFFFF)
+		*/
+		this.readInternalWRAM,
+		/*
+			I/O Registers (04000000-040003FE)
+			Unused (04000400-04FFFFFF)
+		*/
+		this.readIO,
+		/*
+			BG/OBJ Palette RAM (05000000-050003FF)
+			Unused (05000400-05FFFFFF)
+		*/
+		this.readPalette,
+		/*
+			VRAM - Video RAM (06000000-06017FFF)
+			Unused (06018000-06FFFFFF)
+		*/
+		this.readVRAM,
+		/*
+			OAM - OBJ Attributes (07000000-070003FF)
+			Unused (07000400-07FFFFFF)
+		*/
+		this.readOAM,
+		/*
+			Game Pak ROM (max 16MB) - Wait State 0 (08000000-08FFFFFF)
+		*/
+		this.readROM0Low,
+		/*
+			Game Pak ROM/FlashROM (max 16MB) - Wait State 0 (09000000-09FFFFFF)
+		*/
+		this.readROM0High,
+		/*
+			Game Pak ROM (max 16MB) - Wait State 1 (0A000000-0AFFFFFF)
+		*/
+		this.readROM1Low,
+		/*
+			Game Pak ROM/FlashROM (max 16MB) - Wait State 1 (0B000000-0BFFFFFF)
+		*/
+		this.readROM1High,
+		/*
+			Game Pak ROM (max 16MB) - Wait State 2 (0C000000-0CFFFFFF)
+		*/
+		this.readROM2Low,
+		/*
+			Game Pak ROM/FlashROM (max 16MB) - Wait State 2 (0D000000-0DFFFFFF)
+		*/
+		this.readROM2High,
+		/*
+			Game Pak SRAM  (max 64 KBytes) - 8bit Bus width (0E000000-0E00FFFF)
+		*/
+		this.readSRAM,
+		/*
+			Unused (0E010000-FFFFFFFF)
+		*/
+		this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused,
+		this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused, this.readUnused
 	];
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
@@ -188,10 +321,13 @@ GameBoyAdvanceIO.prototype.configureWRAM = function (address, data) {
 			this.WRAMConfiguration[0] = data & 0x2F;
 			if ((data & 0x01) == 0) {
 				this.memoryWriter[2] = ((data & 0x20) == 0x20) ? this.writeExternalWRAM : this.writeInternalWRAMMirrored;
+				this.memoryReader[2] = ((data & 0x20) == 0x20) ? this.readExternalWRAM : this.readInternalWRAMMirrored;
 				this.memoryWriter[3] = this.writeInternalWRAM;
+				this.memoryReader[3] = this.readInternalWRAM;
 			}
 			else {
 				this.memoryWriter[2] = this.memoryWriter[3] = this.writeUnused;
+				this.memoryReader[2] = this.memoryReader[3] = this.readUnused;
 			}
 			break;
 		case 3:
@@ -199,4 +335,23 @@ GameBoyAdvanceIO.prototype.configureWRAM = function (address, data) {
 			this.waitStateWRAMLong = (this.waitStateWRAM << 1) + 1;
 			this.WRAMConfiguration[1] = data;
 	}
+}
+GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address, data) {
+	parentObj.waitStateType = 0;
+	if (address < 0x4000) {
+		if (parentObj.emulatorCore.register[0x15] < 0x4000) {
+			parentObj.lastBIOSREAD[address & 0x3] = parentObj.BIOS[address];
+			return parentObj.BIOS[address];
+		}
+		else {
+			return parentObj.lastBIOSREAD[address & 0x3];
+		}
+	}
+	else {
+		return parentObj.readUnused(parentObj, address, data);
+	}
+}
+GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address, data) {
+	parentObj.waitStateType = 0;
+	return parentObj.emulatorCore.fetch >>> ((address & 0x3) << 8);
 }
