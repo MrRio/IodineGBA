@@ -381,7 +381,7 @@ GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address) {
 		parentObj.waitStateType = 0;
 		if (parentObj.emulatorCore.register[0x15] < 0x4000) {
 			//If reading from BIOS while executing it:
-			parentObj.lastBIOSREAD[address & 0x3] = parentObj.BIOS[address];
+			parentObj.lastBIOSREAD[address & 0x3] = parentObj.emulatorCore.registers[0x15];
 			return parentObj.BIOS[address];
 		}
 		else {
