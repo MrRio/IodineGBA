@@ -22,7 +22,7 @@ function GameBoyAdvanceIO(emulatorCore) {
 	//WRAM Settings:
 	this.waitStateWRAM = 2;					//External WRAM 8 and 16 bit request wait states
 	this.waitStateWRAMLong = 5;				//External WRAM 32 bit request (Due to 16 bit data bus) wait states.
-	this.WRAMConfiguration = [0x20, 0xD];	//WRAM configuration control register current data.
+	this.WRAMConfiguration = [0xD, 0x20];	//WRAM configuration control register current data.
 	this.lastBIOSREAD = [0, 0, 0, 0];		//BIOS read bus last.
 	//Internal wait state marker for adding clocks later in this core:
 	this.waitStateType = 0;
