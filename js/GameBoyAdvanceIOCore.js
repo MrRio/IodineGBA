@@ -672,12 +672,12 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x3] = this.readZero;
 	//4000004h - DISPSTAT - General LCD Status (Read/Write)
 	this.readIO[0x4] = function (parentObj, address) {
-		return ((parentObj.emulatorCore.inVBlank ? 0x1 : 0) |
-		(parentObj.emulatorCore.inHBlank ? 0x2 : 0) |
-		(parentObj.emulatorCore.VCounterMatch ? 0x4 : 0) |
-		(parentObj.emulatorCore.IRQVBlank ? 0x8 : 0) |
-		(parentObj.emulatorCore.IRQHBlank ? 0x10 : 0) |
-		(parentObj.emulatorCore.IRQVCounter ? 0x20 : 0));
+		return ((parentObj.emulatorCore.gfx.inVBlank ? 0x1 : 0) |
+		(parentObj.emulatorCore.gfx.inHBlank ? 0x2 : 0) |
+		(parentObj.emulatorCore.gfx.VCounterMatch ? 0x4 : 0) |
+		(parentObj.emulatorCore.gfx.IRQVBlank ? 0x8 : 0) |
+		(parentObj.emulatorCore.gfx.IRQHBlank ? 0x10 : 0) |
+		(parentObj.emulatorCore.gfx.IRQVCounter ? 0x20 : 0));
 	}
 	//4000005h - DISPSTAT - General LCD Status (Read/Write)
 	this.readIO[0x5] = function (parentObj, address) {
