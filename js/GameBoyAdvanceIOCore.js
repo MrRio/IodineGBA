@@ -298,7 +298,7 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[2] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.greenSwap = ((data & 0x01) == 0x01);
 	}
-	//4000003h - Nothing:
+	//4000003h - Undocumented - Green Swap (R/W)
 	this.writeIO[3] = this.NOP;
 	//4000004h - DISPSTAT - General LCD Status (Read/Write)
 	this.writeIO[4] = function (parentObj, address, data) {
