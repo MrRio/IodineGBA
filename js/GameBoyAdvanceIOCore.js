@@ -335,6 +335,62 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[6] = this.NOP;
 	//4000007h - VCOUNT - Vertical Counter (Read only)
 	this.writeIO[7] = this.NOP;
+	//4000008h - BG0CNT - BG0 Control (R/W) (BG Modes 0,1 only)
+	this.writeIO[8] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG0Priority = data & 0x3;
+		parentObj.emulatorCore.gfx.BG0CharacterBaseBlock = (data & 0xC) >> 2;
+		//Bits 5-6 always 0.
+		parentObj.emulatorCore.gfx.BG0Mosaic = ((data & 0x40) == 0x40);
+		parentObj.emulatorCore.gfx.BG0Palette256 = ((data & 0x80) == 0x80);
+	}
+	//4000009h - BG0CNT - BG0 Control (R/W) (BG Modes 0,1 only)
+	this.writeIO[9] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG0ScreenBaseBlock = data & 0x1F;
+		parentObj.emulatorCore.gfx.BG0DisplayOverflow = ((data & 0x20) == 0x20);	//Note: Only applies to BG2/3 supposedly.
+		parentObj.emulatorCore.gfx.BG0ScreenSize = (data & 0xC0) >> 6;
+	}
+	//400000Ah - BG1CNT - BG1 Control (R/W) (BG Modes 0,1 only)
+	this.writeIO[0xA] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG1Priority = data & 0x3;
+		parentObj.emulatorCore.gfx.BG1CharacterBaseBlock = (data & 0xC) >> 2;
+		//Bits 5-6 always 0.
+		parentObj.emulatorCore.gfx.BG1Mosaic = ((data & 0x40) == 0x40);
+		parentObj.emulatorCore.gfx.BG1Palette256 = ((data & 0x80) == 0x80);
+	}
+	//400000Bh - BG1CNT - BG1 Control (R/W) (BG Modes 0,1 only)
+	this.writeIO[0xB] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG1ScreenBaseBlock = data & 0x1F;
+		parentObj.emulatorCore.gfx.BG1DisplayOverflow = ((data & 0x20) == 0x20);	//Note: Only applies to BG2/3 supposedly.
+		parentObj.emulatorCore.gfx.BG1ScreenSize = (data & 0xC0) >> 6;
+	}
+	//400000Ch - BG2CNT - BG2 Control (R/W) (BG Modes 0,1,2 only)
+	this.writeIO[0xC] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG2Priority = data & 0x3;
+		parentObj.emulatorCore.gfx.BG2CharacterBaseBlock = (data & 0xC) >> 2;
+		//Bits 5-6 always 0.
+		parentObj.emulatorCore.gfx.BG2Mosaic = ((data & 0x40) == 0x40);
+		parentObj.emulatorCore.gfx.BG2Palette256 = ((data & 0x80) == 0x80);
+	}
+	//400000Dh - BG2CNT - BG2 Control (R/W) (BG Modes 0,1,2 only)
+	this.writeIO[0xD] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG2ScreenBaseBlock = data & 0x1F;
+		parentObj.emulatorCore.gfx.BG2DisplayOverflow = ((data & 0x20) == 0x20);
+		parentObj.emulatorCore.gfx.BG2ScreenSize = (data & 0xC0) >> 6;
+	}
+	//400000Eh - BG3CNT - BG3 Control (R/W) (BG Modes 0,2 only)
+	this.writeIO[0xE] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG3Priority = data & 0x3;
+		parentObj.emulatorCore.gfx.BG3CharacterBaseBlock = (data & 0xC) >> 2;
+		//Bits 5-6 always 0.
+		parentObj.emulatorCore.gfx.BG3Mosaic = ((data & 0x40) == 0x40);
+		parentObj.emulatorCore.gfx.BG3Palette256 = ((data & 0x80) == 0x80);
+	}
+	//400000Fh - BG3CNT - BG3 Control (R/W) (BG Modes 0,2 only)
+	this.writeIO[0xF] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG3ScreenBaseBlock = data & 0x1F;
+		parentObj.emulatorCore.gfx.BG3DisplayOverflow = ((data & 0x20) == 0x20);
+		parentObj.emulatorCore.gfx.BG3ScreenSize = (data & 0xC0) >> 6;
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
