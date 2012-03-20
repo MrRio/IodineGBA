@@ -315,8 +315,10 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 		//V-Counter match value:
 		parentObj.emulatorCore.gfx.VCounter = data;
 	}
-	//4000006h- VCOUNT - Vertical Counter (Read only)
+	//4000006h - VCOUNT - Vertical Counter (Read only)
 	this.writeIO[6] = this.NOP;
+	//4000007h - VCOUNT - Vertical Counter (Read only)
+	this.writeIO[7] = this.NOP;
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -343,7 +345,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[2] = function (parentObj, address) {
 		return (parentObj.emulatorCore.gfx.greenSwap ? 0x1 : 0);
 	}
-	//4000003h - Nothing:
+	//4000003h - Undocumented - Green Swap (R/W)
 	this.readIO[3] = this.readZero;
 	//4000004h - DISPSTAT - General LCD Status (Read/Write)
 	this.readIO[4] = function (parentObj, address) {
@@ -362,6 +364,8 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[6] = function (parentObj, address) {
 		return parentObj.emulatorCore.gfx.currentScanLine;
 	}
+	//4000007h - VCOUNT - Vertical Counter (Read only)
+	this.readIO[7] = this.readZero;
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
 	//External WRAM:
