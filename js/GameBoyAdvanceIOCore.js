@@ -35,22 +35,25 @@ GameBoyAdvanceIO.prototype.memoryWrite = function (address, data) {
 }
 GameBoyAdvanceIO.prototype.memoryRead8 = function (address) {
 	//Byte Write:
-	this.memoryRead(address >>> 0);
+	var data8 = this.memoryRead(address >>> 0);
 	this.waitStateDelay8();
+	return data8;
 }
 GameBoyAdvanceIO.prototype.memoryRead16 = function (address) {
 	//Half-Word Write:
-	this.memoryRead(address >>>= 0);
-	this.memoryRead(address + 1);
+	var data16 = this.memoryRead(address >>>= 0);
+	data16 |= this.memoryRead(address + 1) << 8;
 	this.waitStateDelay16();
+	return data16;
 }
 GameBoyAdvanceIO.prototype.memoryRead32 = function (address) {
 	//Word Write:
-	this.memoryRead(address >>>= 0);
-	this.memoryRead(address + 1);
-	this.memoryRead(address + 2);
-	this.memoryRead(address + 3);
+	var data32 = this.memoryRead(address >>>= 0);
+	data32 |= this.memoryRead(address + 1);
+	data32 |= this.memoryRead(address + 2);
+	data32 |= this.memoryRead(address + 3);
 	this.waitStateDelay32();
+	return data32;
 }
 GameBoyAdvanceIO.prototype.memoryRead = function (address) {
 	return this.memoryReader[address >>> 24](this, address);
@@ -271,9 +274,9 @@ GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 	this.compileIOReadDispatch();
 }
 GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
-	this.IOWrite = [];
+	this.writeIO = [];
 	//4000000h - DISPCNT - LCD Control (Read/Write)
-	this.IOWrite[0] = function (parentObj, address, data) {
+	this.writeIO[0] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.BGMode = data & 0x07;
 		parentObj.emulatorCore.gfx.frameSelect = (data & 0x10) >> 4;
 		parentObj.emulatorCore.gfx.HBlankIntervalFree = ((data & 0x20) == 0x20);
@@ -281,7 +284,7 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 		parentObj.emulatorCore.gfx.forcedBlank = ((data & 0x80) == 0x80);
 	}
 	//4000001h - DISPCNT - LCD Control (Read/Write)
-	this.IOWrite[1] = function (parentObj, address, data) {
+	this.writeIO[1] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.displayBG0 = ((data & 0x01) == 0x01);
 		parentObj.emulatorCore.gfx.displayBG1 = ((data & 0x02) == 0x02);
 		parentObj.emulatorCore.gfx.displayBG2 = ((data & 0x04) == 0x04);
@@ -292,16 +295,33 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 		parentObj.emulatorCore.gfx.displayObjectWindowFlag = ((data & 0x80) == 0x80);
 	}
 	//4000002h - Undocumented - Green Swap (R/W)
-	this.IOWrite[2] = function (parentObj, address, data) {
+	this.writeIO[2] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.greenSwap = ((data & 0x01) == 0x01);
 	}
 	//4000003h - Nothing:
-	this.IOWrite[3] = this.NOP;
+	this.writeIO[3] = this.NOP;
+	//4000004h - DISPSTAT - General LCD Status (Read/Write)
+	this.writeIO[4] = function (parentObj, address, data) {
+		//VBlank flag read only.
+		//HBlank flag read only.
+		//V-Counter flag read only.
+		//Only LCD IRQ generation enablers can be set here:
+		parentObj.emulatorCore.gfx.IRQVBlank = ((data & 0x08) == 0x08);
+		parentObj.emulatorCore.gfx.IRQHBlank = ((data & 0x10) == 0x10);
+		parentObj.emulatorCore.gfx.IRQVCounter = ((data & 0x20) == 0x20);
+	}
+	//4000005h - DISPSTAT - General LCD Status (Read/Write)
+	this.writeIO[5] = function (parentObj, address, data) {
+		//V-Counter match value:
+		parentObj.emulatorCore.gfx.VCounter = data;
+	}
+	//4000006h- VCOUNT - Vertical Counter (Read only)
+	this.writeIO[6] = this.NOP;
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
-	this.IORead = [];
+	this.readIO = [];
 	//4000000h - DISPCNT - LCD Control (Read/Write)
-	this.IORead[0] = function (parentObj, address) {
+	this.readIO[0] = function (parentObj, address) {
 		return (parentObj.emulatorCore.gfx.BGMode |
 		(parentObj.emulatorCore.gfx.frameSelect << 4) |
 		(parentObj.emulatorCore.gfx.HBlankIntervalFree ? 0x20 : 0) | 
@@ -309,7 +329,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		(parentObj.emulatorCore.gfx.forcedBlank ? 0x80 : 0));
 	}
 	//4000001h - DISPCNT - LCD Control (Read/Write)
-	this.IORead[1] = function (parentObj, address) {
+	this.readIO[1] = function (parentObj, address) {
 		return ((parentObj.emulatorCore.gfx.displayBG0 ? 0x1 : 0) |
 		(parentObj.emulatorCore.gfx.displayBG1 ? 0x2 : 0) |
 		(parentObj.emulatorCore.gfx.displayBG2 ? 0x4 : 0) |
@@ -320,11 +340,28 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		(parentObj.emulatorCore.gfx.displayObjectWindowFlag ? 0x80 : 0));
 	}
 	//4000002h - Undocumented - Green Swap (R/W)
-	this.IORead[2] = function (parentObj, address) {
+	this.readIO[2] = function (parentObj, address) {
 		return (parentObj.emulatorCore.gfx.greenSwap ? 0x1 : 0);
 	}
 	//4000003h - Nothing:
-	this.IORead[3] = this.readZero;
+	this.readIO[3] = this.readZero;
+	//4000004h - DISPSTAT - General LCD Status (Read/Write)
+	this.readIO[4] = function (parentObj, address) {
+		return ((parentObj.emulatorCore.inVBlank ? 0x1 : 0) |
+		(parentObj.emulatorCore.inHBlank ? 0x2 : 0) |
+		(parentObj.emulatorCore.VCounterMatch ? 0x4 : 0) |
+		(parentObj.emulatorCore.IRQVBlank ? 0x8 : 0) |
+		(parentObj.emulatorCore.IRQHBlank ? 0x10 : 0) |
+		(parentObj.emulatorCore.IRQVCounter ? 0x20 : 0));
+	}
+	//4000005h - DISPSTAT - General LCD Status (Read/Write)
+	this.readIO[5] = function (parentObj, address) {
+		return parentObj.emulatorCore.gfx.VCounter;
+	}
+	//4000006h - VCOUNT - Vertical Counter (Read only)
+	this.readIO[6] = function (parentObj, address) {
+		return parentObj.emulatorCore.gfx.currentScanLine;
+	}
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
 	//External WRAM:
