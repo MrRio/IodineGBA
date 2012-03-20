@@ -438,6 +438,58 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	}
 	//4000007h - VCOUNT - Vertical Counter (Read only)
 	this.readIO[7] = this.readZero;
+	//4000008h - BG0CNT - BG0 Control (R/W) (BG Modes 0,1 only)
+	this.readIO[8] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.BG0Priority |
+		(parentObj.emulatorCore.gfx.BG0CharacterBaseBlock << 2) |
+		(parentObj.emulatorCore.gfx.BG0Mosaic ? 0x40 : 0) | 
+		(parentObj.emulatorCore.gfx.BG0Palette256 ? 0x80 : 0));
+	}
+	//4000009h - BG0CNT - BG0 Control (R/W) (BG Modes 0,1 only)
+	this.readIO[9] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.BG0ScreenBaseBlock |
+		(parentObj.emulatorCore.gfx.BG0DisplayOverflow ? 0x20 : 0) |
+		(parentObj.emulatorCore.gfx.BG0ScreenSize << 6));
+	}
+	//400000Ah - BG1CNT - BG1 Control (R/W) (BG Modes 0,1 only)
+	this.readIO[0xA] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.BG1Priority |
+		(parentObj.emulatorCore.gfx.BG1CharacterBaseBlock << 2) |
+		(parentObj.emulatorCore.gfx.BG1Mosaic ? 0x40 : 0) | 
+		(parentObj.emulatorCore.gfx.BG1Palette256 ? 0x80 : 0));
+	}
+	//400000Bh - BG1CNT - BG1 Control (R/W) (BG Modes 0,1 only)
+	this.readIO[0xB] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.BG1ScreenBaseBlock |
+		(parentObj.emulatorCore.gfx.BG1DisplayOverflow ? 0x20 : 0) |
+		(parentObj.emulatorCore.gfx.BG1ScreenSize << 6));
+	}
+	//400000Ch - BG2CNT - BG2 Control (R/W) (BG Modes 0,1,2 only)
+	this.readIO[0xC] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.BG2Priority |
+		(parentObj.emulatorCore.gfx.BG2CharacterBaseBlock << 2) |
+		(parentObj.emulatorCore.gfx.BG2Mosaic ? 0x40 : 0) | 
+		(parentObj.emulatorCore.gfx.BG2Palette256 ? 0x80 : 0));
+	}
+	//400000Dh - BG2CNT - BG2 Control (R/W) (BG Modes 0,1,2 only)
+	this.readIO[0xD] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.BG2ScreenBaseBlock |
+		(parentObj.emulatorCore.gfx.BG2DisplayOverflow ? 0x20 : 0) |
+		(parentObj.emulatorCore.gfx.BG2ScreenSize << 6));
+	}
+	//400000Eh - BG3CNT - BG3 Control (R/W) (BG Modes 0,2 only)
+	this.readIO[0xE] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.BG3Priority |
+		(parentObj.emulatorCore.gfx.BG3CharacterBaseBlock << 2) |
+		(parentObj.emulatorCore.gfx.BG3Mosaic ? 0x40 : 0) | 
+		(parentObj.emulatorCore.gfx.BG3Palette256 ? 0x80 : 0));
+	}
+	//400000Fh - BG3CNT - BG3 Control (R/W) (BG Modes 0,2 only)
+	this.readIO[0xF] = function (parentObj, address) {
+		return (parentObj.emulatorCore.gfx.BG3ScreenBaseBlock |
+		(parentObj.emulatorCore.gfx.BG3DisplayOverflow ? 0x20 : 0) |
+		(parentObj.emulatorCore.gfx.BG3ScreenSize << 6));
+	}
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
 	//External WRAM:
