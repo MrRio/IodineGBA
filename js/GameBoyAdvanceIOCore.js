@@ -391,6 +391,70 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 		parentObj.emulatorCore.gfx.BG3DisplayOverflow = ((data & 0x20) == 0x20);
 		parentObj.emulatorCore.gfx.BG3ScreenSize = (data & 0xC0) >> 6;
 	}
+	//4000010h - BG0HOFS - BG0 X-Offset (W)
+	this.writeIO[0x10] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG0XCoord = (parentObj.emulatorCore.gfx.BG0XCoord & 0x100) | data;
+	}
+	//4000011h - BG0HOFS - BG0 X-Offset (W)
+	this.writeIO[0x11] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG0XCoord = ((data & 0x01) << 8) | (parentObj.emulatorCore.gfx.BG0XCoord & 0xFF);
+	}
+	//4000012h - BG0VOFS - BG0 Y-Offset (W)
+	this.writeIO[0x12] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG0YCoord = (parentObj.emulatorCore.gfx.BG0YCoord & 0x100) | data;
+	}
+	//4000013h - BG0VOFS - BG0 Y-Offset (W)
+	this.writeIO[0x13] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG0YCoord = ((data & 0x01) << 8) | (parentObj.emulatorCore.gfx.BG0YCoord & 0xFF);
+	}
+	//4000014h - BG1HOFS - BG1 X-Offset (W)
+	this.writeIO[0x14] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG1XCoord = (parentObj.emulatorCore.gfx.BG1XCoord & 0x100) | data;
+	}
+	//4000015h - BG1HOFS - BG1 X-Offset (W)
+	this.writeIO[0x15] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG1XCoord = ((data & 0x01) << 8) | (parentObj.emulatorCore.gfx.BG1XCoord & 0xFF);
+	}
+	//4000016h - BG1VOFS - BG1 Y-Offset (W)
+	this.writeIO[0x16] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG1YCoord = (parentObj.emulatorCore.gfx.BG1YCoord & 0x100) | data;
+	}
+	//4000017h - BG1VOFS - BG1 Y-Offset (W)
+	this.writeIO[0x17] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG1YCoord = ((data & 0x01) << 8) | (parentObj.emulatorCore.gfx.BG1YCoord & 0xFF);
+	}
+	//4000018h - BG2HOFS - BG2 X-Offset (W)
+	this.writeIO[0x18] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG2XCoord = (parentObj.emulatorCore.gfx.BG2XCoord & 0x100) | data;
+	}
+	//4000019h - BG2HOFS - BG2 X-Offset (W)
+	this.writeIO[0x19] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG2XCoord = ((data & 0x01) << 8) | (parentObj.emulatorCore.gfx.BG2XCoord & 0xFF);
+	}
+	//400001Ah - BG2VOFS - BG2 Y-Offset (W)
+	this.writeIO[0x1A] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG2YCoord = (parentObj.emulatorCore.gfx.BG2YCoord & 0x100) | data;
+	}
+	//400001Bh - BG2VOFS - BG2 Y-Offset (W)
+	this.writeIO[0x1B] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG2YCoord = ((data & 0x01) << 8) | (parentObj.emulatorCore.gfx.BG2YCoord & 0xFF);
+	}
+	//400001Ch - BG3HOFS - BG3 X-Offset (W)
+	this.writeIO[0x1C] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG3XCoord = (parentObj.emulatorCore.gfx.BG3XCoord & 0x100) | data;
+	}
+	//400001Dh - BG3HOFS - BG3 X-Offset (W)
+	this.writeIO[0x1D] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG3XCoord = ((data & 0x01) << 8) | (parentObj.emulatorCore.gfx.BG3XCoord & 0xFF);
+	}
+	//400001Eh - BG3VOFS - BG3 Y-Offset (W)
+	this.writeIO[0x1E] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG3YCoord = (parentObj.emulatorCore.gfx.BG3YCoord & 0x100) | data;
+	}
+	//400001Fh - BG3VOFS - BG3 Y-Offset (W)
+	this.writeIO[0x1F] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.BG3YCoord = ((data & 0x01) << 8) | (parentObj.emulatorCore.gfx.BG3YCoord & 0xFF);
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -490,6 +554,38 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		(parentObj.emulatorCore.gfx.BG3DisplayOverflow ? 0x20 : 0) |
 		(parentObj.emulatorCore.gfx.BG3ScreenSize << 6));
 	}
+	//4000010h - BG0HOFS - BG0 X-Offset (W)
+	this.readIO[0x10] = this.readZero;
+	//4000011h - BG0HOFS - BG0 X-Offset (W)
+	this.readIO[0x11] = this.readZero;
+	//4000012h - BG0VOFS - BG0 Y-Offset (W)
+	this.readIO[0x12] = this.readZero;
+	//4000013h - BG0VOFS - BG0 Y-Offset (W)
+	this.readIO[0x13] = this.readZero;
+	//4000014h - BG1HOFS - BG1 X-Offset (W)
+	this.readIO[0x14] = this.readZero;
+	//4000015h - BG1HOFS - BG1 X-Offset (W)
+	this.readIO[0x15] = this.readZero;
+	//4000016h - BG1VOFS - BG1 Y-Offset (W)
+	this.readIO[0x16] = this.readZero;
+	//4000017h - BG1VOFS - BG1 Y-Offset (W)
+	this.readIO[0x17] = this.readZero;
+	//4000018h - BG2HOFS - BG2 X-Offset (W)
+	this.readIO[0x18] = this.readZero;
+	//4000019h - BG2HOFS - BG2 X-Offset (W)
+	this.readIO[0x19] = this.readZero;
+	//400001Ah - BG2VOFS - BG2 Y-Offset (W)
+	this.readIO[0x1A] = this.readZero;
+	//400001Bh - BG2VOFS - BG2 Y-Offset (W)
+	this.readIO[0x1B] = this.readZero;
+	//400001Ch - BG3HOFS - BG3 X-Offset (W)
+	this.readIO[0x1C] = this.readZero;
+	//400001Dh - BG3HOFS - BG3 X-Offset (W)
+	this.readIO[0x1D] = this.readZero;
+	//400001Eh - BG3VOFS - BG3 Y-Offset (W)
+	this.readIO[0x1E] = this.readZero;
+	//400001Fh - BG3VOFS - BG3 Y-Offset (W)
+	this.readIO[0x1F] = this.readZero;
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
 	//External WRAM:
