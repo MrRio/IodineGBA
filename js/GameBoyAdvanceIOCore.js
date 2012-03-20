@@ -49,9 +49,9 @@ GameBoyAdvanceIO.prototype.memoryRead16 = function (address) {
 GameBoyAdvanceIO.prototype.memoryRead32 = function (address) {
 	//Word Write:
 	var data32 = this.memoryRead(address >>>= 0);
-	data32 |= this.memoryRead(address + 1);
-	data32 |= this.memoryRead(address + 2);
-	data32 |= this.memoryRead(address + 3);
+	data32 |= this.memoryRead(address + 1) << 8;
+	data32 |= this.memoryRead(address + 2) << 16;
+	data32 |= this.memoryRead(address + 3) << 24;
 	this.waitStateDelay32();
 	return data32;
 }
