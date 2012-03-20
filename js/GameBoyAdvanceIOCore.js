@@ -553,6 +553,7 @@ GameBoyAdvanceIO.prototype.configureWRAM = function (address, data) {
 	switch (address & 0x3) {
 		case 3:
 			this.WRAMConfiguration[0] = data & 0x2F;
+			//We're overwriting the master dispatch table for address decoding to handle the new RAM access cases:
 			if ((data & 0x01) == 0) {
 				this.memoryWriter[2] = ((data & 0x20) == 0x20) ? this.writeExternalWRAM : this.writeInternalWRAM;
 				this.memoryReader[2] = ((data & 0x20) == 0x20) ? this.readExternalWRAM : this.readInternalWRAM;
