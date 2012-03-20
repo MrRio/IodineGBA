@@ -773,6 +773,38 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x1E] = this.readZero;
 	//400001Fh - BG3VOFS - BG3 Y-Offset (W)
 	this.readIO[0x1F] = this.readZero;
+	//4000020h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
+	this.readIO[0x20] = this.readZero;
+	//4000021h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
+	this.readIO[0x21] = this.readZero;
+	//4000022h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
+	this.readIO[0x22] = this.readZero;
+	//4000023h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
+	this.readIO[0x23] = this.readZero;
+	//4000024h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
+	this.readIO[0x24] = this.readZero;
+	//4000025h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
+	this.readIO[0x25] = this.readZero;
+	//4000026h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
+	this.readIO[0x26] = this.readZero;
+	//4000027h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
+	this.readIO[0x27] = this.readZero;
+	//4000028h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
+	this.readIO[0x28] = this.readZero;
+	//4000029h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
+	this.readIO[0x29] = this.readZero;
+	//400002Ah - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
+	this.readIO[0x2A] = this.readZero;
+	//400002Bh - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
+	this.readIO[0x2B] = this.readZero;
+	//400002Ch - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
+	this.readIO[0x2C] = this.readZero;
+	//400002Dh - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
+	this.readIO[0x2D] = this.readZero;
+	//400002Eh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
+	this.readIO[0x2E] = this.readZero;
+	//400002Fh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
+	this.readIO[0x2F] = this.readZero;
 	//4000030h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
 	this.readIO[0x30] = this.readZero;
 	//4000031h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
