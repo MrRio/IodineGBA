@@ -1,3 +1,19 @@
+/* 
+ * This file is part of IodineGBA
+ *
+ * Copyright (C) 2012 Grant Galitz
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ * The full license is available at http://www.gnu.org/licenses/gpl.html
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ */
 function GameBoyAdvanceIO(emulatorCore) {
 	//Reference to the emulator core:
 	this.emulatorCore = emulatorCore;
@@ -7,7 +23,7 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.waitStateWRAM = 2;					//External WRAM 8 and 16 bit request wait states
 	this.waitStateWRAMLong = 5;				//External WRAM 32 bit request (Due to 16 bit data bus) wait states.
 	this.WRAMConfiguration = [0x20, 0xD];	//WRAM configuration control register current data.
-	this.lastBIOSREAD = [0, 0, 0, 0];		//BIOS read bus last .
+	this.lastBIOSREAD = [0, 0, 0, 0];		//BIOS read bus last.
 	//Internal wait state marker for adding clocks later in this core:
 	this.waitStateType = 0;
 }
