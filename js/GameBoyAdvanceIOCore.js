@@ -104,7 +104,7 @@ GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 			I/O Registers (04000000-040003FE)
 			Unused (04000400-04FFFFFF)
 		*/
-		this.writeIO,
+		this.writeIODispatch,
 		/*
 			BG/OBJ Palette RAM (05000000-050003FF)
 			Unused (05000400-05FFFFFF)
@@ -207,7 +207,7 @@ GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 			I/O Registers (04000000-040003FE)
 			Unused (04000400-04FFFFFF)
 		*/
-		this.readIO,
+		this.readIODispatch,
 		/*
 			BG/OBJ Palette RAM (05000000-050003FF)
 			Unused (05000400-05FFFFFF)
@@ -597,7 +597,7 @@ GameBoyAdvanceIO.prototype.writeInternalWRAM = function (parentObj, address, dat
 	parentObj.internalRAM[address & 0x7FFF] = data;
 	parentObj.waitStateType = 0;
 }
-GameBoyAdvanceIO.prototype.writeIO = function (parentObj, address, data) {
+GameBoyAdvanceIO.prototype.writeIODispatch = function (parentObj, address, data) {
 	parentObj.waitStateType = 0;
 	if (address < 0x4000400) {
 		//IO Write:
@@ -605,7 +605,7 @@ GameBoyAdvanceIO.prototype.writeIO = function (parentObj, address, data) {
 	}
 	else if ((address & 0x4FF0800) == 0x4000800) {
 		//WRAM wait state control:
-		parentObj.configureWRAM(address, data);
+		parentObj.writeConfigureWRAM(address, data);
 	}
 }
 GameBoyAdvanceIO.prototype.NOP = function (parentObj, address, data) {
@@ -645,10 +645,10 @@ GameBoyAdvanceIO.prototype.waitStateDelay32 = function () {
 			this.emulatorCore.CPUClocks += this.waitStateWRAMLong;
 	}
 }
-GameBoyAdvanceIO.prototype.configureWRAM = function (address, data) {
+GameBoyAdvanceIO.prototype.writeConfigureWRAM = function (address, data) {
 	switch (address & 0x3) {
 		case 3:
-			this.WRAMConfiguration[0] = data & 0x2F;
+			this.WRAMConfiguration[1] = data & 0x2F;
 			//We're overwriting the master dispatch table for address decoding to handle the new RAM access cases:
 			if ((data & 0x01) == 0) {
 				this.memoryWriter[2] = ((data & 0x20) == 0x20) ? this.writeExternalWRAM : this.writeInternalWRAM;
@@ -664,7 +664,7 @@ GameBoyAdvanceIO.prototype.configureWRAM = function (address, data) {
 		case 0:
 			this.waitStateWRAM = data + 1;
 			this.waitStateWRAMLong = (this.waitStateWRAM << 1) + 1;
-			this.WRAMConfiguration[1] = data;
+			this.WRAMConfiguration[0] = data;
 	}
 }
 GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address) {
@@ -684,10 +684,37 @@ GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address) {
 		return parentObj.readUnused(parentObj, address);
 	}
 }
+GameBoyAdvanceIO.prototype.readIODispatch = function (parentObj, address, data) {
+	if (address < 0x4000400) {
+		//IO Write:
+		parentObj.waitStateType = 0;
+		return parentObj.readIO[address & 0x3FF](parentObj, address);
+	}
+	else if ((address & 0x4FF0800) == 0x4000800) {
+		//WRAM wait state control:
+		parentObj.waitStateType = 0;
+		return parentObj.readConfigureWRAM(address);
+	}
+	else {
+		return parentObj.readUnused(parentObj, address);
+	}
+}
+GameBoyAdvanceIO.prototype.readConfigureWRAM = function (address) {
+	switch (address & 0x3) {
+		case 3:
+			return this.WRAMConfiguration[1];
+			break;
+		case 0:
+			return this.WRAMConfiguration[0];
+			break;
+		default:
+			return 0;
+	}
+}
 GameBoyAdvanceIO.prototype.readZero = function (parentObj, address) {
 	return 0;
 }
 GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address) {
 	parentObj.waitStateType = 0;
-	return parentObj.emulatorCore.fetch >>> ((address & 0x3) << 8);
+	return (parentObj.emulatorCore.fetch >>> ((address & 0x3) << 8)) & 0xFF;
 }
