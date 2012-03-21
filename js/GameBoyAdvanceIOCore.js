@@ -25,18 +25,18 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.WRAMConfiguration = [0xD, 0x20];	//WRAM configuration control register current data.
 	this.lastBIOSREAD = [0, 0, 0, 0];		//BIOS read bus last.
 	//Internal wait state marker for adding clocks later in this core:
-	this.waitStateType = 0;
+	this.memoryAccessType = 0;
 }
 GameBoyAdvanceIO.prototype.memoryWrite8 = function (address, data) {
 	//Byte Write:
 	this.memoryWrite(address >>> 0, data);
-	this.waitStateDelay8();
+	this.accessPostProcess8[this.memoryAccessType](this);
 }
 GameBoyAdvanceIO.prototype.memoryWrite16 = function (address, data) {
 	//Half-Word Write:
 	this.memoryWrite(address >>>= 0, data & 0xFF);
 	this.memoryWrite(address + 1, data >> 8);
-	this.waitStateDelay16();
+	this.accessPostProcess16[this.memoryAccessType](this);
 }
 GameBoyAdvanceIO.prototype.memoryWrite32 = function (address, data) {
 	//Word Write:
@@ -44,7 +44,7 @@ GameBoyAdvanceIO.prototype.memoryWrite32 = function (address, data) {
 	this.memoryWrite(address + 1, (data >> 8) & 0xFF);
 	this.memoryWrite(address + 2, (data >> 16) & 0xFF);
 	this.memoryWrite(address + 3, data >>> 24);
-	this.waitStateDelay32();
+	this.accessPostProcess32[this.memoryAccessType](this);
 }
 GameBoyAdvanceIO.prototype.memoryWrite = function (address, data) {
 	this.memoryWriter[address >>> 24](this, address, data);
@@ -52,14 +52,14 @@ GameBoyAdvanceIO.prototype.memoryWrite = function (address, data) {
 GameBoyAdvanceIO.prototype.memoryRead8 = function (address) {
 	//Byte Write:
 	var data8 = this.memoryRead(address >>> 0);
-	this.waitStateDelay8();
+	this.accessPostProcess8[this.memoryAccessType](this);
 	return data8;
 }
 GameBoyAdvanceIO.prototype.memoryRead16 = function (address) {
 	//Half-Word Write:
 	var data16 = this.memoryRead(address >>>= 0);
 	data16 |= this.memoryRead(address + 1) << 8;
-	this.waitStateDelay16();
+	this.accessPostProcess16[this.memoryAccessType](this);
 	return data16;
 }
 GameBoyAdvanceIO.prototype.memoryRead32 = function (address) {
@@ -68,7 +68,7 @@ GameBoyAdvanceIO.prototype.memoryRead32 = function (address) {
 	data32 |= this.memoryRead(address + 1) << 8;
 	data32 |= this.memoryRead(address + 2) << 16;
 	data32 |= this.memoryRead(address + 3) << 24;
-	this.waitStateDelay32();
+	this.accessPostProcess32[this.memoryAccessType](this);
 	return data32;
 }
 GameBoyAdvanceIO.prototype.memoryRead = function (address) {
@@ -288,6 +288,7 @@ GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 	];
 	this.compileIOWriteDispatch();
 	this.compileIOReadDispatch();
+	this.compileMemoryAccessPostProcessDispatch();
 }
 GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO = [];
@@ -526,41 +527,49 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x28] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2ReferenceX = (parentObj.emulatorCore.gfx.BG2ReferenceX & 0xFFFFF00) | data;
+		parentObj.memoryAccessType = 2;
 	}
 	//4000029h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
 	this.writeIO[0x29] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2ReferenceX = (data << 8) | (parentObj.emulatorCore.gfx.BG2ReferenceX & 0xFFF00FF);
+		parentObj.memoryAccessType = 2;
 	}
 	//400002Ah - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
 	this.writeIO[0x2A] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2ReferenceX = (data << 16) | (parentObj.emulatorCore.gfx.BG2ReferenceX & 0xF00FFFF);
+		parentObj.memoryAccessType = 2;
 	}
 	//400002Bh - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
 	this.writeIO[0x2B] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2ReferenceX = ((data & 0xF) << 24) | (parentObj.emulatorCore.gfx.BG2ReferenceX & 0xFFFFFF);
+		parentObj.memoryAccessType = 2;
 	}
 	//400002Ch - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
 	this.writeIO[0x2C] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2ReferenceY = (parentObj.emulatorCore.gfx.BG2ReferenceY & 0xFFFFF00) | data;
+		parentObj.memoryAccessType = 3;
 	}
 	//400002Dh - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
 	this.writeIO[0x2D] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2ReferenceY = (data << 8) | (parentObj.emulatorCore.gfx.BG2ReferenceY & 0xFFF00FF);
+		parentObj.memoryAccessType = 3;
 	}
 	//400002Eh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.writeIO[0x2E] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2ReferenceY = (data << 16) | (parentObj.emulatorCore.gfx.BG2ReferenceY & 0xF00FFFF);
+		parentObj.memoryAccessType = 3;
 	}
 	//400002Fh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.writeIO[0x2F] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2ReferenceY = ((data & 0xF) << 24) | (parentObj.emulatorCore.gfx.BG2ReferenceY & 0xFFFFFF);
+		parentObj.memoryAccessType = 3;
 	}
 	//4000030h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
 	this.writeIO[0x30] = function (parentObj, address, data) {
@@ -606,41 +615,49 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x38] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3ReferenceX = (parentObj.emulatorCore.gfx.BG3ReferenceX & 0xFFFFF00) | data;
+		parentObj.memoryAccessType = 4;
 	}
 	//4000039h - BG3X_L - BG3 Reference Point X-Coordinate, lower 16 bit (W)
 	this.writeIO[0x39] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3ReferenceX = (data << 8) | (parentObj.emulatorCore.gfx.BG3ReferenceX & 0xFFF00FF);
+		parentObj.memoryAccessType = 4;
 	}
 	//400003Ah - BG3X_H - BG3 Reference Point X-Coordinate, upper 12 bit (W)
 	this.writeIO[0x3A] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3ReferenceX = (data << 16) | (parentObj.emulatorCore.gfx.BG3ReferenceX & 0xF00FFFF);
+		parentObj.memoryAccessType = 4;
 	}
 	//400003Bh - BG3X_H - BG3 Reference Point X-Coordinate, upper 12 bit (W)
 	this.writeIO[0x3B] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3ReferenceX = ((data & 0xF) << 24) | (parentObj.emulatorCore.gfx.BG3ReferenceX & 0xFFFFFF);
+		parentObj.memoryAccessType = 4;
 	}
 	//400003Ch - BG3Y_L - BG3 Reference Point Y-Coordinate, lower 16 bit (W)
 	this.writeIO[0x3C] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3ReferenceY = (parentObj.emulatorCore.gfx.BG3ReferenceY & 0xFFFFF00) | data;
+		parentObj.memoryAccessType = 5;
 	}
 	//400003Dh - BGY_L - BG3 Reference Point Y-Coordinate, lower 16 bit (W)
 	this.writeIO[0x3D] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3ReferenceY = (data << 8) | (parentObj.emulatorCore.gfx.BG3ReferenceY & 0xFFF00FF);
+		parentObj.memoryAccessType = 5;
 	}
 	//400003Eh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.writeIO[0x3E] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3ReferenceY = (data << 16) | (parentObj.emulatorCore.gfx.BG3ReferenceY & 0xF00FFFF);
+		parentObj.memoryAccessType = 5;
 	}
 	//400003Fh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.writeIO[0x3F] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3ReferenceY = ((data & 0xF) << 24) | (parentObj.emulatorCore.gfx.BG3ReferenceY & 0xFFFFFF);
+		parentObj.memoryAccessType = 5;
 	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
@@ -841,15 +858,15 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
 	//External WRAM:
 	parentObj.externalRAM[address & 0x3FFFF] = data;
-	parentObj.waitStateType = 1;
+	parentObj.memoryAccessType = 1;
 }
 GameBoyAdvanceIO.prototype.writeInternalWRAM = function (parentObj, address, data) {
 	//Internal WRAM:
 	parentObj.internalRAM[address & 0x7FFF] = data;
-	parentObj.waitStateType = 0;
+	parentObj.memoryAccessType = 0;
 }
 GameBoyAdvanceIO.prototype.writeIODispatch = function (parentObj, address, data) {
-	parentObj.waitStateType = 0;
+	parentObj.memoryAccessType = 0;
 	if (address < 0x4000400) {
 		//IO Write:
 		parentObj.writeIO[address & 0x3FF](parentObj, address, data);
@@ -863,37 +880,39 @@ GameBoyAdvanceIO.prototype.NOP = function (parentObj, address, data) {
 	//Ignore the data write...
 }
 GameBoyAdvanceIO.prototype.writeUnused = function (parentObj, address, data) {
-	parentObj.waitStateType = 0;
+	parentObj.memoryAccessType = 0;
 	//Ignore the data write...
 }
-GameBoyAdvanceIO.prototype.waitStateDelay8 = function () {
-	switch (this.waitStateType) {
-		case 0:
-			//No wait state.
-			break;
-		case 1:
-			//External WRAM state:
-			this.emulatorCore.CPUClocks += this.waitStateWRAM;
+GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
+	this.accessPostProcess8 = [];
+	this.accessPostProcess16 = [];
+	this.accessPostProcess32 = [];
+	this.accessPostProcess8[0] = this.accessPostProcess16[0] = this.accessPostProcess32[0] = function (parentObj) {
+		//Nothing to delay the clock or to run after memory access.
 	}
-}
-GameBoyAdvanceIO.prototype.waitStateDelay16 = function () {
-	switch (this.waitStateType) {
-		case 0:
-			//No wait state.
-			break;
-		case 1:
-			//External WRAM state:
-			this.emulatorCore.CPUClocks += this.waitStateWRAM;
+	this.accessPostProcess8[1] = this.accessPostProcess16[1] = function (parentObj) {
+		//External WRAM state:
+		parentObj.emulatorCore.CPUClocks += parentObj.waitStateWRAM;
 	}
-}
-GameBoyAdvanceIO.prototype.waitStateDelay32 = function () {
-	switch (this.waitStateType) {
-		case 0:
-			//No wait state.
-			break;
-		case 1:
-			//External WRAM state:
-			this.emulatorCore.CPUClocks += this.waitStateWRAMLong;
+	this.accessPostProcess32[1] = function (parentObj) {
+		//External WRAM state:
+		parentObj.emulatorCore.CPUClocks += parentObj.waitStateWRAMLong;
+	}
+	this.accessPostProcess8[2] = this.accessPostProcess16[2] = this.accessPostProcess32[2] = function (parentObj) {
+		//Shadow Copy BG2 Reference Point X:
+		parentObj.emulatorCore.gfx.shadowCopyBG2ReferenceX();
+	}
+	this.accessPostProcess8[3] = this.accessPostProcess16[3] = this.accessPostProcess32[3] = function (parentObj) {
+		//Shadow Copy BG2 Reference Point Y:
+		parentObj.emulatorCore.gfx.shadowCopyBG2ReferenceY();
+	}
+	this.accessPostProcess8[4] = this.accessPostProcess16[4] = this.accessPostProcess32[4] = function (parentObj) {
+		//Shadow Copy BG3 Reference Point X:
+		parentObj.emulatorCore.gfx.shadowCopyBG3ReferenceX();
+	}
+	this.accessPostProcess8[5] = this.accessPostProcess16[5] = this.accessPostProcess32[5] = function (parentObj) {
+		//Shadow Copy BG3 Reference Point Y:
+		parentObj.emulatorCore.gfx.shadowCopyBG3ReferenceY();
 	}
 }
 GameBoyAdvanceIO.prototype.writeConfigureWRAM = function (address, data) {
@@ -920,7 +939,7 @@ GameBoyAdvanceIO.prototype.writeConfigureWRAM = function (address, data) {
 }
 GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address) {
 	if (address < 0x4000) {
-		parentObj.waitStateType = 0;
+		parentObj.memoryAccessType = 0;
 		if (parentObj.emulatorCore.register[0x15] < 0x4000) {
 			//If reading from BIOS while executing it:
 			parentObj.lastBIOSREAD[address & 0x3] = parentObj.emulatorCore.registers[0x15];
@@ -938,12 +957,12 @@ GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address) {
 GameBoyAdvanceIO.prototype.readIODispatch = function (parentObj, address, data) {
 	if (address < 0x4000400) {
 		//IO Write:
-		parentObj.waitStateType = 0;
+		parentObj.memoryAccessType = 0;
 		return parentObj.readIO[address & 0x3FF](parentObj, address);
 	}
 	else if ((address & 0x4FF0800) == 0x4000800) {
 		//WRAM wait state control:
-		parentObj.waitStateType = 0;
+		parentObj.memoryAccessType = 0;
 		return parentObj.readConfigureWRAM(address);
 	}
 	else {
@@ -966,6 +985,6 @@ GameBoyAdvanceIO.prototype.readZero = function (parentObj, address) {
 	return 0;
 }
 GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address) {
-	parentObj.waitStateType = 0;
+	parentObj.memoryAccessType = 0;
 	return (parentObj.emulatorCore.fetch >>> ((address & 0x3) << 8)) & 0xFF;
 }
