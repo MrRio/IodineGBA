@@ -1035,7 +1035,7 @@ GameBoyAdvanceIO.prototype.writeConfigureWRAM = function (address, data) {
 			}
 			break;
 		case 0:
-			this.waitStateWRAM = data + 1;
+			this.waitStateWRAM = (0xF - (data & 0xF)) + 1;
 			this.waitStateWRAMLong = (this.waitStateWRAM << 1) + 1;
 			this.WRAMConfiguration[0] = data;
 	}
