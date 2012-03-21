@@ -902,6 +902,14 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x42] = this.readZero;
 	//4000043h - WIN1H - Window 1 Horizontal Dimensions (W)
 	this.readIO[0x43] = this.readZero;
+	//4000044h - WIN0V - Window 0 Vertical Dimensions (W)
+	this.readIO[0x44] = this.readZero;
+	//4000045h - WIN0V - Window 0 Vertical Dimensions (W)
+	this.readIO[0x45] = this.readZero;
+	//4000046h - WIN1V - Window 1 Vertical Dimensions (W)
+	this.readIO[0x46] = this.readZero;
+	//4000047h - WIN1V - Window 1 Vertical Dimensions (W)
+	this.readIO[0x47] = this.readZero;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
