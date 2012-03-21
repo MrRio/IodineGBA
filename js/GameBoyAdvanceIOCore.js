@@ -1036,7 +1036,7 @@ GameBoyAdvanceIO.prototype.writeConfigureWRAM = function (address, data) {
 			break;
 		case 0:
 			this.waitStateWRAM = (0xF - (data & 0xF)) + 1;
-			this.waitStateWRAMLong = (this.waitStateWRAM << 1) + 1;
+			this.waitStateWRAMLong = (this.waitStateWRAM << 1) + 1;	//32 bits of data in two bus requests, so the wait stating occurs twice, with the extra clock being the second request.
 			this.WRAMConfiguration[0] = data;
 	}
 }
