@@ -699,6 +699,28 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.WIN1XCoordTop = data;
 	}
+	//4000048h - WININ - Control of Inside of Window(s) (R/W)
+	this.writeIO[0x48] = function (parentObj, address, data) {
+		//Window 0:
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN0BG0 = ((data & 0x01) == 0x01);
+		parentObj.emulatorCore.gfx.WIN0BG1 = ((data & 0x02) == 0x02);
+		parentObj.emulatorCore.gfx.WIN0BG2 = ((data & 0x04) == 0x04);
+		parentObj.emulatorCore.gfx.WIN0BG3 = ((data & 0x08) == 0x08);
+		parentObj.emulatorCore.gfx.WIN0OBJ = ((data & 0x10) == 0x10);
+		parentObj.emulatorCore.gfx.WIN0Effects = ((data & 0x20) == 0x20);
+	}
+	//4000049h - WININ - Control of Inside of Window(s) (R/W)
+	this.writeIO[0x49] = function (parentObj, address, data) {
+		//Window 1:
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN1BG0 = ((data & 0x01) == 0x01);
+		parentObj.emulatorCore.gfx.WIN1BG1 = ((data & 0x02) == 0x02);
+		parentObj.emulatorCore.gfx.WIN1BG2 = ((data & 0x04) == 0x04);
+		parentObj.emulatorCore.gfx.WIN1BG3 = ((data & 0x08) == 0x08);
+		parentObj.emulatorCore.gfx.WIN1OBJ = ((data & 0x10) == 0x10);
+		parentObj.emulatorCore.gfx.WIN1Effects = ((data & 0x20) == 0x20);
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -910,6 +932,26 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x46] = this.readZero;
 	//4000047h - WIN1V - Window 1 Vertical Dimensions (W)
 	this.readIO[0x47] = this.readZero;
+	//4000048h - WININ - Control of Inside of Window(s) (R/W)
+	this.readIO[0x48] = function (parentObj, address) {
+		//Window 0:
+		return ((parentObj.emulatorCore.gfx.WIN0BG0 ? 0x1 : 0) |
+		(parentObj.emulatorCore.gfx.WIN0BG1 ? 0x2 : 0) |
+		(parentObj.emulatorCore.gfx.WIN0BG2 ? 0x4 : 0) |
+		(parentObj.emulatorCore.gfx.WIN0BG3 ? 0x8 : 0) |
+		(parentObj.emulatorCore.gfx.WIN0OBJ ? 0x10 : 0) |
+		(parentObj.emulatorCore.gfx.WIN0Effects ? 0x20 : 0));
+	}
+	//4000049h - WININ - Control of Inside of Window(s) (R/W)
+	this.readIO[0x49] = function (parentObj, address) {
+		//Window 1:
+		return ((parentObj.emulatorCore.gfx.WIN1BG0 ? 0x1 : 0) |
+		(parentObj.emulatorCore.gfx.WIN1BG1 ? 0x2 : 0) |
+		(parentObj.emulatorCore.gfx.WIN1BG2 ? 0x4 : 0) |
+		(parentObj.emulatorCore.gfx.WIN1BG3 ? 0x8 : 0) |
+		(parentObj.emulatorCore.gfx.WIN1OBJ ? 0x10 : 0) |
+		(parentObj.emulatorCore.gfx.WIN1Effects ? 0x20 : 0));
+	}
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
