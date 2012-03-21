@@ -659,6 +659,26 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 		parentObj.emulatorCore.gfx.BG3ReferenceY = ((data & 0xF) << 24) | (parentObj.emulatorCore.gfx.BG3ReferenceY & 0xFFFFFF);
 		parentObj.memoryAccessType = 5;
 	}
+	//4000040h - WIN0H - Window 0 Horizontal Dimensions (W)
+	this.writeIO[0x40] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN0XCoordRight = data;	//Window x-coord goes up to this minus 1.
+	}
+	//4000041h - WIN0H - Window 0 Horizontal Dimensions (W)
+	this.writeIO[0x41] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN0XCoordLeft = data;
+	}
+	//4000042h - WIN1H - Window 1 Horizontal Dimensions (W)
+	this.writeIO[0x42] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN1XCoordRight = data;	//Window x-coord goes up to this minus 1.
+	}
+	//4000043h - WIN1H - Window 1 Horizontal Dimensions (W)
+	this.writeIO[0x43] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN1XCoordLeft = data;
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -854,6 +874,14 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x3E] = this.readZero;
 	//400003Fh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.readIO[0x3F] = this.readZero;
+	//4000040h - WIN0H - Window 0 Horizontal Dimensions (W)
+	this.readIO[0x40] = this.readZero;
+	//4000041h - WIN0H - Window 0 Horizontal Dimensions (W)
+	this.readIO[0x41] = this.readZero;
+	//4000042h - WIN1H - Window 1 Horizontal Dimensions (W)
+	this.readIO[0x42] = this.readZero;
+	//4000043h - WIN1H - Window 1 Horizontal Dimensions (W)
+	this.readIO[0x43] = this.readZero;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
