@@ -855,35 +855,12 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//400003Fh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.readIO[0x3F] = this.readZero;
 }
-GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
-	//External WRAM:
-	parentObj.externalRAM[address & 0x3FFFF] = data;
-	parentObj.memoryAccessType = 1;
-}
-GameBoyAdvanceIO.prototype.writeInternalWRAM = function (parentObj, address, data) {
-	//Internal WRAM:
-	parentObj.internalRAM[address & 0x7FFF] = data;
-	parentObj.memoryAccessType = 0;
-}
-GameBoyAdvanceIO.prototype.writeIODispatch = function (parentObj, address, data) {
-	parentObj.memoryAccessType = 0;
-	if (address < 0x4000400) {
-		//IO Write:
-		parentObj.writeIO[address & 0x3FF](parentObj, address, data);
-	}
-	else if ((address & 0x4FF0800) == 0x4000800) {
-		//WRAM wait state control:
-		parentObj.writeConfigureWRAM(address, data);
-	}
-}
-GameBoyAdvanceIO.prototype.NOP = function (parentObj, address, data) {
-	//Ignore the data write...
-}
-GameBoyAdvanceIO.prototype.writeUnused = function (parentObj, address, data) {
-	parentObj.memoryAccessType = 0;
-	//Ignore the data write...
-}
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
+	/*
+		Create dispatches for handling special memory access cases,
+		for things like wait state clocking and graphics shadow registers being updated on write.
+		This way we can specialize in edge timings and cases without performance loss.
+	*/
 	this.accessPostProcess8 = [];
 	this.accessPostProcess16 = [];
 	this.accessPostProcess32 = [];
@@ -914,6 +891,34 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 		//Shadow Copy BG3 Reference Point Y:
 		parentObj.emulatorCore.gfx.shadowCopyBG3ReferenceY();
 	}
+}
+GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
+	//External WRAM:
+	parentObj.externalRAM[address & 0x3FFFF] = data;
+	parentObj.memoryAccessType = 1;
+}
+GameBoyAdvanceIO.prototype.writeInternalWRAM = function (parentObj, address, data) {
+	//Internal WRAM:
+	parentObj.internalRAM[address & 0x7FFF] = data;
+	parentObj.memoryAccessType = 0;
+}
+GameBoyAdvanceIO.prototype.writeIODispatch = function (parentObj, address, data) {
+	parentObj.memoryAccessType = 0;
+	if (address < 0x4000400) {
+		//IO Write:
+		parentObj.writeIO[address & 0x3FF](parentObj, address, data);
+	}
+	else if ((address & 0x4FF0800) == 0x4000800) {
+		//WRAM wait state control:
+		parentObj.writeConfigureWRAM(address, data);
+	}
+}
+GameBoyAdvanceIO.prototype.NOP = function (parentObj, address, data) {
+	//Ignore the data write...
+}
+GameBoyAdvanceIO.prototype.writeUnused = function (parentObj, address, data) {
+	parentObj.memoryAccessType = 0;
+	//Ignore the data write...
 }
 GameBoyAdvanceIO.prototype.writeConfigureWRAM = function (address, data) {
 	switch (address & 0x3) {
