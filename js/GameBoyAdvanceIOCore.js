@@ -679,6 +679,26 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.WIN1XCoordLeft = data;
 	}
+	//4000044h - WIN0V - Window 0 Vertical Dimensions (W)
+	this.writeIO[0x44] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN0XCoordBottom = data;	//Window y-coord goes up to this minus 1.
+	}
+	//4000045h - WIN0V - Window 0 Vertical Dimensions (W)
+	this.writeIO[0x45] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN0XCoordTop = data;
+	}
+	//4000046h - WIN1V - Window 1 Vertical Dimensions (W)
+	this.writeIO[0x46] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN1XCoordBottom = data;	//Window y-coord goes up to this minus 1.
+	}
+	//4000047h - WIN1V - Window 1 Vertical Dimensions (W)
+	this.writeIO[0x47] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WIN1XCoordTop = data;
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
