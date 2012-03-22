@@ -487,41 +487,49 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x20] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2dx = (parentObj.emulatorCore.gfx.BG2dx & 0xFF00) | data;
+		parentObj.memoryAccessType = 6;
 	}
 	//4000021h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
 	this.writeIO[0x21] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2dx = (data << 8) | (parentObj.emulatorCore.gfx.BG2dx & 0xFF);
+		parentObj.memoryAccessType = 6;
 	}
 	//4000022h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
 	this.writeIO[0x22] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2dmx = (parentObj.emulatorCore.gfx.BG2dmx & 0xFF00) | data;
+		parentObj.memoryAccessType = 7;
 	}
 	//4000023h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
 	this.writeIO[0x23] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2dmx = (data << 8) | (parentObj.emulatorCore.gfx.BG2dmx & 0xFF);
+		parentObj.memoryAccessType = 7;
 	}
 	//4000024h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
 	this.writeIO[0x24] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2dy = (parentObj.emulatorCore.gfx.BG2dy & 0xFF00) | data;
+		parentObj.memoryAccessType = 8;
 	}
 	//4000025h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
 	this.writeIO[0x25] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2dy = (data << 8) | (parentObj.emulatorCore.gfx.BG2dy & 0xFF);
+		parentObj.memoryAccessType = 8;
 	}
 	//4000026h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
 	this.writeIO[0x26] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2dmy = (parentObj.emulatorCore.gfx.BG2dmy & 0xFF00) | data;
+		parentObj.memoryAccessType = 9;
 	}
 	//4000027h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
 	this.writeIO[0x27] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG2dmy = (data << 8) | (parentObj.emulatorCore.gfx.BG2dmy & 0xFF);
+		parentObj.memoryAccessType = 9;
 	}
 	//4000028h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
 	this.writeIO[0x28] = function (parentObj, address, data) {
@@ -575,41 +583,49 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x30] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3dx = (parentObj.emulatorCore.gfx.BG3dx & 0xFF00) | data;
+		parentObj.memoryAccessType = 10;
 	}
 	//4000031h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
 	this.writeIO[0x31] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3dx = (data << 8) | (parentObj.emulatorCore.gfx.BG3dx & 0xFF);
+		parentObj.memoryAccessType = 10;
 	}
 	//4000032h - BG3PB - BG3 Rotation/Scaling Parameter B (alias dmx) (W)
 	this.writeIO[0x32] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3dmx = (parentObj.emulatorCore.gfx.BG3dmx & 0xFF00) | data;
+		parentObj.memoryAccessType = 11;
 	}
 	//4000033h - BG3PB - BG3 Rotation/Scaling Parameter B (alias dmx) (W)
 	this.writeIO[0x33] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3dmx = (data << 8) | (parentObj.emulatorCore.gfx.BG3dmx & 0xFF);
+		parentObj.memoryAccessType = 11;
 	}
 	//4000034h - BG3PC - BG3 Rotation/Scaling Parameter C (alias dy) (W)
 	this.writeIO[0x34] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3dy = (parentObj.emulatorCore.gfx.BG3dy & 0xFF00) | data;
+		parentObj.memoryAccessType = 12;
 	}
 	//4000035h - BG3PC - BG3 Rotation/Scaling Parameter C (alias dy) (W)
 	this.writeIO[0x35] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3dy = (data << 8) | (parentObj.emulatorCore.gfx.BG3dy & 0xFF);
+		parentObj.memoryAccessType = 12;
 	}
 	//4000036h - BG3PD - BG3 Rotation/Scaling Parameter D (alias dmy) (W)
 	this.writeIO[0x36] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3dmy = (parentObj.emulatorCore.gfx.BG3dmy & 0xFF00) | data;
+		parentObj.memoryAccessType = 13;
 	}
 	//4000037h - BG3PD - BG3 Rotation/Scaling Parameter D (alias dmy) (W)
 	this.writeIO[0x37] = function (parentObj, address, data) {
 		parentObj.emulatorCore.gfx.JIT();
 		parentObj.emulatorCore.gfx.BG3dmy = (data << 8) | (parentObj.emulatorCore.gfx.BG3dmy & 0xFF);
+		parentObj.memoryAccessType = 13;
 	}
 	//4000038h - BG3X_L - BG3 Reference Point X-Coordinate, lower 16 bit (W)
 	this.writeIO[0x38] = function (parentObj, address, data) {
@@ -1157,6 +1173,38 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 	this.accessPostProcess8[5] = this.accessPostProcess16[5] = this.accessPostProcess32[5] = function (parentObj) {
 		//Shadow Copy BG3 Reference Point Y:
 		parentObj.emulatorCore.gfx.shadowCopyBG3ReferenceY();
+	}
+	this.accessPostProcess8[6] = this.accessPostProcess16[6] = this.accessPostProcess32[6] = function (parentObj) {
+		//Update the adjusted BG2 dx value:
+		parentObj.emulatorCore.gfx.updateBG2dxCache();
+	}
+	this.accessPostProcess8[7] = this.accessPostProcess16[7] = this.accessPostProcess32[7] = function (parentObj) {
+		//Update the adjusted BG2 dmx value:
+		parentObj.emulatorCore.gfx.updateBG2dmxCache();
+	}
+	this.accessPostProcess8[8] = this.accessPostProcess16[8] = this.accessPostProcess32[8] = function (parentObj) {
+		//Update the adjusted BG2 dy value:
+		parentObj.emulatorCore.gfx.updateBG2dyCache();
+	}
+	this.accessPostProcess8[9] = this.accessPostProcess16[9] = this.accessPostProcess32[9] = function (parentObj) {
+		//Update the adjusted BG2 dmy value:
+		parentObj.emulatorCore.gfx.updateBG2dmyCache();
+	}
+	this.accessPostProcess8[10] = this.accessPostProcess16[10] = this.accessPostProcess32[10] = function (parentObj) {
+		//Update the adjusted BG3 dx value:
+		parentObj.emulatorCore.gfx.updateBG3dxCache();
+	}
+	this.accessPostProcess8[11] = this.accessPostProcess16[11] = this.accessPostProcess32[11] = function (parentObj) {
+		//Update the adjusted BG3 dmx value:
+		parentObj.emulatorCore.gfx.updateBG3dmxCache();
+	}
+	this.accessPostProcess8[12] = this.accessPostProcess16[12] = this.accessPostProcess32[12] = function (parentObj) {
+		//Update the adjusted BG3 dy value:
+		parentObj.emulatorCore.gfx.updateBG3dyCache();
+	}
+	this.accessPostProcess8[13] = this.accessPostProcess16[13] = this.accessPostProcess32[13] = function (parentObj) {
+		//Update the adjusted BG3 dmy value:
+		parentObj.emulatorCore.gfx.updateBG3dmyCache();
 	}
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
