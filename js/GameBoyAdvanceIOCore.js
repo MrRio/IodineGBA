@@ -721,6 +721,26 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 		parentObj.emulatorCore.gfx.WIN1OBJ = ((data & 0x10) == 0x10);
 		parentObj.emulatorCore.gfx.WIN1Effects = ((data & 0x20) == 0x20);
 	}
+	//400004Ah- WINOUT - Control of Outside of Windows & Inside of OBJ Window (R/W)
+	this.writeIO[0x4A] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WINBG0Outside = ((data & 0x01) == 0x01);
+		parentObj.emulatorCore.gfx.WINBG1Outside = ((data & 0x02) == 0x02);
+		parentObj.emulatorCore.gfx.WINBG2Outside = ((data & 0x04) == 0x04);
+		parentObj.emulatorCore.gfx.WINBG3Outside = ((data & 0x08) == 0x08);
+		parentObj.emulatorCore.gfx.WINOBJOutside = ((data & 0x10) == 0x10);
+		parentObj.emulatorCore.gfx.WINEffectsOutside = ((data & 0x20) == 0x20);
+	}
+	//400004AB- WINOUT - Control of Outside of Windows & Inside of OBJ Window (R/W)
+	this.writeIO[0x4B] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.WINOBJBG0Outside = ((data & 0x01) == 0x01);
+		parentObj.emulatorCore.gfx.WINOBJBG1Outside = ((data & 0x02) == 0x02);
+		parentObj.emulatorCore.gfx.WINOBJBG2Outside = ((data & 0x04) == 0x04);
+		parentObj.emulatorCore.gfx.WINOBJBG3Outside = ((data & 0x08) == 0x08);
+		parentObj.emulatorCore.gfx.WINOBJOBJOutside = ((data & 0x10) == 0x10);
+		parentObj.emulatorCore.gfx.WINOBJEffectsOutside = ((data & 0x20) == 0x20);
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -951,6 +971,24 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		(parentObj.emulatorCore.gfx.WIN1BG3 ? 0x8 : 0) |
 		(parentObj.emulatorCore.gfx.WIN1OBJ ? 0x10 : 0) |
 		(parentObj.emulatorCore.gfx.WIN1Effects ? 0x20 : 0));
+	}
+	//400004Ah- WINOUT - Control of Outside of Windows & Inside of OBJ Window (R/W)
+	this.readIO[0x4A] = function (parentObj, address, data) {
+		return ((parentObj.emulatorCore.gfx.WINBG0Outside ? 0x1 : 0) |
+		(parentObj.emulatorCore.gfx.WINBG1Outside ? 0x2 : 0) |
+		(parentObj.emulatorCore.gfx.WINBG2Outside ? 0x4 : 0) |
+		(parentObj.emulatorCore.gfx.WINBG3Outside ? 0x8 : 0) |
+		(parentObj.emulatorCore.gfx.WINOBJOutside ? 0x10 : 0) |
+		(parentObj.emulatorCore.gfx.WINEffectsOutside ? 0x20 : 0));
+	}
+	//400004AB- WINOUT - Control of Outside of Windows & Inside of OBJ Window (R/W)
+	this.readIO[0x4B] = function (parentObj, address, data) {
+		return ((parentObj.emulatorCore.gfx.WINOBJBG0Outside ? 0x1 : 0) |
+		(parentObj.emulatorCore.gfx.WINOBJBG1Outside ? 0x2 : 0) |
+		(parentObj.emulatorCore.gfx.WINOBJBG2Outside ? 0x4 : 0) |
+		(parentObj.emulatorCore.gfx.WINOBJBG3Outside ? 0x8 : 0) |
+		(parentObj.emulatorCore.gfx.WINOBJOBJOutside ? 0x10 : 0) |
+		(parentObj.emulatorCore.gfx.WINOBJEffectsOutside ? 0x20 : 0));
 	}
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
