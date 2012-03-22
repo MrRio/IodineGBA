@@ -757,6 +757,66 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x4E] = this.NOP;
 	//400004Fh - NOT USED - ZERO
 	this.writeIO[0x4F] = this.NOP;
+	//4000050h - BLDCNT - Color Special Effects Selection (R/W)
+	this.writeIO[0x50] = function (parentObj, address, data) {
+		//Select target 1 and color effects mode:
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.BG0EffectsTarget1 = ((data & 0x01) == 0x01);
+		parentObj.emulatorCore.gfx.BG1EffectsTarget1 = ((data & 0x02) == 0x02);
+		parentObj.emulatorCore.gfx.BG2EffectsTarget1 = ((data & 0x04) == 0x04);
+		parentObj.emulatorCore.gfx.BG3EffectsTarget1 = ((data & 0x08) == 0x08);
+		parentObj.emulatorCore.gfx.OBJEffectsTarget1 = ((data & 0x10) == 0x10);
+		parentObj.emulatorCore.gfx.BackdropEffectsTarget1 = ((data & 0x20) == 0x20);
+		parentObj.emulatorCore.gfx.colorEffectsType = data >> 6;
+	}
+	//4000051h - BLDCNT - Color Special Effects Selection (R/W)
+	this.writeIO[0x51] = function (parentObj, address, data) {
+		//Select target 2:
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.BG0EffectsTarget2 = ((data & 0x01) == 0x01);
+		parentObj.emulatorCore.gfx.BG1EffectsTarget2 = ((data & 0x02) == 0x02);
+		parentObj.emulatorCore.gfx.BG2EffectsTarget2 = ((data & 0x04) == 0x04);
+		parentObj.emulatorCore.gfx.BG3EffectsTarget2 = ((data & 0x08) == 0x08);
+		parentObj.emulatorCore.gfx.OBJEffectsTarget2 = ((data & 0x10) == 0x10);
+		parentObj.emulatorCore.gfx.BackdropEffectsTarget2 = ((data & 0x20) == 0x20);
+	}
+	//4000052h - BLDALPHA - Alpha Blending Coefficients (W)
+	this.writeIO[0x52] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.alphaBlendAmountTarget1 = data & 0x1F;
+	}
+	//4000053h - BLDALPHA - Alpha Blending Coefficients (W)
+	this.writeIO[0x53] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.alphaBlendAmountTarget2 = data & 0x1F;
+	}
+	//4000054h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
+	this.writeIO[0x54] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.brightnessEffectAmount = data & 0x1F;
+	}
+	//4000055h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
+	this.writeIO[0x55] = this.NOP;
+	//4000056h - NOT USED - ZERO
+	this.writeIO[0x56] = this.NOP;
+	//4000057h - NOT USED - ZERO
+	this.writeIO[0x57] = this.NOP;
+	//4000058h - NOT USED - GLITCHED
+	this.writeIO[0x58] = this.NOP;
+	//4000059h - NOT USED - GLITCHED
+	this.writeIO[0x59] = this.NOP;
+	//400005Ah - NOT USED - GLITCHED
+	this.writeIO[0x5A] = this.NOP;
+	//400005Bh - NOT USED - GLITCHED
+	this.writeIO[0x5B] = this.NOP;
+	//400005Ch - NOT USED - GLITCHED
+	this.writeIO[0x5C] = this.NOP;
+	//400005Dh - NOT USED - GLITCHED
+	this.writeIO[0x5D] = this.NOP;
+	//400005Eh - NOT USED - GLITCHED
+	this.writeIO[0x5E] = this.NOP;
+	//400005Fh - NOT USED - GLITCHED
+	this.writeIO[0x5F] = this.NOP;
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -1014,6 +1074,53 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x4E] = this.readZero;
 	//400004Fh - NOT USED - ZERO
 	this.readIO[0x4F] = this.readZero;
+	//4000050h - BLDCNT - Color Special Effects Selection (R/W)
+	this.readIO[0x50] = function (parentObj, address, data) {
+		return ((parentObj.emulatorCore.gfx.BG0EffectsTarget1 ? 0x1 : 0) |
+		(parentObj.emulatorCore.gfx.BG1EffectsTarget1 ? 0x2 : 0) |
+		(parentObj.emulatorCore.gfx.BG2EffectsTarget1 ? 0x4 : 0) |
+		(parentObj.emulatorCore.gfx.BG3EffectsTarget1 ? 0x8 : 0) |
+		(parentObj.emulatorCore.gfx.OBJEffectsTarget1 ? 0x10 : 0) |
+		(parentObj.emulatorCore.gfx.BackdropEffectsTarget1 ? 0x20 : 0) |
+		(parentObj.emulatorCore.gfx.colorEffectsType << 6));
+	}
+	//4000051h - BLDCNT - Color Special Effects Selection (R/W)
+	this.readIO[0x51] = function (parentObj, address, data) {
+		return ((parentObj.emulatorCore.gfx.BG0EffectsTarget2 ? 0x1 : 0) |
+		(parentObj.emulatorCore.gfx.BG1EffectsTarget2 ? 0x2 : 0) |
+		(parentObj.emulatorCore.gfx.BG2EffectsTarget2 ? 0x4 : 0) |
+		(parentObj.emulatorCore.gfx.BG3EffectsTarget2 ? 0x8 : 0) |
+		(parentObj.emulatorCore.gfx.OBJEffectsTarget2 ? 0x10 : 0) |
+		(parentObj.emulatorCore.gfx.BackdropEffectsTarget2 ? 0x20 : 0));
+	}
+	//4000052h - BLDALPHA - Alpha Blending Coefficients (W)
+	this.readIO[0x52] = this.readZero;
+	//4000053h - BLDALPHA - Alpha Blending Coefficients (W)
+	this.readIO[0x53] = this.readZero;
+	//4000054h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
+	this.readIO[0x54] = this.readZero;
+	//4000055h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
+	this.readIO[0x55] = this.readZero;
+	//4000056h - NOT USED - ZERO
+	this.readIO[0x56] = this.readZero;
+	//4000057h - NOT USED - ZERO
+	this.readIO[0x57] = this.readZero;
+	//4000058h - NOT USED - GLITCHED
+	this.readIO[0x58] = this.readUnused;
+	//4000059h - NOT USED - GLITCHED
+	this.readIO[0x59] = this.readUnused;
+	//400005Ah - NOT USED - GLITCHED
+	this.readIO[0x5A] = this.readUnused;
+	//400005Bh - NOT USED - GLITCHED
+	this.readIO[0x5B] = this.readUnused;
+	//400005Ch - NOT USED - GLITCHED
+	this.readIO[0x5C] = this.readUnused;
+	//400005Dh - NOT USED - GLITCHED
+	this.readIO[0x5D] = this.readUnused;
+	//400005Eh - NOT USED - GLITCHED
+	this.readIO[0x5E] = this.readUnused;
+	//400005Fh - NOT USED - GLITCHED
+	this.readIO[0x5F] = this.readUnused;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
