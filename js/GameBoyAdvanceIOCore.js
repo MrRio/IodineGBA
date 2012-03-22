@@ -741,6 +741,22 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 		parentObj.emulatorCore.gfx.WINOBJOBJOutside = ((data & 0x10) == 0x10);
 		parentObj.emulatorCore.gfx.WINOBJEffectsOutside = ((data & 0x20) == 0x20);
 	}
+	//400004Ch - MOSAIC - Mosaic Size (W)
+	this.writeIO[0x4C] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.BGMosaicHSize = data & 0xF;
+		parentObj.emulatorCore.gfx.BGMosaicVSize = data >> 4;
+	}
+	//400004Dh - MOSAIC - Mosaic Size (W)
+	this.writeIO[0x4D] = function (parentObj, address, data) {
+		parentObj.emulatorCore.gfx.JIT();
+		parentObj.emulatorCore.gfx.OBJMosaicHSize = data & 0xF;
+		parentObj.emulatorCore.gfx.OBJMosaicVSize = data >> 4;
+	}
+	//400004Eh - NOT USED - ZERO
+	this.writeIO[0x4E] = this.NOP;
+	//400004Fh - NOT USED - ZERO
+	this.writeIO[0x4F] = this.NOP;
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -990,6 +1006,14 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		(parentObj.emulatorCore.gfx.WINOBJOBJOutside ? 0x10 : 0) |
 		(parentObj.emulatorCore.gfx.WINOBJEffectsOutside ? 0x20 : 0));
 	}
+	//400004Ch - MOSAIC - Mosaic Size (W)
+	this.readIO[0x4C] = this.readZero;
+	//400004Dh - MOSAIC - Mosaic Size (W)
+	this.readIO[0x4D] = this.readZero;
+	//400004Eh - NOT USED - ZERO
+	this.readIO[0x4E] = this.readZero;
+	//400004Fh - NOT USED - ZERO
+	this.readIO[0x4F] = this.readZero;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
