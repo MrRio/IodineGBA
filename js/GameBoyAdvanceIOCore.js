@@ -1285,7 +1285,7 @@ GameBoyAdvanceIO.prototype.writeIODispatch = function (parentObj, address, data)
 	parentObj.memoryAccessType = 0;
 	if (address < 0x4000400) {
 		//IO Write:
-		parentObj.writeIO[address & 0x3FF](parentObj, address, data);
+		parentObj.writeIO[address & 0x3FF](parentObj, data);
 	}
 	else if ((address & 0x4FF0800) == 0x4000800) {
 		//WRAM wait state control:
