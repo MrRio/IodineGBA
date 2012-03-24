@@ -355,13 +355,11 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//4000010h - BG0HOFS - BG0 X-Offset (W)
 	this.writeIO[0x10] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG0XCoord = (parentObj.gfx.BG0XCoord & 0x100) | data;
+		parentObj.gfx.BG0HOFS0(data);
 	}
 	//4000011h - BG0HOFS - BG0 X-Offset (W)
 	this.writeIO[0x11] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG0XCoord = ((data & 0x01) << 8) | (parentObj.gfx.BG0XCoord & 0xFF);
+		parentObj.gfx.BG0HOFS1(data);
 	}
 	//4000012h - BG0VOFS - BG0 Y-Offset (W)
 	this.writeIO[0x12] = function (parentObj, data) {

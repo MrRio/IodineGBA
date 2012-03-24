@@ -57,6 +57,12 @@ GameBoyAdvanceGraphics.prototype.initialize = function () {
 	this.BG3ScreenSize = 0;
 	this.BG0XCoord = 0;
 	this.BG0YCoord = 0;
+	this.BG1XCoord = 0;
+	this.BG1YCoord = 0;
+	this.BG2XCoord = 0;
+	this.BG2YCoord = 0;
+	this.BG3XCoord = 0;
+	this.BG3YCoord = 0;
 }
 GameBoyAdvanceGraphics.prototype.writeDISPCNT0 = function (data) {
 	this.JIT();
@@ -149,4 +155,12 @@ GameBoyAdvanceGraphics.prototype.writeBG3CNT1 = function (data) {
 	this.BG3ScreenBaseBlock = data & 0x1F;
 	this.BG3DisplayOverflow = ((data & 0x20) == 0x20);
 	this.BG3ScreenSize = (data & 0xC0) >> 6;
+}
+GameBoyAdvanceGraphics.prototype.BG0HOFS0 = function (data) {
+	this.JIT();
+	this.BG0XCoord = (this.BG0XCoord & 0x100) | data;
+}
+GameBoyAdvanceGraphics.prototype.BG0HOFS1 = function (data) {
+	this.JIT();
+	this.BG0XCoord = ((data & 0x01) << 8) | (this.BG0XCoord & 0xFF);
 }
