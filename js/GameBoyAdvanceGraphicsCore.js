@@ -108,3 +108,45 @@ GameBoyAdvanceGraphics.prototype.writeBG0CNT1 = function (data) {
 	this.BG0DisplayOverflow = ((data & 0x20) == 0x20);	//Note: Only applies to BG2/3 supposedly.
 	this.BG0ScreenSize = (data & 0xC0) >> 6;
 }
+GameBoyAdvanceGraphics.prototype.writeBG1CNT0 = function (data) {
+	this.JIT();
+	this.BG1Priority = data & 0x3;
+	this.BG1CharacterBaseBlock = (data & 0xC) >> 2;
+	//Bits 5-6 always 0.
+	this.BG1Mosaic = ((data & 0x40) == 0x40);
+	this.BG1Palette256 = ((data & 0x80) == 0x80);
+}
+GameBoyAdvanceGraphics.prototype.writeBG1CNT1 = function (data) {
+	this.JIT();
+	this.BG1ScreenBaseBlock = data & 0x1F;
+	this.BG1DisplayOverflow = ((data & 0x20) == 0x20);	//Note: Only applies to BG2/3 supposedly.
+	this.BG1ScreenSize = (data & 0xC0) >> 6;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2CNT0 = function (data) {
+	this.JIT();
+	this.BG2Priority = data & 0x3;
+	this.BG2CharacterBaseBlock = (data & 0xC) >> 2;
+	//Bits 5-6 always 0.
+	this.BG2Mosaic = ((data & 0x40) == 0x40);
+	this.BG2Palette256 = ((data & 0x80) == 0x80);
+}
+GameBoyAdvanceGraphics.prototype.writeBG2CNT1 = function (data) {
+	this.JIT();
+	this.BG2ScreenBaseBlock = data & 0x1F;
+	this.BG2DisplayOverflow = ((data & 0x20) == 0x20);
+	this.BG2ScreenSize = (data & 0xC0) >> 6;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3CNT0 = function (data) {
+	this.JIT();
+	this.BG3Priority = data & 0x3;
+	this.BG3CharacterBaseBlock = (data & 0xC) >> 2;
+	//Bits 5-6 always 0.
+	this.BG3Mosaic = ((data & 0x40) == 0x40);
+	this.BG3Palette256 = ((data & 0x80) == 0x80);
+}
+GameBoyAdvanceGraphics.prototype.writeBG3CNT1 = function (data) {
+	this.JIT();
+	this.BG3ScreenBaseBlock = data & 0x1F;
+	this.BG3DisplayOverflow = ((data & 0x20) == 0x20);
+	this.BG3ScreenSize = (data & 0xC0) >> 6;
+}

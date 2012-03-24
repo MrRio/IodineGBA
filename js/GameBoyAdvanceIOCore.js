@@ -331,51 +331,27 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//400000Ah - BG1CNT - BG1 Control (R/W) (BG Modes 0,1 only)
 	this.writeIO[0xA] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG1Priority = data & 0x3;
-		parentObj.gfx.BG1CharacterBaseBlock = (data & 0xC) >> 2;
-		//Bits 5-6 always 0.
-		parentObj.gfx.BG1Mosaic = ((data & 0x40) == 0x40);
-		parentObj.gfx.BG1Palette256 = ((data & 0x80) == 0x80);
+		parentObj.gfx.writeBG1CNT0(data);
 	}
 	//400000Bh - BG1CNT - BG1 Control (R/W) (BG Modes 0,1 only)
 	this.writeIO[0xB] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG1ScreenBaseBlock = data & 0x1F;
-		parentObj.gfx.BG1DisplayOverflow = ((data & 0x20) == 0x20);	//Note: Only applies to BG2/3 supposedly.
-		parentObj.gfx.BG1ScreenSize = (data & 0xC0) >> 6;
+		parentObj.gfx.writeBG1CNT1(data);
 	}
 	//400000Ch - BG2CNT - BG2 Control (R/W) (BG Modes 0,1,2 only)
 	this.writeIO[0xC] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2Priority = data & 0x3;
-		parentObj.gfx.BG2CharacterBaseBlock = (data & 0xC) >> 2;
-		//Bits 5-6 always 0.
-		parentObj.gfx.BG2Mosaic = ((data & 0x40) == 0x40);
-		parentObj.gfx.BG2Palette256 = ((data & 0x80) == 0x80);
+		parentObj.gfx.writeBG2CNT0(data);
 	}
 	//400000Dh - BG2CNT - BG2 Control (R/W) (BG Modes 0,1,2 only)
 	this.writeIO[0xD] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2ScreenBaseBlock = data & 0x1F;
-		parentObj.gfx.BG2DisplayOverflow = ((data & 0x20) == 0x20);
-		parentObj.gfx.BG2ScreenSize = (data & 0xC0) >> 6;
+		parentObj.gfx.writeBG2CNT1(data);
 	}
 	//400000Eh - BG3CNT - BG3 Control (R/W) (BG Modes 0,2 only)
 	this.writeIO[0xE] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3Priority = data & 0x3;
-		parentObj.gfx.BG3CharacterBaseBlock = (data & 0xC) >> 2;
-		//Bits 5-6 always 0.
-		parentObj.gfx.BG3Mosaic = ((data & 0x40) == 0x40);
-		parentObj.gfx.BG3Palette256 = ((data & 0x80) == 0x80);
+		parentObj.gfx.writeBG3CNT0(data);
 	}
 	//400000Fh - BG3CNT - BG3 Control (R/W) (BG Modes 0,2 only)
 	this.writeIO[0xF] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3ScreenBaseBlock = data & 0x1F;
-		parentObj.gfx.BG3DisplayOverflow = ((data & 0x20) == 0x20);
-		parentObj.gfx.BG3ScreenSize = (data & 0xC0) >> 6;
+		parentObj.gfx.writeBG3CNT1(data);
 	}
 	//4000010h - BG0HOFS - BG0 X-Offset (W)
 	this.writeIO[0x10] = function (parentObj, data) {
