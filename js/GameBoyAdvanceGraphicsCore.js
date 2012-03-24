@@ -164,3 +164,59 @@ GameBoyAdvanceGraphics.prototype.BG0HOFS1 = function (data) {
 	this.JIT();
 	this.BG0XCoord = ((data & 0x01) << 8) | (this.BG0XCoord & 0xFF);
 }
+GameBoyAdvanceGraphics.prototype.BG0VOFS0 = function (data) {
+	this.JIT();
+	this.BG0YCoord = (this.BG0YCoord & 0x100) | data;
+}
+GameBoyAdvanceGraphics.prototype.BG0VOFS1 = function (data) {
+	this.JIT();
+	this.BG0YCoord = ((data & 0x01) << 8) | (this.BG0YCoord & 0xFF);
+}
+GameBoyAdvanceGraphics.prototype.BG1HOFS0 = function (data) {
+	this.JIT();
+	this.BG1XCoord = (this.BG1XCoord & 0x100) | data;
+}
+GameBoyAdvanceGraphics.prototype.BG1HOFS1 = function (data) {
+	this.JIT();
+	this.BG1XCoord = ((data & 0x01) << 8) | (this.BG1XCoord & 0xFF);
+}
+GameBoyAdvanceGraphics.prototype.BG1VOFS0 = function (data) {
+	this.JIT();
+	this.BG1YCoord = (this.BG1YCoord & 0x100) | data;
+}
+GameBoyAdvanceGraphics.prototype.BG1VOFS1 = function (data) {
+	this.JIT();
+	this.BG1YCoord = ((data & 0x01) << 8) | (this.BG1YCoord & 0xFF);
+}
+GameBoyAdvanceGraphics.prototype.BG2HOFS0 = function (data) {
+	this.JIT();
+	this.BG2XCoord = (this.BG2XCoord & 0x100) | data;
+}
+GameBoyAdvanceGraphics.prototype.BG2HOFS1 = function (data) {
+	this.JIT();
+	this.BG2XCoord = ((data & 0x01) << 8) | (this.BG2XCoord & 0xFF);
+}
+GameBoyAdvanceGraphics.prototype.BG2VOFS0 = function (data) {
+	this.JIT();
+	this.BG2YCoord = (this.BG2YCoord & 0x100) | data;
+}
+GameBoyAdvanceGraphics.prototype.BG2VOFS1 = function (data) {
+	this.JIT();
+	this.BG2YCoord = ((data & 0x01) << 8) | (this.BG2YCoord & 0xFF);
+}
+GameBoyAdvanceGraphics.prototype.BG3HOFS0 = function (data) {
+	this.JIT();
+	this.BG3XCoord = (this.BG3XCoord & 0x100) | data;
+}
+GameBoyAdvanceGraphics.prototype.BG3HOFS1 = function (data) {
+	this.JIT();
+	this.BG3XCoord = ((data & 0x01) << 8) | (this.BG3XCoord & 0xFF);
+}
+GameBoyAdvanceGraphics.prototype.BG3VOFS0 = function (data) {
+	this.JIT();
+	this.BG3YCoord = (this.BG3YCoord & 0x100) | data;
+}
+GameBoyAdvanceGraphics.prototype.BG3VOFS1 = function (data) {
+	this.JIT();
+	this.BG3YCoord = ((data & 0x01) << 8) | (this.BG3YCoord & 0xFF);
+}

@@ -363,73 +363,59 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//4000012h - BG0VOFS - BG0 Y-Offset (W)
 	this.writeIO[0x12] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG0YCoord = (parentObj.gfx.BG0YCoord & 0x100) | data;
+		parentObj.gfx.BG0VOFS0(data);
 	}
 	//4000013h - BG0VOFS - BG0 Y-Offset (W)
 	this.writeIO[0x13] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG0YCoord = ((data & 0x01) << 8) | (parentObj.gfx.BG0YCoord & 0xFF);
+		parentObj.gfx.BG0VOFS1(data);
 	}
 	//4000014h - BG1HOFS - BG1 X-Offset (W)
 	this.writeIO[0x14] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG1XCoord = (parentObj.gfx.BG1XCoord & 0x100) | data;
+		parentObj.gfx.BG1HOFS0(data);
 	}
 	//4000015h - BG1HOFS - BG1 X-Offset (W)
 	this.writeIO[0x15] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG1XCoord = ((data & 0x01) << 8) | (parentObj.gfx.BG1XCoord & 0xFF);
+		parentObj.gfx.BG1HOFS1(data);
 	}
 	//4000016h - BG1VOFS - BG1 Y-Offset (W)
 	this.writeIO[0x16] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG1YCoord = (parentObj.gfx.BG1YCoord & 0x100) | data;
+		parentObj.gfx.BG1VOFS0(data);
 	}
 	//4000017h - BG1VOFS - BG1 Y-Offset (W)
 	this.writeIO[0x17] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG1YCoord = ((data & 0x01) << 8) | (parentObj.gfx.BG1YCoord & 0xFF);
+		parentObj.gfx.BG1VOFS1(data);
 	}
 	//4000018h - BG2HOFS - BG2 X-Offset (W)
 	this.writeIO[0x18] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2XCoord = (parentObj.gfx.BG2XCoord & 0x100) | data;
+		parentObj.gfx.BG2HOFS0(data);
 	}
 	//4000019h - BG2HOFS - BG2 X-Offset (W)
 	this.writeIO[0x19] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2XCoord = ((data & 0x01) << 8) | (parentObj.gfx.BG2XCoord & 0xFF);
+		parentObj.gfx.BG2HOFS1(data);
 	}
 	//400001Ah - BG2VOFS - BG2 Y-Offset (W)
 	this.writeIO[0x1A] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2YCoord = (parentObj.gfx.BG2YCoord & 0x100) | data;
+		parentObj.gfx.BG2VOFS0(data);
 	}
 	//400001Bh - BG2VOFS - BG2 Y-Offset (W)
 	this.writeIO[0x1B] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2YCoord = ((data & 0x01) << 8) | (parentObj.gfx.BG2YCoord & 0xFF);
+		parentObj.gfx.BG2VOFS1(data);
 	}
 	//400001Ch - BG3HOFS - BG3 X-Offset (W)
 	this.writeIO[0x1C] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3XCoord = (parentObj.gfx.BG3XCoord & 0x100) | data;
+		parentObj.gfx.BG3HOFS0(data);
 	}
 	//400001Dh - BG3HOFS - BG3 X-Offset (W)
 	this.writeIO[0x1D] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3XCoord = ((data & 0x01) << 8) | (parentObj.gfx.BG3XCoord & 0xFF);
+		parentObj.gfx.BG3HOFS1(data);
 	}
 	//400001Eh - BG3VOFS - BG3 Y-Offset (W)
 	this.writeIO[0x1E] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3YCoord = (parentObj.gfx.BG3YCoord & 0x100) | data;
+		parentObj.gfx.BG3VOFS0(data);
 	}
 	//400001Fh - BG3VOFS - BG3 Y-Offset (W)
 	this.writeIO[0x1F] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3YCoord = ((data & 0x01) << 8) | (parentObj.gfx.BG3YCoord & 0xFF);
+		parentObj.gfx.BG3VOFS1(data);
 	}
 	//4000020h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
 	this.writeIO[0x20] = function (parentObj, data) {
