@@ -1006,41 +1006,19 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x47] = this.readZero;
 	//4000048h - WININ - Control of Inside of Window(s) (R/W)
 	this.readIO[0x48] = function (parentObj) {
-		//Window 0:
-		return ((parentObj.gfx.WIN0BG0 ? 0x1 : 0) |
-		(parentObj.gfx.WIN0BG1 ? 0x2 : 0) |
-		(parentObj.gfx.WIN0BG2 ? 0x4 : 0) |
-		(parentObj.gfx.WIN0BG3 ? 0x8 : 0) |
-		(parentObj.gfx.WIN0OBJ ? 0x10 : 0) |
-		(parentObj.gfx.WIN0Effects ? 0x20 : 0));
+		return parentObj.gfx.readWININ0();
 	}
 	//4000049h - WININ - Control of Inside of Window(s) (R/W)
 	this.readIO[0x49] = function (parentObj) {
-		//Window 1:
-		return ((parentObj.gfx.WIN1BG0 ? 0x1 : 0) |
-		(parentObj.gfx.WIN1BG1 ? 0x2 : 0) |
-		(parentObj.gfx.WIN1BG2 ? 0x4 : 0) |
-		(parentObj.gfx.WIN1BG3 ? 0x8 : 0) |
-		(parentObj.gfx.WIN1OBJ ? 0x10 : 0) |
-		(parentObj.gfx.WIN1Effects ? 0x20 : 0));
+		return parentObj.gfx.readWININ1();
 	}
 	//400004Ah- WINOUT - Control of Outside of Windows & Inside of OBJ Window (R/W)
 	this.readIO[0x4A] = function (parentObj) {
-		return ((parentObj.gfx.WINBG0Outside ? 0x1 : 0) |
-		(parentObj.gfx.WINBG1Outside ? 0x2 : 0) |
-		(parentObj.gfx.WINBG2Outside ? 0x4 : 0) |
-		(parentObj.gfx.WINBG3Outside ? 0x8 : 0) |
-		(parentObj.gfx.WINOBJOutside ? 0x10 : 0) |
-		(parentObj.gfx.WINEffectsOutside ? 0x20 : 0));
+		return parentObj.gfx.readWINOUT0();
 	}
 	//400004AB- WINOUT - Control of Outside of Windows & Inside of OBJ Window (R/W)
 	this.readIO[0x4B] = function (parentObj) {
-		return ((parentObj.gfx.WINOBJBG0Outside ? 0x1 : 0) |
-		(parentObj.gfx.WINOBJBG1Outside ? 0x2 : 0) |
-		(parentObj.gfx.WINOBJBG2Outside ? 0x4 : 0) |
-		(parentObj.gfx.WINOBJBG3Outside ? 0x8 : 0) |
-		(parentObj.gfx.WINOBJOBJOutside ? 0x10 : 0) |
-		(parentObj.gfx.WINOBJEffectsOutside ? 0x20 : 0));
+		return parentObj.gfx.readWINOUT1();
 	}
 	//400004Ch - MOSAIC - Mosaic Size (W)
 	this.readIO[0x4C] = this.readZero;
@@ -1052,22 +1030,11 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x4F] = this.readZero;
 	//4000050h - BLDCNT - Color Special Effects Selection (R/W)
 	this.readIO[0x50] = function (parentObj) {
-		return ((parentObj.gfx.BG0EffectsTarget1 ? 0x1 : 0) |
-		(parentObj.gfx.BG1EffectsTarget1 ? 0x2 : 0) |
-		(parentObj.gfx.BG2EffectsTarget1 ? 0x4 : 0) |
-		(parentObj.gfx.BG3EffectsTarget1 ? 0x8 : 0) |
-		(parentObj.gfx.OBJEffectsTarget1 ? 0x10 : 0) |
-		(parentObj.gfx.BackdropEffectsTarget1 ? 0x20 : 0) |
-		(parentObj.gfx.colorEffectsType << 6));
+		return parentObj.gfx.readBLDCNT0();
 	}
 	//4000051h - BLDCNT - Color Special Effects Selection (R/W)
 	this.readIO[0x51] = function (parentObj) {
-		return ((parentObj.gfx.BG0EffectsTarget2 ? 0x1 : 0) |
-		(parentObj.gfx.BG1EffectsTarget2 ? 0x2 : 0) |
-		(parentObj.gfx.BG2EffectsTarget2 ? 0x4 : 0) |
-		(parentObj.gfx.BG3EffectsTarget2 ? 0x8 : 0) |
-		(parentObj.gfx.OBJEffectsTarget2 ? 0x10 : 0) |
-		(parentObj.gfx.BackdropEffectsTarget2 ? 0x20 : 0));
+		return parentObj.gfx.readBLDCNT1();
 	}
 	//4000052h - BLDALPHA - Alpha Blending Coefficients (W)
 	this.readIO[0x52] = this.readZero;
@@ -1213,7 +1180,7 @@ GameBoyAdvanceIO.prototype.readConfigureWRAM = function (address) {
 			return 0;
 	}
 }
-GameBoyAdvanceIO.prototype.readZero = function (parentObj, address) {
+GameBoyAdvanceIO.prototype.readZero = function (parentObj) {
 	return 0;
 }
 GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address) {

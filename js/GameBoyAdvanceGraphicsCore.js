@@ -404,3 +404,54 @@ GameBoyAdvanceGraphics.prototype.writeBG3Y_H1 = function (data) {
 	this.BG3ReferenceY = ((data & 0xF) << 24) | (this.BG3ReferenceY & 0xFFFFFF);
 	this.actualBG3ReferenceY = (this.BG3ReferenceY << 4) / 0xFF0;
 }
+GameBoyAdvanceGraphics.prototype.readWININ0 = function () {
+	//Window 0:
+	return ((this.WIN0BG0 ? 0x1 : 0) |
+	(this.WIN0BG1 ? 0x2 : 0) |
+	(this.WIN0BG2 ? 0x4 : 0) |
+	(this.WIN0BG3 ? 0x8 : 0) |
+	(this.WIN0OBJ ? 0x10 : 0) |
+	(this.WIN0Effects ? 0x20 : 0));
+}
+GameBoyAdvanceGraphics.prototype.readWININ1 = function () {
+	//Window 1:
+	return ((this.WIN1BG0 ? 0x1 : 0) |
+	(this.WIN1BG1 ? 0x2 : 0) |
+	(this.WIN1BG2 ? 0x4 : 0) |
+	(this.WIN1BG3 ? 0x8 : 0) |
+	(this.WIN1OBJ ? 0x10 : 0) |
+	(this.WIN1Effects ? 0x20 : 0));
+}
+GameBoyAdvanceGraphics.prototype.readWINOUT0 = function () {
+	return ((this.WINBG0Outside ? 0x1 : 0) |
+	(this.WINBG1Outside ? 0x2 : 0) |
+	(this.WINBG2Outside ? 0x4 : 0) |
+	(this.WINBG3Outside ? 0x8 : 0) |
+	(this.WINOBJOutside ? 0x10 : 0) |
+	(this.WINEffectsOutside ? 0x20 : 0));
+}
+GameBoyAdvanceGraphics.prototype.readWINOUT1 = function () {
+	return ((this.WINOBJBG0Outside ? 0x1 : 0) |
+	(this.WINOBJBG1Outside ? 0x2 : 0) |
+	(this.WINOBJBG2Outside ? 0x4 : 0) |
+	(this.WINOBJBG3Outside ? 0x8 : 0) |
+	(this.WINOBJOBJOutside ? 0x10 : 0) |
+	(this.WINOBJEffectsOutside ? 0x20 : 0));
+}
+GameBoyAdvanceGraphics.prototype.readBLDCNT0 = function () {
+	return ((this.BG0EffectsTarget1 ? 0x1 : 0) |
+	(this.BG1EffectsTarget1 ? 0x2 : 0) |
+	(this.BG2EffectsTarget1 ? 0x4 : 0) |
+	(this.BG3EffectsTarget1 ? 0x8 : 0) |
+	(this.OBJEffectsTarget1 ? 0x10 : 0) |
+	(this.BackdropEffectsTarget1 ? 0x20 : 0) |
+	(this.colorEffectsType << 6));
+}
+GameBoyAdvanceGraphics.prototype.readBLDCNT1 = function () {
+	return ((this.BG0EffectsTarget2 ? 0x1 : 0) |
+	(this.BG1EffectsTarget2 ? 0x2 : 0) |
+	(this.BG2EffectsTarget2 ? 0x4 : 0) |
+	(this.BG3EffectsTarget2 ? 0x8 : 0) |
+	(this.OBJEffectsTarget2 ? 0x10 : 0) |
+	(this.BackdropEffectsTarget2 ? 0x20 : 0));
+}
