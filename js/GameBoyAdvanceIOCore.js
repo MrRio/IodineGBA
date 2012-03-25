@@ -767,6 +767,34 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x7E] = this.NOP;
 	//400007Fh - NOT USED - ZERO
 	this.writeIO[0x7F] = this.NOP;
+	//4000080h - SOUNDCNT_L (NR50, NR51) - Channel L/R Volume/Enable (R/W)
+	this.writeIO[0x80] = function (parentObj, data) {
+		//NR50:
+		parentObj.sound.SOUNDCNT_L0(data);
+	}
+	//4000081h - SOUNDCNT_L (NR50, NR51) - Channel L/R Volume/Enable (R/W)
+	this.writeIO[0x81] = function (parentObj, data) {
+		//NR51:
+		parentObj.sound.SOUNDCNT_L1(data);
+	}
+	//4000082h - SOUNDCNT_H (GBA only) - DMA Sound Control/Mixing (R/W)
+	this.writeIO[0x82] = function (parentObj, data) {
+		parentObj.sound.SOUNDCNT_H0(data);
+	}
+	//4000083h - SOUNDCNT_H (GBA only) - DMA Sound Control/Mixing (R/W)
+	this.writeIO[0x83] = function (parentObj, data) {
+		parentObj.sound.SOUNDCNT_H1(data);
+	}
+	//4000084h - SOUNDCNT_X (NR52) - Sound on/off (R/W)
+	this.writeIO[0x84] = function (parentObj, data) {
+		parentObj.sound.SOUNDCNT_X(data);
+	}
+	//4000085h - NOT USED - ZERO
+	this.writeIO[0x85] = this.NOP;
+	//4000086h - NOT USED - ZERO
+	this.writeIO[0x86] = this.NOP;
+	//4000087h - NOT USED - ZERO
+	this.writeIO[0x87] = this.NOP;
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
