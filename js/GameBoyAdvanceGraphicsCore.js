@@ -63,6 +63,30 @@ GameBoyAdvanceGraphics.prototype.initialize = function () {
 	this.BG2YCoord = 0;
 	this.BG3XCoord = 0;
 	this.BG3YCoord = 0;
+	this.BG2dx = 0;
+	this.BG2dmx = 0;
+	this.BG2dy = 0;
+	this.BG2dmy = 0;
+	this.actualBG2dx = 0;
+	this.actualBG2dmx = 0;
+	this.actualBG2dy = 0;
+	this.actualBG2dmy = 0;
+	this.BG3dx = 0;
+	this.BG3dmx = 0;
+	this.BG3dy = 0;
+	this.BG3dmy = 0;
+	this.actualBG3dx = 0;
+	this.actualBG3dmx = 0;
+	this.actualBG3dy = 0;
+	this.actualBG3dmy = 0;
+	this.BG2ReferenceX = 0;
+	this.BG2ReferenceY = 0;
+	this.actualBG2ReferenceX = 0;
+	this.actualBG2ReferenceY = 0;
+	this.BG3ReferenceX = 0;
+	this.BG3ReferenceY = 0;
+	this.actualBG3ReferenceX = 0;
+	this.actualBG3ReferenceY = 0;
 }
 GameBoyAdvanceGraphics.prototype.writeDISPCNT0 = function (data) {
 	this.JIT();
@@ -156,67 +180,227 @@ GameBoyAdvanceGraphics.prototype.writeBG3CNT1 = function (data) {
 	this.BG3DisplayOverflow = ((data & 0x20) == 0x20);
 	this.BG3ScreenSize = (data & 0xC0) >> 6;
 }
-GameBoyAdvanceGraphics.prototype.BG0HOFS0 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG0HOFS0 = function (data) {
 	this.JIT();
 	this.BG0XCoord = (this.BG0XCoord & 0x100) | data;
 }
-GameBoyAdvanceGraphics.prototype.BG0HOFS1 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG0HOFS1 = function (data) {
 	this.JIT();
 	this.BG0XCoord = ((data & 0x01) << 8) | (this.BG0XCoord & 0xFF);
 }
-GameBoyAdvanceGraphics.prototype.BG0VOFS0 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG0VOFS0 = function (data) {
 	this.JIT();
 	this.BG0YCoord = (this.BG0YCoord & 0x100) | data;
 }
-GameBoyAdvanceGraphics.prototype.BG0VOFS1 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG0VOFS1 = function (data) {
 	this.JIT();
 	this.BG0YCoord = ((data & 0x01) << 8) | (this.BG0YCoord & 0xFF);
 }
-GameBoyAdvanceGraphics.prototype.BG1HOFS0 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG1HOFS0 = function (data) {
 	this.JIT();
 	this.BG1XCoord = (this.BG1XCoord & 0x100) | data;
 }
-GameBoyAdvanceGraphics.prototype.BG1HOFS1 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG1HOFS1 = function (data) {
 	this.JIT();
 	this.BG1XCoord = ((data & 0x01) << 8) | (this.BG1XCoord & 0xFF);
 }
-GameBoyAdvanceGraphics.prototype.BG1VOFS0 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG1VOFS0 = function (data) {
 	this.JIT();
 	this.BG1YCoord = (this.BG1YCoord & 0x100) | data;
 }
-GameBoyAdvanceGraphics.prototype.BG1VOFS1 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG1VOFS1 = function (data) {
 	this.JIT();
 	this.BG1YCoord = ((data & 0x01) << 8) | (this.BG1YCoord & 0xFF);
 }
-GameBoyAdvanceGraphics.prototype.BG2HOFS0 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG2HOFS0 = function (data) {
 	this.JIT();
 	this.BG2XCoord = (this.BG2XCoord & 0x100) | data;
 }
-GameBoyAdvanceGraphics.prototype.BG2HOFS1 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG2HOFS1 = function (data) {
 	this.JIT();
 	this.BG2XCoord = ((data & 0x01) << 8) | (this.BG2XCoord & 0xFF);
 }
-GameBoyAdvanceGraphics.prototype.BG2VOFS0 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG2VOFS0 = function (data) {
 	this.JIT();
 	this.BG2YCoord = (this.BG2YCoord & 0x100) | data;
 }
-GameBoyAdvanceGraphics.prototype.BG2VOFS1 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG2VOFS1 = function (data) {
 	this.JIT();
 	this.BG2YCoord = ((data & 0x01) << 8) | (this.BG2YCoord & 0xFF);
 }
-GameBoyAdvanceGraphics.prototype.BG3HOFS0 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG3HOFS0 = function (data) {
 	this.JIT();
 	this.BG3XCoord = (this.BG3XCoord & 0x100) | data;
 }
-GameBoyAdvanceGraphics.prototype.BG3HOFS1 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG3HOFS1 = function (data) {
 	this.JIT();
 	this.BG3XCoord = ((data & 0x01) << 8) | (this.BG3XCoord & 0xFF);
 }
-GameBoyAdvanceGraphics.prototype.BG3VOFS0 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG3VOFS0 = function (data) {
 	this.JIT();
 	this.BG3YCoord = (this.BG3YCoord & 0x100) | data;
 }
-GameBoyAdvanceGraphics.prototype.BG3VOFS1 = function (data) {
+GameBoyAdvanceGraphics.prototype.writeBG3VOFS1 = function (data) {
 	this.JIT();
 	this.BG3YCoord = ((data & 0x01) << 8) | (this.BG3YCoord & 0xFF);
+}
+GameBoyAdvanceGraphics.prototype.writeBG2PA0 = function (data) {
+	this.JIT();
+	this.BG2dx = (this.BG2dx & 0xFF00) | data;
+	this.actualBG2dx = (this.BG2dx << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2PA1 = function (data) {
+	this.JIT();
+	this.BG2dx = (data << 8) | (this.BG2dx & 0xFF);
+	this.actualBG2dx = (this.BG2dx << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2PB0 = function (data) {
+	this.JIT();
+	this.BG2dmx = (this.BG2dmx & 0xFF00) | data;
+	this.actualBG2dmx = (this.BG2dmx << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2PB1 = function (data) {
+	this.JIT();
+	this.BG2dmx = (data << 8) | (this.BG2dmx & 0xFF);
+	this.actualBG2dmx = (this.BG2dmx << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2PC0 = function (data) {
+	this.JIT();
+	this.BG2dy = (this.BG2dy & 0xFF00) | data;
+	this.actualBG2dy = (this.BG2dy << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2PC1 = function (data) {
+	this.JIT();
+	this.BG2dy = (data << 8) | (this.BG2dy & 0xFF);
+	this.actualBG2dy = (this.BG2dy << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2PD0 = function (data) {
+	this.JIT();
+	this.BG2dmy = (this.BG2dmx & 0xFF00) | data;
+	this.actualBG2dmy = (this.BG2dmy << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2PD1 = function (data) {
+	this.JIT();
+	this.BG2dmy = (data << 8) | (this.BG2dmx & 0xFF);
+	this.actualBG2dmy = (this.BG2dmy << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3PA0 = function (data) {
+	this.JIT();
+	this.BG3dx = (this.BG3dx & 0xFF00) | data;
+	this.actualBG3dx = (this.BG3dx << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3PA1 = function (data) {
+	this.JIT();
+	this.BG3dx = (data << 8) | (this.BG3dx & 0xFF);
+	this.actualBG3dx = (this.BG3dx << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3PB0 = function (data) {
+	this.JIT();
+	this.BG3dmx = (this.BG3dmx & 0xFF00) | data;
+	this.actualBG3dmx = (this.BG3dmx << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3PB1 = function (data) {
+	this.JIT();
+	this.BG3dmx = (data << 8) | (this.BG3dmx & 0xFF);
+	this.actualBG3dmx = (this.BG3dmx << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3PC0 = function (data) {
+	this.JIT();
+	this.BG3dy = (this.BG3dy & 0xFF00) | data;
+	this.actualBG3dy = (this.BG3dy << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3PC1 = function (data) {
+	this.JIT();
+	this.BG3dy = (data << 8) | (this.BG3dy & 0xFF);
+	this.actualBG3dy = (this.BG3dy << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3PD0 = function (data) {
+	this.JIT();
+	this.BG3dmy = (this.BG3dmx & 0xFF00) | data;
+	this.actualBG3dmy = (this.BG3dmy << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3PD1 = function (data) {
+	this.JIT();
+	this.BG3dmy = (data << 8) | (this.BG3dmx & 0xFF);
+	this.actualBG3dmy = (this.BG3dmy << 16) / 0xFF0000;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2X_L0 = function (data) {
+	this.JIT();
+	this.BG2ReferenceX = (this.BG2ReferenceX & 0xFFFFF00) | data;
+	this.actualBG2ReferenceX = (this.BG2ReferenceX << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2X_L1 = function (data) {
+	this.JIT();
+	this.BG2ReferenceX = (data << 8) | (this.BG2ReferenceX & 0xFFF00FF);
+	this.actualBG2ReferenceX = (this.BG2ReferenceX << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2X_H0 = function (data) {
+	this.JIT();
+	this.BG2ReferenceX = (data << 16) | (this.BG2ReferenceX & 0xF00FFFF);
+	this.actualBG2ReferenceX = (this.BG2ReferenceX << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2X_H1 = function (data) {
+	this.JIT();
+	this.BG2ReferenceX = ((data & 0xF) << 24) | (this.BG2ReferenceX & 0xFFFFFF);
+	this.actualBG2ReferenceX = (this.BG2ReferenceX << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2Y_L0 = function (data) {
+	this.JIT();
+	this.BG2ReferenceY = (this.BG2ReferenceY & 0xFFFFF00) | data;
+	this.actualBG2ReferenceY = (this.BG2ReferenceY << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2Y_L1 = function (data) {
+	this.JIT();
+	this.BG2ReferenceY = (data << 8) | (this.BG2ReferenceY & 0xFFF00FF);
+	this.actualBG2ReferenceY = (this.BG2ReferenceY << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2Y_H0 = function (data) {
+	this.JIT();
+	this.BG2ReferenceY = (data << 16) | (this.BG2ReferenceY & 0xF00FFFF);
+	this.actualBG2ReferenceY = (this.BG2ReferenceY << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG2Y_H1 = function (data) {
+	this.JIT();
+	this.BG2ReferenceY = ((data & 0xF) << 24) | (this.BG2ReferenceY & 0xFFFFFF);
+	this.actualBG2ReferenceY = (this.BG2ReferenceY << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3X_L0 = function (data) {
+	this.JIT();
+	this.BG3ReferenceX = (this.BG3ReferenceX & 0xFFFFF00) | data;
+	this.actualBG3ReferenceX = (this.BG3ReferenceX << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3X_L1 = function (data) {
+	this.JIT();
+	this.BG3ReferenceX = (data << 8) | (this.BG3ReferenceX & 0xFFF00FF);
+	this.actualBG3ReferenceX = (this.BG3ReferenceX << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3X_H0 = function (data) {
+	this.JIT();
+	this.BG3ReferenceX = (data << 16) | (this.BG3ReferenceX & 0xF00FFFF);
+	this.actualBG3ReferenceX = (this.BG3ReferenceX << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3X_H1 = function (data) {
+	this.JIT();
+	this.BG3ReferenceX = ((data & 0xF) << 24) | (this.BG3ReferenceX & 0xFFFFFF);
+	this.actualBG3ReferenceX = (this.BG3ReferenceX << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3Y_L0 = function (data) {
+	this.JIT();
+	this.BG3ReferenceY = (this.BG3ReferenceY & 0xFFFFF00) | data;
+	this.actualBG3ReferenceY = (this.BG3ReferenceY << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3Y_L1 = function (data) {
+	this.JIT();
+	this.BG3ReferenceY = (data << 8) | (this.BG3ReferenceY & 0xFFF00FF);
+	this.actualBG3ReferenceY = (this.BG3ReferenceY << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3Y_H0 = function (data) {
+	this.JIT();
+	this.BG3ReferenceY = (data << 16) | (this.BG3ReferenceY & 0xF00FFFF);
+	this.actualBG3ReferenceY = (this.BG3ReferenceY << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeBG3Y_H1 = function (data) {
+	this.JIT();
+	this.BG3ReferenceY = ((data & 0xF) << 24) | (this.BG3ReferenceY & 0xFFFFFF);
+	this.actualBG3ReferenceY = (this.BG3ReferenceY << 4) / 0xFF0;
 }

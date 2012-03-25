@@ -355,259 +355,195 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//4000010h - BG0HOFS - BG0 X-Offset (W)
 	this.writeIO[0x10] = function (parentObj, data) {
-		parentObj.gfx.BG0HOFS0(data);
+		parentObj.gfx.writeBG0HOFS0(data);
 	}
 	//4000011h - BG0HOFS - BG0 X-Offset (W)
 	this.writeIO[0x11] = function (parentObj, data) {
-		parentObj.gfx.BG0HOFS1(data);
+		parentObj.gfx.writeBG0HOFS1(data);
 	}
 	//4000012h - BG0VOFS - BG0 Y-Offset (W)
 	this.writeIO[0x12] = function (parentObj, data) {
-		parentObj.gfx.BG0VOFS0(data);
+		parentObj.gfx.writeBG0VOFS0(data);
 	}
 	//4000013h - BG0VOFS - BG0 Y-Offset (W)
 	this.writeIO[0x13] = function (parentObj, data) {
-		parentObj.gfx.BG0VOFS1(data);
+		parentObj.gfx.writeBG0VOFS1(data);
 	}
 	//4000014h - BG1HOFS - BG1 X-Offset (W)
 	this.writeIO[0x14] = function (parentObj, data) {
-		parentObj.gfx.BG1HOFS0(data);
+		parentObj.gfx.writeBG1HOFS0(data);
 	}
 	//4000015h - BG1HOFS - BG1 X-Offset (W)
 	this.writeIO[0x15] = function (parentObj, data) {
-		parentObj.gfx.BG1HOFS1(data);
+		parentObj.gfx.writeBG1HOFS1(data);
 	}
 	//4000016h - BG1VOFS - BG1 Y-Offset (W)
 	this.writeIO[0x16] = function (parentObj, data) {
-		parentObj.gfx.BG1VOFS0(data);
+		parentObj.gfx.writeBG1VOFS0(data);
 	}
 	//4000017h - BG1VOFS - BG1 Y-Offset (W)
 	this.writeIO[0x17] = function (parentObj, data) {
-		parentObj.gfx.BG1VOFS1(data);
+		parentObj.gfx.writeBG1VOFS1(data);
 	}
 	//4000018h - BG2HOFS - BG2 X-Offset (W)
 	this.writeIO[0x18] = function (parentObj, data) {
-		parentObj.gfx.BG2HOFS0(data);
+		parentObj.gfx.writeBG2HOFS0(data);
 	}
 	//4000019h - BG2HOFS - BG2 X-Offset (W)
 	this.writeIO[0x19] = function (parentObj, data) {
-		parentObj.gfx.BG2HOFS1(data);
+		parentObj.gfx.writeBG2HOFS1(data);
 	}
 	//400001Ah - BG2VOFS - BG2 Y-Offset (W)
 	this.writeIO[0x1A] = function (parentObj, data) {
-		parentObj.gfx.BG2VOFS0(data);
+		parentObj.gfx.writeBG2VOFS0(data);
 	}
 	//400001Bh - BG2VOFS - BG2 Y-Offset (W)
 	this.writeIO[0x1B] = function (parentObj, data) {
-		parentObj.gfx.BG2VOFS1(data);
+		parentObj.gfx.writeBG2VOFS1(data);
 	}
 	//400001Ch - BG3HOFS - BG3 X-Offset (W)
 	this.writeIO[0x1C] = function (parentObj, data) {
-		parentObj.gfx.BG3HOFS0(data);
+		parentObj.gfx.writeBG3HOFS0(data);
 	}
 	//400001Dh - BG3HOFS - BG3 X-Offset (W)
 	this.writeIO[0x1D] = function (parentObj, data) {
-		parentObj.gfx.BG3HOFS1(data);
+		parentObj.gfx.writeBG3HOFS1(data);
 	}
 	//400001Eh - BG3VOFS - BG3 Y-Offset (W)
 	this.writeIO[0x1E] = function (parentObj, data) {
-		parentObj.gfx.BG3VOFS0(data);
+		parentObj.gfx.writeBG3VOFS0(data);
 	}
 	//400001Fh - BG3VOFS - BG3 Y-Offset (W)
 	this.writeIO[0x1F] = function (parentObj, data) {
-		parentObj.gfx.BG3VOFS1(data);
+		parentObj.gfx.writeBG3VOFS1(data);
 	}
 	//4000020h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
 	this.writeIO[0x20] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2dx = (parentObj.gfx.BG2dx & 0xFF00) | data;
-		parentObj.memoryAccessType = 6;
+		parentObj.gfx.writeBG2PA0(data);
 	}
 	//4000021h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
 	this.writeIO[0x21] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2dx = (data << 8) | (parentObj.gfx.BG2dx & 0xFF);
-		parentObj.memoryAccessType = 6;
+		parentObj.gfx.writeBG2PA1(data);
 	}
 	//4000022h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
 	this.writeIO[0x22] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2dmx = (parentObj.gfx.BG2dmx & 0xFF00) | data;
-		parentObj.memoryAccessType = 7;
+		parentObj.gfx.writeBG2PB0(data);
 	}
 	//4000023h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
 	this.writeIO[0x23] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2dmx = (data << 8) | (parentObj.gfx.BG2dmx & 0xFF);
-		parentObj.memoryAccessType = 7;
+		parentObj.gfx.writeBG2PB1(data);
 	}
 	//4000024h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
 	this.writeIO[0x24] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2dy = (parentObj.gfx.BG2dy & 0xFF00) | data;
-		parentObj.memoryAccessType = 8;
+		parentObj.gfx.writeBG2PC0(data);
 	}
 	//4000025h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
 	this.writeIO[0x25] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2dy = (data << 8) | (parentObj.gfx.BG2dy & 0xFF);
-		parentObj.memoryAccessType = 8;
+		parentObj.gfx.writeBG2PC1(data);
 	}
 	//4000026h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
 	this.writeIO[0x26] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2dmy = (parentObj.gfx.BG2dmy & 0xFF00) | data;
-		parentObj.memoryAccessType = 9;
+		parentObj.gfx.writeBG2PD0(data);
 	}
 	//4000027h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
 	this.writeIO[0x27] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2dmy = (data << 8) | (parentObj.gfx.BG2dmy & 0xFF);
-		parentObj.memoryAccessType = 9;
+		parentObj.gfx.writeBG2PD1(data);
 	}
 	//4000028h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
 	this.writeIO[0x28] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2ReferenceX = (parentObj.gfx.BG2ReferenceX & 0xFFFFF00) | data;
-		parentObj.memoryAccessType = 2;
+		parentObj.gfx.writeBG2X_L0(data);
 	}
 	//4000029h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
 	this.writeIO[0x29] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2ReferenceX = (data << 8) | (parentObj.gfx.BG2ReferenceX & 0xFFF00FF);
-		parentObj.memoryAccessType = 2;
+		parentObj.gfx.writeBG2X_L1(data);
 	}
 	//400002Ah - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
 	this.writeIO[0x2A] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2ReferenceX = (data << 16) | (parentObj.gfx.BG2ReferenceX & 0xF00FFFF);
-		parentObj.memoryAccessType = 2;
+		parentObj.gfx.writeBG2X_H0(data);
 	}
 	//400002Bh - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
 	this.writeIO[0x2B] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2ReferenceX = ((data & 0xF) << 24) | (parentObj.gfx.BG2ReferenceX & 0xFFFFFF);
-		parentObj.memoryAccessType = 2;
+		parentObj.gfx.writeBG2X_H1(data);
 	}
 	//400002Ch - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
 	this.writeIO[0x2C] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2ReferenceY = (parentObj.gfx.BG2ReferenceY & 0xFFFFF00) | data;
-		parentObj.memoryAccessType = 3;
+		parentObj.gfx.writeBG2Y_L0(data);
 	}
 	//400002Dh - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
 	this.writeIO[0x2D] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2ReferenceY = (data << 8) | (parentObj.gfx.BG2ReferenceY & 0xFFF00FF);
-		parentObj.memoryAccessType = 3;
+		parentObj.gfx.writeBG2Y_L1(data);
 	}
 	//400002Eh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.writeIO[0x2E] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2ReferenceY = (data << 16) | (parentObj.gfx.BG2ReferenceY & 0xF00FFFF);
-		parentObj.memoryAccessType = 3;
+		parentObj.gfx.writeBG2Y_H0(data);
 	}
 	//400002Fh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.writeIO[0x2F] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG2ReferenceY = ((data & 0xF) << 24) | (parentObj.gfx.BG2ReferenceY & 0xFFFFFF);
-		parentObj.memoryAccessType = 3;
+		parentObj.gfx.writeBG2Y_H1(data);
 	}
 	//4000030h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
 	this.writeIO[0x30] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3dx = (parentObj.gfx.BG3dx & 0xFF00) | data;
-		parentObj.memoryAccessType = 10;
+		parentObj.gfx.writeBG3PA0(data);
 	}
 	//4000031h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
 	this.writeIO[0x31] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3dx = (data << 8) | (parentObj.gfx.BG3dx & 0xFF);
-		parentObj.memoryAccessType = 10;
+		parentObj.gfx.writeBG3PA1(data);
 	}
 	//4000032h - BG3PB - BG3 Rotation/Scaling Parameter B (alias dmx) (W)
 	this.writeIO[0x32] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3dmx = (parentObj.gfx.BG3dmx & 0xFF00) | data;
-		parentObj.memoryAccessType = 11;
+		parentObj.gfx.writeBG3PB0(data);
 	}
 	//4000033h - BG3PB - BG3 Rotation/Scaling Parameter B (alias dmx) (W)
 	this.writeIO[0x33] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3dmx = (data << 8) | (parentObj.gfx.BG3dmx & 0xFF);
-		parentObj.memoryAccessType = 11;
+		parentObj.gfx.writeBG3PB1(data);
 	}
 	//4000034h - BG3PC - BG3 Rotation/Scaling Parameter C (alias dy) (W)
 	this.writeIO[0x34] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3dy = (parentObj.gfx.BG3dy & 0xFF00) | data;
-		parentObj.memoryAccessType = 12;
+		parentObj.gfx.writeBG3PC0(data);
 	}
 	//4000035h - BG3PC - BG3 Rotation/Scaling Parameter C (alias dy) (W)
 	this.writeIO[0x35] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3dy = (data << 8) | (parentObj.gfx.BG3dy & 0xFF);
-		parentObj.memoryAccessType = 12;
+		parentObj.gfx.writeBG3PC1(data);
 	}
 	//4000036h - BG3PD - BG3 Rotation/Scaling Parameter D (alias dmy) (W)
 	this.writeIO[0x36] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3dmy = (parentObj.gfx.BG3dmy & 0xFF00) | data;
-		parentObj.memoryAccessType = 13;
+		parentObj.gfx.writeBG3PD0(data);
 	}
 	//4000037h - BG3PD - BG3 Rotation/Scaling Parameter D (alias dmy) (W)
 	this.writeIO[0x37] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3dmy = (data << 8) | (parentObj.gfx.BG3dmy & 0xFF);
-		parentObj.memoryAccessType = 13;
+		parentObj.gfx.writeBG3PD1(data);
 	}
 	//4000038h - BG3X_L - BG3 Reference Point X-Coordinate, lower 16 bit (W)
 	this.writeIO[0x38] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3ReferenceX = (parentObj.gfx.BG3ReferenceX & 0xFFFFF00) | data;
-		parentObj.memoryAccessType = 4;
+		parentObj.gfx.writeBG3X_L0(data);
 	}
 	//4000039h - BG3X_L - BG3 Reference Point X-Coordinate, lower 16 bit (W)
 	this.writeIO[0x39] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3ReferenceX = (data << 8) | (parentObj.gfx.BG3ReferenceX & 0xFFF00FF);
-		parentObj.memoryAccessType = 4;
+		parentObj.gfx.writeBG3X_L1(data);
 	}
 	//400003Ah - BG3X_H - BG3 Reference Point X-Coordinate, upper 12 bit (W)
 	this.writeIO[0x3A] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3ReferenceX = (data << 16) | (parentObj.gfx.BG3ReferenceX & 0xF00FFFF);
-		parentObj.memoryAccessType = 4;
+		parentObj.gfx.writeBG3X_H0(data);
 	}
 	//400003Bh - BG3X_H - BG3 Reference Point X-Coordinate, upper 12 bit (W)
 	this.writeIO[0x3B] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3ReferenceX = ((data & 0xF) << 24) | (parentObj.gfx.BG3ReferenceX & 0xFFFFFF);
-		parentObj.memoryAccessType = 4;
+		parentObj.gfx.writeBG3X_H1(data);
 	}
 	//400003Ch - BG3Y_L - BG3 Reference Point Y-Coordinate, lower 16 bit (W)
 	this.writeIO[0x3C] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3ReferenceY = (parentObj.gfx.BG3ReferenceY & 0xFFFFF00) | data;
-		parentObj.memoryAccessType = 5;
+		parentObj.gfx.writeBG3Y_L0(data);
 	}
 	//400003Dh - BGY_L - BG3 Reference Point Y-Coordinate, lower 16 bit (W)
 	this.writeIO[0x3D] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3ReferenceY = (data << 8) | (parentObj.gfx.BG3ReferenceY & 0xFFF00FF);
-		parentObj.memoryAccessType = 5;
+		parentObj.gfx.writeBG3Y_L1(data);
 	}
 	//400003Eh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.writeIO[0x3E] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3ReferenceY = (data << 16) | (parentObj.gfx.BG3ReferenceY & 0xF00FFFF);
-		parentObj.memoryAccessType = 5;
+		parentObj.gfx.writeBG3Y_H0(data);
 	}
 	//400003Fh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
 	this.writeIO[0x3F] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG3ReferenceY = ((data & 0xF) << 24) | (parentObj.gfx.BG3ReferenceY & 0xFFFFFF);
-		parentObj.memoryAccessType = 5;
+		parentObj.gfx.writeBG3Y_H1(data);
 	}
 	//4000040h - WIN0H - Window 0 Horizontal Dimensions (W)
 	this.writeIO[0x40] = function (parentObj, data) {
@@ -1181,54 +1117,6 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 	this.accessPostProcess32[1] = function (parentObj) {
 		//External WRAM state:
 		parentObj.emulatorCore.CPUClocks += parentObj.waitStateWRAMLong;
-	}
-	this.accessPostProcess8[2] = this.accessPostProcess16[2] = this.accessPostProcess32[2] = function (parentObj) {
-		//Shadow Copy BG2 Reference Point X:
-		parentObj.gfx.shadowCopyBG2ReferenceX();
-	}
-	this.accessPostProcess8[3] = this.accessPostProcess16[3] = this.accessPostProcess32[3] = function (parentObj) {
-		//Shadow Copy BG2 Reference Point Y:
-		parentObj.gfx.shadowCopyBG2ReferenceY();
-	}
-	this.accessPostProcess8[4] = this.accessPostProcess16[4] = this.accessPostProcess32[4] = function (parentObj) {
-		//Shadow Copy BG3 Reference Point X:
-		parentObj.gfx.shadowCopyBG3ReferenceX();
-	}
-	this.accessPostProcess8[5] = this.accessPostProcess16[5] = this.accessPostProcess32[5] = function (parentObj) {
-		//Shadow Copy BG3 Reference Point Y:
-		parentObj.gfx.shadowCopyBG3ReferenceY();
-	}
-	this.accessPostProcess8[6] = this.accessPostProcess16[6] = this.accessPostProcess32[6] = function (parentObj) {
-		//Update the adjusted BG2 dx value:
-		parentObj.gfx.updateBG2dxCache();
-	}
-	this.accessPostProcess8[7] = this.accessPostProcess16[7] = this.accessPostProcess32[7] = function (parentObj) {
-		//Update the adjusted BG2 dmx value:
-		parentObj.gfx.updateBG2dmxCache();
-	}
-	this.accessPostProcess8[8] = this.accessPostProcess16[8] = this.accessPostProcess32[8] = function (parentObj) {
-		//Update the adjusted BG2 dy value:
-		parentObj.gfx.updateBG2dyCache();
-	}
-	this.accessPostProcess8[9] = this.accessPostProcess16[9] = this.accessPostProcess32[9] = function (parentObj) {
-		//Update the adjusted BG2 dmy value:
-		parentObj.gfx.updateBG2dmyCache();
-	}
-	this.accessPostProcess8[10] = this.accessPostProcess16[10] = this.accessPostProcess32[10] = function (parentObj) {
-		//Update the adjusted BG3 dx value:
-		parentObj.gfx.updateBG3dxCache();
-	}
-	this.accessPostProcess8[11] = this.accessPostProcess16[11] = this.accessPostProcess32[11] = function (parentObj) {
-		//Update the adjusted BG3 dmx value:
-		parentObj.gfx.updateBG3dmxCache();
-	}
-	this.accessPostProcess8[12] = this.accessPostProcess16[12] = this.accessPostProcess32[12] = function (parentObj) {
-		//Update the adjusted BG3 dy value:
-		parentObj.gfx.updateBG3dyCache();
-	}
-	this.accessPostProcess8[13] = this.accessPostProcess16[13] = this.accessPostProcess32[13] = function (parentObj) {
-		//Update the adjusted BG3 dmy value:
-		parentObj.gfx.updateBG3dmyCache();
 	}
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
