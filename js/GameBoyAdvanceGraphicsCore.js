@@ -714,3 +714,10 @@ GameBoyAdvanceGraphics.prototype.writeBLDY = function (data) {
 	this.JIT();
 	this.brightnessEffectAmount = data & 0x1F;
 }
+GameBoyAdvanceGraphics.prototype.writeVRAM = function (address, data) {
+	this.JIT();
+	this.VRAM[address] = data;
+}
+GameBoyAdvanceGraphics.prototype.readVRAM = function (address) {
+	return this.VRAM[address];
+}
