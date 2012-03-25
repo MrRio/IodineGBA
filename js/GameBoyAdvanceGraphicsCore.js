@@ -91,10 +91,10 @@ GameBoyAdvanceGraphics.prototype.initialize = function () {
 	this.WIN0XCoordLeft = 0;
 	this.WIN1XCoordRight = 0;
 	this.WIN1XCoordLeft = 0;
-	this.WIN0XCoordBottom = 0;
-	this.WIN0XCoordTop = 0;
-	this.WIN1XCoordBottom = 0;
-	this.WIN1XCoordTop = 0;
+	this.WIN0YCoordBottom = 0;
+	this.WIN0YCoordTop = 0;
+	this.WIN1YCoordBottom = 0;
+	this.WIN1YCoordTop = 0;
 	this.WIN0BG0 = false;
 	this.WIN0BG1 = false;
 	this.WIN0BG2 = false;
@@ -533,6 +533,39 @@ GameBoyAdvanceGraphics.prototype.writeBG3Y_H1 = function (data) {
 	this.JIT();
 	this.BG3ReferenceY = ((data & 0xF) << 24) | (this.BG3ReferenceY & 0xFFFFFF);
 	this.actualBG3ReferenceY = (this.BG3ReferenceY << 4) / 0xFF0;
+}
+GameBoyAdvanceGraphics.prototype.writeWIN0H0 = function (data) {
+	this.JIT();
+	this.WIN0XCoordRight = data;		//Window x-coord goes up to this minus 1.
+}
+GameBoyAdvanceGraphics.prototype.writeWIN0H1 = function (dara) {
+	this.JIT();
+	this.WIN0XCoordLeft = data;
+}
+GameBoyAdvanceGraphics.prototype.writeWIN1H0 = function (data) {
+	this.JIT();
+	this.WIN1XCoordRight = data;		//Window x-coord goes up to this minus 1.
+}
+GameBoyAdvanceGraphics.prototype.writeWIN1H1 = function (data) {
+	this.JIT();
+	this.WIN1XCoordLeft = data;
+}
+
+GameBoyAdvanceGraphics.prototype.writeWIN0V0 = function (data) {
+	this.JIT();
+	this.WIN0YCoordBottom = data;		//Window y-coord goes up to this minus 1.
+}
+GameBoyAdvanceGraphics.prototype.writeWIN0V1 = function (dara) {
+	this.JIT();
+	this.WIN0YCoordTop = data;
+}
+GameBoyAdvanceGraphics.prototype.writeWIN1V0 = function (data) {
+	this.JIT();
+	this.WIN1YCoordBottom = data;		//Window y-coord goes up to this minus 1.
+}
+GameBoyAdvanceGraphics.prototype.writeWIN1V1 = function (data) {
+	this.JIT();
+	this.WIN1YCoordTop = data;
 }
 GameBoyAdvanceGraphics.prototype.readWININ0 = function () {
 	//Window 0:

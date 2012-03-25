@@ -547,43 +547,35 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//4000040h - WIN0H - Window 0 Horizontal Dimensions (W)
 	this.writeIO[0x40] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN0XCoordRight = data;	//Window x-coord goes up to this minus 1.
+		parentObj.gfx.writeWIN0H0(data);
 	}
 	//4000041h - WIN0H - Window 0 Horizontal Dimensions (W)
 	this.writeIO[0x41] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN0XCoordLeft = data;
+		parentObj.gfx.writeWIN0H1(data);
 	}
 	//4000042h - WIN1H - Window 1 Horizontal Dimensions (W)
 	this.writeIO[0x42] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN1XCoordRight = data;	//Window x-coord goes up to this minus 1.
+		parentObj.gfx.writeWIN1H0(data);
 	}
 	//4000043h - WIN1H - Window 1 Horizontal Dimensions (W)
 	this.writeIO[0x43] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN1XCoordLeft = data;
+		parentObj.gfx.writeWIN1H1(data);
 	}
 	//4000044h - WIN0V - Window 0 Vertical Dimensions (W)
 	this.writeIO[0x44] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN0XCoordBottom = data;	//Window y-coord goes up to this minus 1.
+		parentObj.gfx.writeWIN0V0(data);
 	}
 	//4000045h - WIN0V - Window 0 Vertical Dimensions (W)
 	this.writeIO[0x45] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN0XCoordTop = data;
+		parentObj.gfx.writeWIN0V1(data);
 	}
 	//4000046h - WIN1V - Window 1 Vertical Dimensions (W)
 	this.writeIO[0x46] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN1XCoordBottom = data;	//Window y-coord goes up to this minus 1.
+		parentObj.gfx.writeWIN1V0(data);
 	}
 	//4000047h - WIN1V - Window 1 Vertical Dimensions (W)
 	this.writeIO[0x47] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN1XCoordTop = data;
+		parentObj.gfx.writeWIN1V1(data);
 	}
 	//4000048h - WININ - Control of Inside of Window(s) (R/W)
 	this.writeIO[0x48] = function (parentObj, data) {
