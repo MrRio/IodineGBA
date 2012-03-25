@@ -812,20 +812,15 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x3] = this.readZero;
 	//4000004h - DISPSTAT - General LCD Status (Read/Write)
 	this.readIO[0x4] = function (parentObj) {
-		return ((parentObj.gfx.inVBlank ? 0x1 : 0) |
-		(parentObj.gfx.inHBlank ? 0x2 : 0) |
-		(parentObj.gfx.VCounterMatch ? 0x4 : 0) |
-		(parentObj.gfx.IRQVBlank ? 0x8 : 0) |
-		(parentObj.gfx.IRQHBlank ? 0x10 : 0) |
-		(parentObj.gfx.IRQVCounter ? 0x20 : 0));
+		return parentObj.gfx.readDISPSTAT0();
 	}
 	//4000005h - DISPSTAT - General LCD Status (Read/Write)
 	this.readIO[0x5] = function (parentObj) {
-		return parentObj.gfx.VCounter;
+		return parentObj.gfx.readDISPSTAT1();
 	}
 	//4000006h - VCOUNT - Vertical Counter (Read only)
 	this.readIO[0x6] = function (parentObj) {
-		return parentObj.gfx.currentScanLine;
+		return parentObj.gfx.readVCOUNT();
 	}
 	//4000007h - VCOUNT - Vertical Counter (Read only)
 	this.readIO[0x7] = this.readZero;

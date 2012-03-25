@@ -140,9 +140,23 @@ GameBoyAdvanceGraphics.prototype.writeDISPSTAT0 = function (data) {
 	this.IRQHBlank = ((data & 0x10) == 0x10);
 	this.IRQVCounter = ((data & 0x20) == 0x20);
 }
+GameBoyAdvanceGraphics.prototype.writeDISPSTAT0 = function (data) {
+	return ((this.inVBlank ? 0x1 : 0) |
+	(this.inHBlank ? 0x2 : 0) |
+	(this.VCounterMatch ? 0x4 : 0) |
+	(this.IRQVBlank ? 0x8 : 0) |
+	(this.IRQHBlank ? 0x10 : 0) |
+	(this.IRQVCounter ? 0x20 : 0));
+}
 GameBoyAdvanceGraphics.prototype.writeDISPSTAT1 = function (data) {
 	//V-Counter match value:
 	this.VCounter = data;
+}
+GameBoyAdvanceGraphics.prototype.writeDISPSTAT1 = function (data) {
+	return this.VCounter;
+}
+GameBoyAdvanceGraphics.prototype.readVCOUNT = function (data) {
+	return this.currentScanLine;
 }
 GameBoyAdvanceGraphics.prototype.writeBG0CNT0 = function (data) {
 	this.JIT();
