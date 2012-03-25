@@ -29,6 +29,8 @@ function GameBoyAdvanceIO(emulatorCore) {
 	//Initialize the A/V objects:
 	this.gfx = new GameBoyAdvanceGraphics(this);
 	this.sound = new GameBoyAdvanceSound(this);
+	//After all sub-objects initialized, initialize dispatches:
+	this.compileMemoryDispatches();
 }
 GameBoyAdvanceIO.prototype.memoryWrite8 = function (address, data) {
 	//Byte Write:
@@ -993,6 +995,19 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 		//External WRAM state:
 		parentObj.emulatorCore.CPUClocks += parentObj.waitStateWRAMLong;
 	}
+	this.accessPostProcess8[2] = function (parentObj) {
+		//VRAM Write:
+		//TODO: Add VRAM delays during draw.
+		//Special case this for the illegal 8-bit VRAM writes?
+	}
+	this.accessPostProcess16[2] = function (parentObj) {
+		//VRAM Write:
+		//TODO: Add VRAM delays during draw.
+	}
+	this.accessPostProcess32[2] = function (parentObj) {
+		//VRAM Write:
+		++parentObj.emulatorCore.CPUClocks;
+	}
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
 	//External WRAM:
@@ -1014,6 +1029,18 @@ GameBoyAdvanceIO.prototype.writeIODispatch = function (parentObj, address, data)
 		//WRAM wait state control:
 		parentObj.writeConfigureWRAM(address, data);
 	}
+}
+GameBoyAdvanceIO.prototype.writeVRAM = function (parentObj, address, data) {
+	if (address < 0x6018000) {
+		parentObj.gfx.writeVRAM(address & 0x1FFFF, data);
+	}
+	else if ((address & 0x1F000) > 0x17000) {
+		parentObj.gfx.writeVRAM(address & 0x17FFF, data);
+	}
+	else {
+		parentObj.gfx.writeVRAM(address & 0x1FFFF, data);
+	}
+	parentObj.memoryAccessType = 2;
 }
 GameBoyAdvanceIO.prototype.NOP = function (parentObj, data) {
 	//Ignore the data write...
@@ -1084,6 +1111,18 @@ GameBoyAdvanceIO.prototype.readIODispatch = function (parentObj, address) {
 	}
 	else {
 		return parentObj.readUnused(parentObj, address);
+	}
+}
+GameBoyAdvanceIO.prototype.readVRAM = function (parentObj, address) {
+	parentObj.memoryAccessType = 2;
+	if (address < 0x6018000) {
+		return parentObj.gfx.readVRAM(address & 0x1FFFF);
+	}
+	else if ((address & 0x1F000) > 0x17000) {
+		return parentObj.gfx.readVRAM(address & 0x17FFF);
+	}
+	else {
+		return parentObj.gfx.readVRAM(address & 0x1FFFF);
 	}
 }
 GameBoyAdvanceIO.prototype.readConfigureWRAM = function (address) {
