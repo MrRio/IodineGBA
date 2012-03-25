@@ -826,55 +826,35 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x7] = this.readZero;
 	//4000008h - BG0CNT - BG0 Control (R/W) (BG Modes 0,1 only)
 	this.readIO[0x8] = function (parentObj) {
-		return (parentObj.gfx.BG0Priority |
-		(parentObj.gfx.BG0CharacterBaseBlock << 2) |
-		(parentObj.gfx.BG0Mosaic ? 0x40 : 0) | 
-		(parentObj.gfx.BG0Palette256 ? 0x80 : 0));
+		return parentObj.gfx.readBG0CNT0();
 	}
 	//4000009h - BG0CNT - BG0 Control (R/W) (BG Modes 0,1 only)
 	this.readIO[0x9] = function (parentObj) {
-		return (parentObj.gfx.BG0ScreenBaseBlock |
-		(parentObj.gfx.BG0DisplayOverflow ? 0x20 : 0) |
-		(parentObj.gfx.BG0ScreenSize << 6));
+		return parentObj.gfx.readBG0CNT1();
 	}
 	//400000Ah - BG1CNT - BG1 Control (R/W) (BG Modes 0,1 only)
 	this.readIO[0xA] = function (parentObj) {
-		return (parentObj.gfx.BG1Priority |
-		(parentObj.gfx.BG1CharacterBaseBlock << 2) |
-		(parentObj.gfx.BG1Mosaic ? 0x40 : 0) | 
-		(parentObj.gfx.BG1Palette256 ? 0x80 : 0));
+		return parentObj.gfx.readBG1CNT0();
 	}
 	//400000Bh - BG1CNT - BG1 Control (R/W) (BG Modes 0,1 only)
 	this.readIO[0xB] = function (parentObj) {
-		return (parentObj.gfx.BG1ScreenBaseBlock |
-		(parentObj.gfx.BG1DisplayOverflow ? 0x20 : 0) |
-		(parentObj.gfx.BG1ScreenSize << 6));
+		return parentObj.gfx.readBG1CNT1();
 	}
 	//400000Ch - BG2CNT - BG2 Control (R/W) (BG Modes 0,1,2 only)
 	this.readIO[0xC] = function (parentObj) {
-		return (parentObj.gfx.BG2Priority |
-		(parentObj.gfx.BG2CharacterBaseBlock << 2) |
-		(parentObj.gfx.BG2Mosaic ? 0x40 : 0) | 
-		(parentObj.gfx.BG2Palette256 ? 0x80 : 0));
+		return parentObj.gfx.readBG2CNT0();
 	}
 	//400000Dh - BG2CNT - BG2 Control (R/W) (BG Modes 0,1,2 only)
 	this.readIO[0xD] = function (parentObj) {
-		return (parentObj.gfx.BG2ScreenBaseBlock |
-		(parentObj.gfx.BG2DisplayOverflow ? 0x20 : 0) |
-		(parentObj.gfx.BG2ScreenSize << 6));
+		return parentObj.gfx.readBG2CNT1();
 	}
 	//400000Eh - BG3CNT - BG3 Control (R/W) (BG Modes 0,2 only)
 	this.readIO[0xE] = function (parentObj) {
-		return (parentObj.gfx.BG3Priority |
-		(parentObj.gfx.BG3CharacterBaseBlock << 2) |
-		(parentObj.gfx.BG3Mosaic ? 0x40 : 0) | 
-		(parentObj.gfx.BG3Palette256 ? 0x80 : 0));
+		return parentObj.gfx.readBG3CNT0();
 	}
 	//400000Fh - BG3CNT - BG3 Control (R/W) (BG Modes 0,2 only)
 	this.readIO[0xF] = function (parentObj) {
-		return (parentObj.gfx.BG3ScreenBaseBlock |
-		(parentObj.gfx.BG3DisplayOverflow ? 0x20 : 0) |
-		(parentObj.gfx.BG3ScreenSize << 6));
+		return parentObj.gfx.readBG3CNT1();
 	}
 	//4000010h - BG0HOFS - BG0 X-Offset (W)
 	this.readIO[0x10] = this.readZero;

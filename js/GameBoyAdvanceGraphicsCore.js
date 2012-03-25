@@ -140,7 +140,7 @@ GameBoyAdvanceGraphics.prototype.writeDISPSTAT0 = function (data) {
 	this.IRQHBlank = ((data & 0x10) == 0x10);
 	this.IRQVCounter = ((data & 0x20) == 0x20);
 }
-GameBoyAdvanceGraphics.prototype.writeDISPSTAT0 = function (data) {
+GameBoyAdvanceGraphics.prototype.readDISPSTAT0 = function () {
 	return ((this.inVBlank ? 0x1 : 0) |
 	(this.inHBlank ? 0x2 : 0) |
 	(this.VCounterMatch ? 0x4 : 0) |
@@ -152,10 +152,10 @@ GameBoyAdvanceGraphics.prototype.writeDISPSTAT1 = function (data) {
 	//V-Counter match value:
 	this.VCounter = data;
 }
-GameBoyAdvanceGraphics.prototype.writeDISPSTAT1 = function (data) {
+GameBoyAdvanceGraphics.prototype.readDISPSTAT1 = function () {
 	return this.VCounter;
 }
-GameBoyAdvanceGraphics.prototype.readVCOUNT = function (data) {
+GameBoyAdvanceGraphics.prototype.readVCOUNT = function () {
 	return this.currentScanLine;
 }
 GameBoyAdvanceGraphics.prototype.writeBG0CNT0 = function (data) {
@@ -166,11 +166,22 @@ GameBoyAdvanceGraphics.prototype.writeBG0CNT0 = function (data) {
 	this.BG0Mosaic = ((data & 0x40) == 0x40);
 	this.BG0Palette256 = ((data & 0x80) == 0x80);
 }
+GameBoyAdvanceGraphics.prototype.readBG0CNT0 = function () {
+	return (this.BG0Priority |
+	(this.BG0CharacterBaseBlock << 2) |
+	(this.BG0Mosaic ? 0x40 : 0) | 
+	(this.BG0Palette256 ? 0x80 : 0));
+}
 GameBoyAdvanceGraphics.prototype.writeBG0CNT1 = function (data) {
 	this.JIT();
 	this.BG0ScreenBaseBlock = data & 0x1F;
 	this.BG0DisplayOverflow = ((data & 0x20) == 0x20);	//Note: Only applies to BG2/3 supposedly.
 	this.BG0ScreenSize = (data & 0xC0) >> 6;
+}
+GameBoyAdvanceGraphics.prototype.readBG0CNT1 = function () {
+	return (this.BG0ScreenBaseBlock |
+	(this.BG0DisplayOverflow ? 0x20 : 0) |
+	(this.BG0ScreenSize << 6));
 }
 GameBoyAdvanceGraphics.prototype.writeBG1CNT0 = function (data) {
 	this.JIT();
@@ -180,11 +191,22 @@ GameBoyAdvanceGraphics.prototype.writeBG1CNT0 = function (data) {
 	this.BG1Mosaic = ((data & 0x40) == 0x40);
 	this.BG1Palette256 = ((data & 0x80) == 0x80);
 }
+GameBoyAdvanceGraphics.prototype.readBG1CNT0 = function () {
+	return (this.BG1Priority |
+	(this.BG1CharacterBaseBlock << 2) |
+	(this.BG1Mosaic ? 0x40 : 0) | 
+	(this.BG1Palette256 ? 0x80 : 0));
+}
 GameBoyAdvanceGraphics.prototype.writeBG1CNT1 = function (data) {
 	this.JIT();
 	this.BG1ScreenBaseBlock = data & 0x1F;
 	this.BG1DisplayOverflow = ((data & 0x20) == 0x20);	//Note: Only applies to BG2/3 supposedly.
 	this.BG1ScreenSize = (data & 0xC0) >> 6;
+}
+GameBoyAdvanceGraphics.prototype.readBG1CNT1 = function () {
+	return (this.BG1ScreenBaseBlock |
+	(this.BG1DisplayOverflow ? 0x20 : 0) |
+	(this.BG1ScreenSize << 6));
 }
 GameBoyAdvanceGraphics.prototype.writeBG2CNT0 = function (data) {
 	this.JIT();
@@ -194,11 +216,22 @@ GameBoyAdvanceGraphics.prototype.writeBG2CNT0 = function (data) {
 	this.BG2Mosaic = ((data & 0x40) == 0x40);
 	this.BG2Palette256 = ((data & 0x80) == 0x80);
 }
+GameBoyAdvanceGraphics.prototype.readBG2CNT0 = function () {
+	return (this.BG2Priority |
+	(this.BG2CharacterBaseBlock << 2) |
+	(this.BG2Mosaic ? 0x40 : 0) | 
+	(this.BG2Palette256 ? 0x80 : 0));
+}
 GameBoyAdvanceGraphics.prototype.writeBG2CNT1 = function (data) {
 	this.JIT();
 	this.BG2ScreenBaseBlock = data & 0x1F;
 	this.BG2DisplayOverflow = ((data & 0x20) == 0x20);
 	this.BG2ScreenSize = (data & 0xC0) >> 6;
+}
+GameBoyAdvanceGraphics.prototype.readBG2CNT1 = function () {
+	return (this.BG2ScreenBaseBlock |
+	(this.BG2DisplayOverflow ? 0x20 : 0) |
+	(this.BG2ScreenSize << 6));
 }
 GameBoyAdvanceGraphics.prototype.writeBG3CNT0 = function (data) {
 	this.JIT();
@@ -208,11 +241,22 @@ GameBoyAdvanceGraphics.prototype.writeBG3CNT0 = function (data) {
 	this.BG3Mosaic = ((data & 0x40) == 0x40);
 	this.BG3Palette256 = ((data & 0x80) == 0x80);
 }
+GameBoyAdvanceGraphics.prototype.readBG3CNT0 = function () {
+	return (this.BG3Priority |
+	(this.BG3CharacterBaseBlock << 2) |
+	(this.BG3Mosaic ? 0x40 : 0) | 
+	(this.BG3Palette256 ? 0x80 : 0));
+}
 GameBoyAdvanceGraphics.prototype.writeBG3CNT1 = function (data) {
 	this.JIT();
 	this.BG3ScreenBaseBlock = data & 0x1F;
 	this.BG3DisplayOverflow = ((data & 0x20) == 0x20);
 	this.BG3ScreenSize = (data & 0xC0) >> 6;
+}
+GameBoyAdvanceGraphics.prototype.readBG3CNT1 = function () {
+	return (this.BG3ScreenBaseBlock |
+	(this.BG3DisplayOverflow ? 0x20 : 0) |
+	(this.BG3ScreenSize << 6));
 }
 GameBoyAdvanceGraphics.prototype.writeBG0HOFS0 = function (data) {
 	this.JIT();
