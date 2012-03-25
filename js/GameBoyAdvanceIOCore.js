@@ -1145,18 +1145,14 @@ GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address) {
 	return (parentObj.emulatorCore.fetch >> ((address & 0x3) << 3)) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused0 = function (parentObj) {
-	parentObj.memoryAccessType = 0;
 	return parentObj.emulatorCore.fetch & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused1 = function (parentObj) {
-	parentObj.memoryAccessType = 0;
 	return (parentObj.emulatorCore.fetch >> 8) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused2 = function (parentObj) {
-	parentObj.memoryAccessType = 0;
 	return (parentObj.emulatorCore.fetch >> 16) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused3 = function (parentObj) {
-	parentObj.memoryAccessType = 0;
 	return (parentObj.emulatorCore.fetch >> 24) & 0xFF;
 }
