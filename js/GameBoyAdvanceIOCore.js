@@ -1061,6 +1061,16 @@ GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address) {
 		return parentObj.readUnused(parentObj, address);
 	}
 }
+GameBoyAdvanceIO.prototype.readExternalWRAM = function (parentObj, address) {
+	//External WRAM:
+	parentObj.memoryAccessType = 1;
+	return parentObj.externalRAM[address & 0x3FFFF];
+}
+GameBoyAdvanceIO.prototype.readInternalWRAM = function (parentObj, address) {
+	//Internal WRAM:
+	parentObj.memoryAccessType = 0;
+	return parentObj.internalRAM[address & 0x7FFF];
+}
 GameBoyAdvanceIO.prototype.readIODispatch = function (parentObj, address) {
 	if (address < 0x4000400) {
 		//IO Write:

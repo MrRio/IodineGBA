@@ -550,7 +550,6 @@ GameBoyAdvanceGraphics.prototype.writeWIN1H1 = function (data) {
 	this.JIT();
 	this.WIN1XCoordLeft = data;
 }
-
 GameBoyAdvanceGraphics.prototype.writeWIN0V0 = function (data) {
 	this.JIT();
 	this.WIN0YCoordBottom = data;		//Window y-coord goes up to this minus 1.
