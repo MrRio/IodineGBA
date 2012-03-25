@@ -798,26 +798,15 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
 	//4000000h - DISPCNT - LCD Control (Read/Write)
 	this.readIO[0] = function (parentObj) {
-		return (parentObj.gfx.BGMode |
-		(parentObj.gfx.frameSelect << 4) |
-		(parentObj.gfx.HBlankIntervalFree ? 0x20 : 0) | 
-		(parentObj.gfx.VRAMOneDimensional ? 0x40 : 0) |
-		(parentObj.gfx.forcedBlank ? 0x80 : 0));
+		return parentObj.gfx.readDISPCNT0();
 	}
 	//4000001h - DISPCNT - LCD Control (Read/Write)
 	this.readIO[0x1] = function (parentObj) {
-		return ((parentObj.gfx.displayBG0 ? 0x1 : 0) |
-		(parentObj.gfx.displayBG1 ? 0x2 : 0) |
-		(parentObj.gfx.displayBG2 ? 0x4 : 0) |
-		(parentObj.gfx.displayBG3 ? 0x8 : 0) |
-		(parentObj.gfx.displayOBJ ? 0x10 : 0) |
-		(parentObj.gfx.displayWindow0Flag ? 0x20 : 0) |
-		(parentObj.gfx.displayWindow1Flag ? 0x40 : 0) |
-		(parentObj.gfx.displayObjectWindowFlag ? 0x80 : 0));
+		return parentObj.gfx.readDISPCNT1();
 	}
 	//4000002h - Undocumented - Green Swap (R/W)
 	this.readIO[0x2] = function (parentObj) {
-		return (parentObj.gfx.greenSwap ? 0x1 : 0);
+		return parentObj.gfx.readGreenSwap();
 	}
 	//4000003h - Undocumented - Green Swap (R/W)
 	this.readIO[0x3] = this.readZero;

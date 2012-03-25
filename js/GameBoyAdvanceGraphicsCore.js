@@ -96,6 +96,13 @@ GameBoyAdvanceGraphics.prototype.writeDISPCNT0 = function (data) {
 	this.VRAMOneDimensional = ((data & 0x40) == 0x40);
 	this.forcedBlank = ((data & 0x80) == 0x80);
 }
+GameBoyAdvanceGraphics.prototype.readDISPCNT0 = function () {
+	return (this.BGMode |
+	(this.frameSelect << 4) |
+	(this.HBlankIntervalFree ? 0x20 : 0) | 
+	(this.VRAMOneDimensional ? 0x40 : 0) |
+	(this.forcedBlank ? 0x80 : 0));
+}
 GameBoyAdvanceGraphics.prototype.writeDISPCNT1 = function (data) {
 	this.JIT();
 	this.displayBG0 = ((data & 0x01) == 0x01);
@@ -107,9 +114,22 @@ GameBoyAdvanceGraphics.prototype.writeDISPCNT1 = function (data) {
 	this.displayWindow1Flag = ((data & 0x40) == 0x40);
 	this.displayObjectWindowFlag = ((data & 0x80) == 0x80);
 }
+GameBoyAdvanceGraphics.prototype.readDISPCNT1 = function () {
+	return ((this.displayBG0 ? 0x1 : 0) |
+	(this.displayBG1 ? 0x2 : 0) |
+	(this.displayBG2 ? 0x4 : 0) |
+	(this.displayBG3 ? 0x8 : 0) |
+	(this.displayOBJ ? 0x10 : 0) |
+	(this.displayWindow0Flag ? 0x20 : 0) |
+	(this.displayWindow1Flag ? 0x40 : 0) |
+	(this.displayObjectWindowFlag ? 0x80 : 0));
+}
 GameBoyAdvanceGraphics.prototype.writeGreenSwap = function (data) {
 	this.JIT();
 	this.greenSwap = ((data & 0x01) == 0x01);
+}
+GameBoyAdvanceGraphics.prototype.readGreenSwap = function () {
+	return (this.greenSwap ? 0x1 : 0);
 }
 GameBoyAdvanceGraphics.prototype.writeDISPSTAT0 = function (data) {
 	//VBlank flag read only.
