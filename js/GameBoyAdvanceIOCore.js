@@ -579,57 +579,27 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//4000048h - WININ - Control of Inside of Window(s) (R/W)
 	this.writeIO[0x48] = function (parentObj, data) {
-		//Window 0:
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN0BG0 = ((data & 0x01) == 0x01);
-		parentObj.gfx.WIN0BG1 = ((data & 0x02) == 0x02);
-		parentObj.gfx.WIN0BG2 = ((data & 0x04) == 0x04);
-		parentObj.gfx.WIN0BG3 = ((data & 0x08) == 0x08);
-		parentObj.gfx.WIN0OBJ = ((data & 0x10) == 0x10);
-		parentObj.gfx.WIN0Effects = ((data & 0x20) == 0x20);
+		parentObj.gfx.writeWININ0(data);
 	}
 	//4000049h - WININ - Control of Inside of Window(s) (R/W)
 	this.writeIO[0x49] = function (parentObj, data) {
-		//Window 1:
-		parentObj.gfx.JIT();
-		parentObj.gfx.WIN1BG0 = ((data & 0x01) == 0x01);
-		parentObj.gfx.WIN1BG1 = ((data & 0x02) == 0x02);
-		parentObj.gfx.WIN1BG2 = ((data & 0x04) == 0x04);
-		parentObj.gfx.WIN1BG3 = ((data & 0x08) == 0x08);
-		parentObj.gfx.WIN1OBJ = ((data & 0x10) == 0x10);
-		parentObj.gfx.WIN1Effects = ((data & 0x20) == 0x20);
+		parentObj.gfx.writeWININ1(data);
 	}
 	//400004Ah- WINOUT - Control of Outside of Windows & Inside of OBJ Window (R/W)
 	this.writeIO[0x4A] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WINBG0Outside = ((data & 0x01) == 0x01);
-		parentObj.gfx.WINBG1Outside = ((data & 0x02) == 0x02);
-		parentObj.gfx.WINBG2Outside = ((data & 0x04) == 0x04);
-		parentObj.gfx.WINBG3Outside = ((data & 0x08) == 0x08);
-		parentObj.gfx.WINOBJOutside = ((data & 0x10) == 0x10);
-		parentObj.gfx.WINEffectsOutside = ((data & 0x20) == 0x20);
+		parentObj.gfx.writeWINOUT0(data);
 	}
 	//400004AB- WINOUT - Control of Outside of Windows & Inside of OBJ Window (R/W)
 	this.writeIO[0x4B] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.WINOBJBG0Outside = ((data & 0x01) == 0x01);
-		parentObj.gfx.WINOBJBG1Outside = ((data & 0x02) == 0x02);
-		parentObj.gfx.WINOBJBG2Outside = ((data & 0x04) == 0x04);
-		parentObj.gfx.WINOBJBG3Outside = ((data & 0x08) == 0x08);
-		parentObj.gfx.WINOBJOBJOutside = ((data & 0x10) == 0x10);
-		parentObj.gfx.WINOBJEffectsOutside = ((data & 0x20) == 0x20);
+		parentObj.gfx.writeWINOUT1(data);
 	}
 	//400004Ch - MOSAIC - Mosaic Size (W)
 	this.writeIO[0x4C] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.BGMosaicHSize = data & 0xF;
-		parentObj.gfx.BGMosaicVSize = data >> 4;
+		parentObj.gfx.writeMOSAIC0(data);
 	}
 	//400004Dh - MOSAIC - Mosaic Size (W)
 	this.writeIO[0x4D] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.OBJMosaicHSize = data & 0xF;
-		parentObj.gfx.OBJMosaicVSize = data >> 4;
+		parentObj.gfx.writeMOSAIC1(data);
 	}
 	//400004Eh - NOT USED - ZERO
 	this.writeIO[0x4E] = this.NOP;
@@ -637,41 +607,23 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x4F] = this.NOP;
 	//4000050h - BLDCNT - Color Special Effects Selection (R/W)
 	this.writeIO[0x50] = function (parentObj, data) {
-		//Select target 1 and color effects mode:
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG0EffectsTarget1 = ((data & 0x01) == 0x01);
-		parentObj.gfx.BG1EffectsTarget1 = ((data & 0x02) == 0x02);
-		parentObj.gfx.BG2EffectsTarget1 = ((data & 0x04) == 0x04);
-		parentObj.gfx.BG3EffectsTarget1 = ((data & 0x08) == 0x08);
-		parentObj.gfx.OBJEffectsTarget1 = ((data & 0x10) == 0x10);
-		parentObj.gfx.BackdropEffectsTarget1 = ((data & 0x20) == 0x20);
-		parentObj.gfx.colorEffectsType = data >> 6;
+		parentObj.gfx.writeBLDCNT0(data);
 	}
 	//4000051h - BLDCNT - Color Special Effects Selection (R/W)
 	this.writeIO[0x51] = function (parentObj, data) {
-		//Select target 2:
-		parentObj.gfx.JIT();
-		parentObj.gfx.BG0EffectsTarget2 = ((data & 0x01) == 0x01);
-		parentObj.gfx.BG1EffectsTarget2 = ((data & 0x02) == 0x02);
-		parentObj.gfx.BG2EffectsTarget2 = ((data & 0x04) == 0x04);
-		parentObj.gfx.BG3EffectsTarget2 = ((data & 0x08) == 0x08);
-		parentObj.gfx.OBJEffectsTarget2 = ((data & 0x10) == 0x10);
-		parentObj.gfx.BackdropEffectsTarget2 = ((data & 0x20) == 0x20);
+		parentObj.gfx.writeBLDCNT1(data);
 	}
 	//4000052h - BLDALPHA - Alpha Blending Coefficients (W)
 	this.writeIO[0x52] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.alphaBlendAmountTarget1 = data & 0x1F;
+		parentObj.gfx.writeBLDALPHA0(data);
 	}
 	//4000053h - BLDALPHA - Alpha Blending Coefficients (W)
 	this.writeIO[0x53] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.alphaBlendAmountTarget2 = data & 0x1F;
+		parentObj.gfx.writeBLDALPHA1(data);
 	}
 	//4000054h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
 	this.writeIO[0x54] = function (parentObj, data) {
-		parentObj.gfx.JIT();
-		parentObj.gfx.brightnessEffectAmount = data & 0x1F;
+		parentObj.gfx.writeBLDY(data);
 	}
 	//4000055h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
 	this.writeIO[0x55] = this.NOP;

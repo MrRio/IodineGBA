@@ -567,6 +567,16 @@ GameBoyAdvanceGraphics.prototype.writeWIN1V1 = function (data) {
 	this.JIT();
 	this.WIN1YCoordTop = data;
 }
+GameBoyAdvanceGraphics.prototype.writeWININ0 = function (data) {
+	//Window 0:
+	this.JIT();
+	this.WIN0BG0 = ((data & 0x01) == 0x01);
+	this.WIN0BG1 = ((data & 0x02) == 0x02);
+	this.WIN0BG2 = ((data & 0x04) == 0x04);
+	this.WIN0BG3 = ((data & 0x08) == 0x08);
+	this.WIN0OBJ = ((data & 0x10) == 0x10);
+	this.WIN0Effects = ((data & 0x20) == 0x20);
+}
 GameBoyAdvanceGraphics.prototype.readWININ0 = function () {
 	//Window 0:
 	return ((this.WIN0BG0 ? 0x1 : 0) |
@@ -575,6 +585,16 @@ GameBoyAdvanceGraphics.prototype.readWININ0 = function () {
 	(this.WIN0BG3 ? 0x8 : 0) |
 	(this.WIN0OBJ ? 0x10 : 0) |
 	(this.WIN0Effects ? 0x20 : 0));
+}
+GameBoyAdvanceGraphics.prototype.writeWININ1 = function (data) {
+	//Window 1:
+	this.JIT();
+	this.WIN1BG0 = ((data & 0x01) == 0x01);
+	this.WIN1BG1 = ((data & 0x02) == 0x02);
+	this.WIN1BG2 = ((data & 0x04) == 0x04);
+	this.WIN1BG3 = ((data & 0x08) == 0x08);
+	this.WIN1OBJ = ((data & 0x10) == 0x10);
+	this.WIN1Effects = ((data & 0x20) == 0x20);
 }
 GameBoyAdvanceGraphics.prototype.readWININ1 = function () {
 	//Window 1:
@@ -585,6 +605,15 @@ GameBoyAdvanceGraphics.prototype.readWININ1 = function () {
 	(this.WIN1OBJ ? 0x10 : 0) |
 	(this.WIN1Effects ? 0x20 : 0));
 }
+GameBoyAdvanceGraphics.prototype.writeWINOUT0 = function (data) {
+	this.JIT();
+	this.WINBG0Outside = ((data & 0x01) == 0x01);
+	this.WINBG1Outside = ((data & 0x02) == 0x02);
+	this.WINBG2Outside = ((data & 0x04) == 0x04);
+	this.WINBG3Outside = ((data & 0x08) == 0x08);
+	this.WINOBJOutside = ((data & 0x10) == 0x10);
+	this.WINEffectsOutside = ((data & 0x20) == 0x20);
+}
 GameBoyAdvanceGraphics.prototype.readWINOUT0 = function () {
 	return ((this.WINBG0Outside ? 0x1 : 0) |
 	(this.WINBG1Outside ? 0x2 : 0) |
@@ -593,6 +622,15 @@ GameBoyAdvanceGraphics.prototype.readWINOUT0 = function () {
 	(this.WINOBJOutside ? 0x10 : 0) |
 	(this.WINEffectsOutside ? 0x20 : 0));
 }
+GameBoyAdvanceGraphics.prototype.writeWINOUT1 = function (data) {
+	this.JIT();
+	this.WINOBJBG0Outside = ((data & 0x01) == 0x01);
+	this.WINOBJBG1Outside = ((data & 0x02) == 0x02);
+	this.WINOBJBG2Outside = ((data & 0x04) == 0x04);
+	this.WINOBJBG3Outside = ((data & 0x08) == 0x08);
+	this.WINOBJOBJOutside = ((data & 0x10) == 0x10);
+	this.WINOBJEffectsOutside = ((data & 0x20) == 0x20);
+}
 GameBoyAdvanceGraphics.prototype.readWINOUT1 = function () {
 	return ((this.WINOBJBG0Outside ? 0x1 : 0) |
 	(this.WINOBJBG1Outside ? 0x2 : 0) |
@@ -600,6 +638,27 @@ GameBoyAdvanceGraphics.prototype.readWINOUT1 = function () {
 	(this.WINOBJBG3Outside ? 0x8 : 0) |
 	(this.WINOBJOBJOutside ? 0x10 : 0) |
 	(this.WINOBJEffectsOutside ? 0x20 : 0));
+}
+GameBoyAdvanceGraphics.prototype.writeMOSAIC0 = function (data) {
+	this.JIT();
+	this.BGMosaicHSize = data & 0xF;
+	this.BGMosaicVSize = data >> 4;
+}
+GameBoyAdvanceGraphics.prototype.writeMOSAIC1 = function (data) {
+	this.JIT();
+	this.OBJMosaicHSize = data & 0xF;
+	this.OBJMosaicVSize = data >> 4;
+}
+GameBoyAdvanceGraphics.prototype.writeBLDCNT0 = function (data) {
+	//Select target 1 and color effects mode:
+	this.JIT();
+	this.BG0EffectsTarget1 = ((data & 0x01) == 0x01);
+	this.BG1EffectsTarget1 = ((data & 0x02) == 0x02);
+	this.BG2EffectsTarget1 = ((data & 0x04) == 0x04);
+	this.BG3EffectsTarget1 = ((data & 0x08) == 0x08);
+	this.OBJEffectsTarget1 = ((data & 0x10) == 0x10);
+	this.BackdropEffectsTarget1 = ((data & 0x20) == 0x20);
+	this.colorEffectsType = data >> 6;
 }
 GameBoyAdvanceGraphics.prototype.readBLDCNT0 = function () {
 	return ((this.BG0EffectsTarget1 ? 0x1 : 0) |
@@ -610,6 +669,16 @@ GameBoyAdvanceGraphics.prototype.readBLDCNT0 = function () {
 	(this.BackdropEffectsTarget1 ? 0x20 : 0) |
 	(this.colorEffectsType << 6));
 }
+GameBoyAdvanceGraphics.prototype.writeBLDCNT1 = function (data) {
+	//Select target 2:
+	this.JIT();
+	this.BG0EffectsTarget2 = ((data & 0x01) == 0x01);
+	this.BG1EffectsTarget2 = ((data & 0x02) == 0x02);
+	this.BG2EffectsTarget2 = ((data & 0x04) == 0x04);
+	this.BG3EffectsTarget2 = ((data & 0x08) == 0x08);
+	this.OBJEffectsTarget2 = ((data & 0x10) == 0x10);
+	this.BackdropEffectsTarget2 = ((data & 0x20) == 0x20);
+}
 GameBoyAdvanceGraphics.prototype.readBLDCNT1 = function () {
 	return ((this.BG0EffectsTarget2 ? 0x1 : 0) |
 	(this.BG1EffectsTarget2 ? 0x2 : 0) |
@@ -617,4 +686,16 @@ GameBoyAdvanceGraphics.prototype.readBLDCNT1 = function () {
 	(this.BG3EffectsTarget2 ? 0x8 : 0) |
 	(this.OBJEffectsTarget2 ? 0x10 : 0) |
 	(this.BackdropEffectsTarget2 ? 0x20 : 0));
+}
+GameBoyAdvanceGraphics.prototype.writeBLDALPHA0 = function (data) {
+	this.JIT();
+	this.alphaBlendAmountTarget1 = data & 0x1F;
+}
+GameBoyAdvanceGraphics.prototype.writeBLDALPHA1 = function (data) {
+	this.JIT();
+	this.alphaBlendAmountTarget2 = data & 0x1F;
+}
+GameBoyAdvanceGraphics.prototype.writeBLDY = function (data) {
+	this.JIT();
+	this.brightnessEffectAmount = data & 0x1F;
 }
