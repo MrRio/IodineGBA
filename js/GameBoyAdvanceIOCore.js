@@ -957,21 +957,21 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//4000057h - NOT USED - ZERO
 	this.readIO[0x57] = this.readZero;
 	//4000058h - NOT USED - GLITCHED
-	this.readIO[0x58] = this.readUnused;
+	this.readIO[0x58] = this.readUnused0;
 	//4000059h - NOT USED - GLITCHED
-	this.readIO[0x59] = this.readUnused;
+	this.readIO[0x59] = this.readUnused1;
 	//400005Ah - NOT USED - GLITCHED
-	this.readIO[0x5A] = this.readUnused;
+	this.readIO[0x5A] = this.readUnused2;
 	//400005Bh - NOT USED - GLITCHED
-	this.readIO[0x5B] = this.readUnused;
+	this.readIO[0x5B] = this.readUnused3;
 	//400005Ch - NOT USED - GLITCHED
-	this.readIO[0x5C] = this.readUnused;
+	this.readIO[0x5C] = this.readUnused0;
 	//400005Dh - NOT USED - GLITCHED
-	this.readIO[0x5D] = this.readUnused;
+	this.readIO[0x5D] = this.readUnused1;
 	//400005Eh - NOT USED - GLITCHED
-	this.readIO[0x5E] = this.readUnused;
+	this.readIO[0x5E] = this.readUnused2;
 	//400005Fh - NOT USED - GLITCHED
-	this.readIO[0x5F] = this.readUnused;
+	this.readIO[0x5F] = this.readUnused3;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
@@ -1103,5 +1103,21 @@ GameBoyAdvanceIO.prototype.readZero = function (parentObj) {
 }
 GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address) {
 	parentObj.memoryAccessType = 0;
-	return (parentObj.emulatorCore.fetch >>> ((address & 0x3) << 8)) & 0xFF;
+	return (parentObj.emulatorCore.fetch >> ((address & 0x3) << 3)) & 0xFF;
+}
+GameBoyAdvanceIO.prototype.readUnused0 = function (parentObj) {
+	parentObj.memoryAccessType = 0;
+	return parentObj.emulatorCore.fetch & 0xFF;
+}
+GameBoyAdvanceIO.prototype.readUnused1 = function (parentObj) {
+	parentObj.memoryAccessType = 0;
+	return (parentObj.emulatorCore.fetch >> 8) & 0xFF;
+}
+GameBoyAdvanceIO.prototype.readUnused2 = function (parentObj) {
+	parentObj.memoryAccessType = 0;
+	return (parentObj.emulatorCore.fetch >> 16) & 0xFF;
+}
+GameBoyAdvanceIO.prototype.readUnused3 = function (parentObj) {
+	parentObj.memoryAccessType = 0;
+	return (parentObj.emulatorCore.fetch >> 24) & 0xFF;
 }
