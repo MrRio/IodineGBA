@@ -795,6 +795,26 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x86] = this.NOP;
 	//4000087h - NOT USED - ZERO
 	this.writeIO[0x87] = this.NOP;
+	//4000088h - SOUNDBIAS - Sound PWM Control (R/W, see below)
+	this.writeIO[0x88] = function (parentObj, data) {
+		parentObj.sound.writeSOUNDBIAS0(data);
+	}
+	//4000089h - SOUNDBIAS - Sound PWM Control (R/W, see below)
+	this.writeIO[0x89] = function (parentObj, data) {
+		parentObj.sound.writeSOUNDBIAS1(data);
+	}
+	//400008Ah - NOT USED - ZERO
+	this.writeIO[0x8A] = this.NOP;
+	//400008Bh - NOT USED - ZERO
+	this.writeIO[0x8B] = this.NOP;
+	//400008Ch - NOT USED - ZERO
+	this.writeIO[0x8C] = this.NOP;
+	//400008Dh - NOT USED - ZERO
+	this.writeIO[0x8D] = this.NOP;
+	//400008Eh - NOT USED - ZERO
+	this.writeIO[0x8E] = this.NOP;
+	//400008Fh - NOT USED - ZERO
+	this.writeIO[0x8F] = this.NOP;
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -1161,6 +1181,26 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x86] = this.readZero;
 	//4000087h - NOT USED - ZERO
 	this.readIO[0x87] = this.readZero;
+	//4000088h - SOUNDBIAS - Sound PWM Control (R/W, see below)
+	this.readIO[0x88] = function (parentObj) {
+		return parentObj.sound.readSOUNDBIAS0();
+	}
+	//4000089h - SOUNDBIAS - Sound PWM Control (R/W, see below)
+	this.readIO[0x89] = function (parentObj) {
+		return parentObj.sound.readSOUNDBIAS1();
+	}
+	//400008Ah - NOT USED - ZERO
+	this.readIO[0x8A] = this.readZero;
+	//400008Bh - NOT USED - ZERO
+	this.readIO[0x8B] = this.readZero;
+	//400008Ch - NOT USED - GLITCHED
+	this.readIO[0x8C] = this.readUnused0;
+	//400008Dh - NOT USED - GLITCHED
+	this.readIO[0x8D] = this.readUnused1;
+	//400008Eh - NOT USED - GLITCHED
+	this.readIO[0x8E] = this.readUnused2;
+	//400008Fh - NOT USED - GLITCHED
+	this.readIO[0x8F] = this.readUnused3;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
