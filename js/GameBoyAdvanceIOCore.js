@@ -652,29 +652,29 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	//4000060h - SOUND1CNT_L (NR10) - Channel 1 Sweep register (R/W)
 	this.writeIO[0x60] = function (parentObj, data) {
 		//NR10:
-		parentObj.sound.SOUND1CNT_L(data);
+		parentObj.sound.writeSOUND1CNT_L(data);
 	}
 	//4000061h - NOT USED - ZERO
 	this.writeIO[0x61] = this.NOP;
 	//4000062h - SOUND1CNT_H (NR11, NR12) - Channel 1 Duty/Len/Envelope (R/W)
 	this.writeIO[0x62] = function (parentObj, data) {
 		//NR11:
-		parentObj.sound.SOUND1CNT_H0(data);
+		parentObj.sound.writeSOUND1CNT_H0(data);
 	}
 	//4000063h - SOUND1CNT_H (NR11, NR12) - Channel 1 Duty/Len/Envelope (R/W)
 	this.writeIO[0x63] = function (parentObj, data) {
 		//NR12:
-		parentObj.sound.SOUND1CNT_H1(data);
+		parentObj.sound.writeSOUND1CNT_H1(data);
 	}
 	//4000064h - SOUND1CNT_X (NR13, NR14) - Channel 1 Frequency/Control (R/W)
 	this.writeIO[0x64] = function (parentObj, data) {
 		//NR13:
-		parentObj.sound.SOUND1CNT_X0(data);
+		parentObj.sound.writeSOUND1CNT_X0(data);
 	}
 	//4000065h - SOUND1CNT_X (NR13, NR14) - Channel 1 Frequency/Control (R/W)
 	this.writeIO[0x65] = function (parentObj, data) {
 		//NR14:
-		parentObj.sound.SOUND1CNT_X1(data);
+		parentObj.sound.writeSOUND1CNT_X1(data);
 	}
 	//4000066h - NOT USED - ZERO
 	this.writeIO[0x66] = this.NOP;
@@ -683,12 +683,12 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	//4000068h - SOUND2CNT_L (NR21, NR22) - Channel 2 Duty/Length/Envelope (R/W)
 	this.writeIO[0x68] = function (parentObj, data) {
 		//NR21:
-		parentObj.sound.SOUND2CNT_L0(data);
+		parentObj.sound.writeSOUND2CNT_L0(data);
 	}
 	//4000069h - SOUND2CNT_L (NR21, NR22) - Channel 2 Duty/Length/Envelope (R/W)
 	this.writeIO[0x69] = function (parentObj, data) {
 		//NR22:
-		parentObj.sound.SOUND2CNT_L1(data);
+		parentObj.sound.writeSOUND2CNT_L1(data);
 	}
 	//400006Ah - NOT USED - ZERO
 	this.writeIO[0x6A] = this.NOP;
@@ -697,12 +697,12 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	//400006Ch - SOUND2CNT_H (NR23, NR24) - Channel 2 Frequency/Control (R/W)
 	this.writeIO[0x6C] = function (parentObj, data) {
 		//NR23:
-		parentObj.sound.SOUND2CNT_H0(data);
+		parentObj.sound.writeSOUND2CNT_H0(data);
 	}
 	//400006Dh - SOUND2CNT_H (NR23, NR24) - Channel 2 Frequency/Control (R/W)
 	this.writeIO[0x6D] = function (parentObj, data) {
 		//NR24:
-		parentObj.sound.SOUND2CNT_H1(data);
+		parentObj.sound.writeSOUND2CNT_H1(data);
 	}
 	//400006Eh - NOT USED - ZERO
 	this.writeIO[0x6E] = this.NOP;
@@ -711,29 +711,29 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	//4000070h - SOUND3CNT_L (NR30) - Channel 3 Stop/Wave RAM select (R/W)
 	this.writeIO[0x70] = function (parentObj, data) {
 		//NR30:
-		parentObj.sound.SOUND3CNT_L(data);
+		parentObj.sound.writeSOUND3CNT_L(data);
 	}
 	//4000071h - SOUND3CNT_L (NR30) - Channel 3 Stop/Wave RAM select (R/W)
 	this.writeIO[0x71] = this.NOP;
 	//4000072h - SOUND3CNT_H (NR31, NR32) - Channel 3 Length/Volume (R/W)
 	this.writeIO[0x72] = function (parentObj, data) {
 		//NR31:
-		parentObj.sound.SOUND3CNT_H0(data);
+		parentObj.sound.writeSOUND3CNT_H0(data);
 	}
 	//4000073h - SOUND3CNT_H (NR31, NR32) - Channel 3 Length/Volume (R/W)
 	this.writeIO[0x73] = function (parentObj, data) {
 		//NR32:
-		parentObj.sound.SOUND3CNT_H1(data);
+		parentObj.sound.writeSOUND3CNT_H1(data);
 	}
 	//4000074h - SOUND3CNT_X (NR33, NR34) - Channel 3 Frequency/Control (R/W)
 	this.writeIO[0x74] = function (parentObj, data) {
 		//NR33:
-		parentObj.sound.SOUND3CNT_X0(data);
+		parentObj.sound.writeSOUND3CNT_X0(data);
 	}
 	//4000075h - SOUND3CNT_X (NR33, NR34) - Channel 3 Frequency/Control (R/W)
 	this.writeIO[0x75] = function (parentObj, data) {
 		//NR34:
-		parentObj.sound.SOUND3CNT_X1(data);
+		parentObj.sound.writeSOUND3CNT_X1(data);
 	}
 	//4000076h - NOT USED - ZERO
 	this.writeIO[0x76] = this.NOP;
@@ -742,12 +742,12 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	//4000078h - SOUND4CNT_L (NR41, NR42) - Channel 4 Length/Envelope (R/W)
 	this.writeIO[0x78] = function (parentObj, data) {
 		//NR41:
-		parentObj.sound.SOUND4CNT_L0(data);
+		parentObj.sound.writeSOUND4CNT_L0(data);
 	}
 	//4000079h - SOUND4CNT_L (NR41, NR42) - Channel 4 Length/Envelope (R/W)
 	this.writeIO[0x79] = function (parentObj, data) {
 		//NR42:
-		parentObj.sound.SOUND4CNT_L1(data);
+		parentObj.sound.writeSOUND4CNT_L1(data);
 	}
 	//400007Ah - NOT USED - ZERO
 	this.writeIO[0x7A] = this.NOP;
@@ -756,12 +756,12 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	//400007Ch - SOUND4CNT_H (NR43, NR44) - Channel 4 Frequency/Control (R/W)
 	this.writeIO[0x7C] = function (parentObj, data) {
 		//NR43:
-		parentObj.sound.SOUND4CNT_H0(data);
+		parentObj.sound.writeSOUND4CNT_H0(data);
 	}
 	//400007Dh - SOUND4CNT_H (NR43, NR44) - Channel 4 Frequency/Control (R/W)
 	this.writeIO[0x7D] = function (parentObj, data) {
 		//NR44:
-		parentObj.sound.SOUND4CNT_H1(data);
+		parentObj.sound.writeSOUND4CNT_H1(data);
 	}
 	//400007Eh - NOT USED - ZERO
 	this.writeIO[0x7E] = this.NOP;
@@ -770,24 +770,24 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	//4000080h - SOUNDCNT_L (NR50, NR51) - Channel L/R Volume/Enable (R/W)
 	this.writeIO[0x80] = function (parentObj, data) {
 		//NR50:
-		parentObj.sound.SOUNDCNT_L0(data);
+		parentObj.sound.writeSOUNDCNT_L0(data);
 	}
 	//4000081h - SOUNDCNT_L (NR50, NR51) - Channel L/R Volume/Enable (R/W)
 	this.writeIO[0x81] = function (parentObj, data) {
 		//NR51:
-		parentObj.sound.SOUNDCNT_L1(data);
+		parentObj.sound.writeSOUNDCNT_L1(data);
 	}
 	//4000082h - SOUNDCNT_H (GBA only) - DMA Sound Control/Mixing (R/W)
 	this.writeIO[0x82] = function (parentObj, data) {
-		parentObj.sound.SOUNDCNT_H0(data);
+		parentObj.sound.writeSOUNDCNT_H0(data);
 	}
 	//4000083h - SOUNDCNT_H (GBA only) - DMA Sound Control/Mixing (R/W)
 	this.writeIO[0x83] = function (parentObj, data) {
-		parentObj.sound.SOUNDCNT_H1(data);
+		parentObj.sound.writeSOUNDCNT_H1(data);
 	}
 	//4000084h - SOUNDCNT_X (NR52) - Sound on/off (R/W)
 	this.writeIO[0x84] = function (parentObj, data) {
-		parentObj.sound.SOUNDCNT_X(data);
+		parentObj.sound.writeSOUNDCNT_X(data);
 	}
 	//4000085h - NOT USED - ZERO
 	this.writeIO[0x85] = this.NOP;
@@ -1030,6 +1030,137 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x5E] = this.readUnused2;
 	//400005Fh - NOT USED - GLITCHED
 	this.readIO[0x5F] = this.readUnused3;
+	//4000060h - SOUND1CNT_L (NR10) - Channel 1 Sweep register (R/W)
+	this.readIO[0x60] = function (parentObj) {
+		//NR10:
+		return parentObj.sound.readSOUND1CNT_L();
+	}
+	//4000061h - NOT USED - ZERO
+	this.readIO[0x61] = this.readZero;
+	//4000062h - SOUND1CNT_H (NR11, NR12) - Channel 1 Duty/Len/Envelope (R/W)
+	this.readIO[0x62] = function (parentObj) {
+		//NR11:
+		return parentObj.sound.readSOUND1CNT_H0();
+	}
+	//4000063h - SOUND1CNT_H (NR11, NR12) - Channel 1 Duty/Len/Envelope (R/W)
+	this.readIO[0x63] = function (parentObj) {
+		//NR12:
+		return parentObj.sound.readSOUND1CNT_H1();
+	}
+	//4000064h - SOUND1CNT_X (NR13, NR14) - Channel 1 Frequency/Control (R/W)
+	this.readIO[0x64] = this.readZero;
+	//4000065h - SOUND1CNT_X (NR13, NR14) - Channel 1 Frequency/Control (R/W)
+	this.readIO[0x65] = function (parentObj) {
+		//NR14:
+		return parentObj.sound.readSOUND1CNT_X();
+	}
+	//4000066h - NOT USED - ZERO
+	this.readIO[0x66] = this.readZero;
+	//4000067h - NOT USED - ZERO
+	this.readIO[0x67] = this.readZero;
+	//4000068h - SOUND2CNT_L (NR21, NR22) - Channel 2 Duty/Length/Envelope (R/W)
+	this.readIO[0x68] = function (parentObj) {
+		//NR21:
+		return parentObj.sound.readSOUND2CNT_L0();
+	}
+	//4000069h - SOUND2CNT_L (NR21, NR22) - Channel 2 Duty/Length/Envelope (R/W)
+	this.readIO[0x69] = function (parentObj) {
+		//NR22:
+		return parentObj.sound.readSOUND2CNT_L1();
+	}
+	//400006Ah - NOT USED - ZERO
+	this.readIO[0x6A] = this.readZero;
+	//400006Bh - NOT USED - ZERO
+	this.readIO[0x6B] = this.readZero;
+	//400006Ch - SOUND2CNT_H (NR23, NR24) - Channel 2 Frequency/Control (R/W)
+	this.readIO[0x6C] = this.readZero;
+	//400006Dh - SOUND2CNT_H (NR23, NR24) - Channel 2 Frequency/Control (R/W)
+	this.readIO[0x6D] = function (parentObj) {
+		//NR24:
+		return parentObj.sound.readSOUND2CNT_H();
+	}
+	//400006Eh - NOT USED - ZERO
+	this.readIO[0x6E] = this.readZero;
+	//400006Fh - NOT USED - ZERO
+	this.readIO[0x6F] = this.readZero;
+	//4000070h - SOUND3CNT_L (NR30) - Channel 3 Stop/Wave RAM select (R/W)
+	this.readIO[0x70] = function (parentObj) {
+		//NR30:
+		return parentObj.sound.readSOUND3CNT_L();
+	}
+	//4000071h - SOUND3CNT_L (NR30) - Channel 3 Stop/Wave RAM select (R/W)
+	this.readIO[0x71] = this.readZero;
+	//4000072h - SOUND3CNT_H (NR31, NR32) - Channel 3 Length/Volume (R/W)
+	this.readIO[0x72] = this.readZero;
+	//4000073h - SOUND3CNT_H (NR31, NR32) - Channel 3 Length/Volume (R/W)
+	this.readIO[0x73] = function (parentObj) {
+		//NR32:
+		return parentObj.sound.readSOUND3CNT_H();
+	}
+	//4000074h - SOUND3CNT_X (NR33, NR34) - Channel 3 Frequency/Control (R/W)
+	this.readIO[0x74] = this.readZero;
+	//4000075h - SOUND3CNT_X (NR33, NR34) - Channel 3 Frequency/Control (R/W)
+	this.readIO[0x75] = function (parentObj) {
+		//NR34:
+		return parentObj.sound.readSOUND3CNT_X();
+	}
+	//4000076h - NOT USED - ZERO
+	this.readIO[0x76] = this.readZero;
+	//4000077h - NOT USED - ZERO
+	this.readIO[0x77] = this.readZero;
+	//4000078h - SOUND4CNT_L (NR41, NR42) - Channel 4 Length/Envelope (R/W)
+	this.readIO[0x78] = this.readZero;
+	//4000079h - SOUND4CNT_L (NR41, NR42) - Channel 4 Length/Envelope (R/W)
+	this.readIO[0x79] = function (parentObj) {
+		//NR42:
+		return parentObj.sound.readSOUND4CNT_L();
+	}
+	//400007Ah - NOT USED - ZERO
+	this.readIO[0x7A] = this.readZero;
+	//400007Bh - NOT USED - ZERO
+	this.readIO[0x7B] = this.readZero;
+	//400007Ch - SOUND4CNT_H (NR43, NR44) - Channel 4 Frequency/Control (R/W)
+	this.readIO[0x7C] = function (parentObj) {
+		//NR43:
+		return parentObj.sound.readSOUND4CNT_H0();
+	}
+	//400007Dh - SOUND4CNT_H (NR43, NR44) - Channel 4 Frequency/Control (R/W)
+	this.readIO[0x7D] = function (parentObj) {
+		//NR44:
+		return parentObj.sound.readSOUND4CNT_H1();
+	}
+	//400007Eh - NOT USED - ZERO
+	this.readIO[0x7E] = this.readZero;
+	//400007Fh - NOT USED - ZERO
+	this.readIO[0x7F] = this.readZero;
+	//4000080h - SOUNDCNT_L (NR50, NR51) - Channel L/R Volume/Enable (R/W)
+	this.readIO[0x80] = function (parentObj) {
+		//NR50:
+		return parentObj.sound.readSOUNDCNT_L0();
+	}
+	//4000081h - SOUNDCNT_L (NR50, NR51) - Channel L/R Volume/Enable (R/W)
+	this.readIO[0x81] = function (parentObj) {
+		//NR51:
+		return parentObj.sound.readSOUNDCNT_L1();
+	}
+	//4000082h - SOUNDCNT_H (GBA only) - DMA Sound Control/Mixing (R/W)
+	this.readIO[0x82] = function (parentObj) {
+		return parentObj.sound.readSOUNDCNT_H0();
+	}
+	//4000083h - SOUNDCNT_H (GBA only) - DMA Sound Control/Mixing (R/W)
+	this.readIO[0x83] = function (parentObj) {
+		return parentObj.sound.readSOUNDCNT_H1();
+	}
+	//4000084h - SOUNDCNT_X (NR52) - Sound on/off (R/W)
+	this.readIO[0x84] = function (parentObj) {
+		return parentObj.sound.readSOUNDCNT_X();
+	}
+	//4000085h - NOT USED - ZERO
+	this.readIO[0x85] = this.readZero;
+	//4000086h - NOT USED - ZERO
+	this.readIO[0x86] = this.readZero;
+	//4000087h - NOT USED - ZERO
+	this.readIO[0x87] = this.readZero;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
