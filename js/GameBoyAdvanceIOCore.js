@@ -1269,6 +1269,14 @@ GameBoyAdvanceIO.prototype.writeVRAM = function (parentObj, address, data) {
 	}
 	parentObj.memoryAccessType = 2;
 }
+GameBoyAdvanceIO.prototype.writeOAM = function (parentObj, address, data) {
+	parentObj.gfx.writeOAM(address & 0x3FF, data);
+	parentObj.memoryAccessType = 2;
+}
+GameBoyAdvanceIO.prototype.writePalette = function (parentObj, address, data) {
+	parentObj.gfx.writePalette(address & 0x3FF, data);
+	parentObj.memoryAccessType = 2;
+}
 GameBoyAdvanceIO.prototype.NOP = function (parentObj, data) {
 	//Ignore the data write...
 }
@@ -1351,6 +1359,14 @@ GameBoyAdvanceIO.prototype.readVRAM = function (parentObj, address) {
 	else {
 		return parentObj.gfx.readVRAM(address & 0x1FFFF);
 	}
+}
+GameBoyAdvanceIO.prototype.readOAM = function (parentObj, address) {
+	parentObj.memoryAccessType = 2;
+	return parentObj.gfx.readOAM(address & 0x3FF);
+}
+GameBoyAdvanceIO.prototype.readPalette = function (parentObj, address) {
+	parentObj.memoryAccessType = 2;
+	return parentObj.gfx.readPalette(address & 0x3FF);
 }
 GameBoyAdvanceIO.prototype.readConfigureWRAM = function (address) {
 	switch (address & 0x3) {
