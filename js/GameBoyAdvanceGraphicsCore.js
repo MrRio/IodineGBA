@@ -212,18 +212,25 @@ GameBoyAdvanceGraphics.prototype.clockLCDState = function () {
 		which tells us we need to be on a new scan-line and refresh over.*/
 		//Make sure we ran the h-blank check this scan line:
 		this.updateHBlank();
-		//Roll over to the next scan line and update state:
+		//De-clock for starting on new scan-line:
 		this.LCDTicks -= 1232;										//We start out at the beginning of the next line.
-		++this.currentScanLine;										//Increment scan line to the next one.
-		this.checkVCounter();										//We're on a new scan line, so check the VCounter for match.
 		//Handle switching in/out of vblank:
 		switch (this.currentScanLine) {
 			case 159:
 				this.updateVBlankStart();
+				this.currentScanLine = 160;							//Increment to the next scan line (Start of v-blank).
 				break;
 			case 226:
 				this.inVBlank = false;								//Un-mark VBlank.
+				this.currentScanLine = 227;							//Increment to the next scan line (Last line of v-blank).
+				break;
+			case 227:
+				this.currentScanLine = 0;							//Reset scan-line to zero (First line of draw).
+				break;
+			default:
+				++this.currentScanLine;								//Increment to the next scan line.
 		}
+		this.checkVCounter();										//We're on a new scan line, so check the VCounter for match.
 		//Recursive clocking of the LCD state:
 		this.clockLCDState();
 	}
