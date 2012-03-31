@@ -26,9 +26,12 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.lastBIOSREAD = [0, 0, 0, 0];		//BIOS read bus last.
 	//Internal wait state marker for adding clocks later in this core:
 	this.memoryAccessType = 0;
-	//Initialize the A/V objects:
+	//Initialize the various handler objects:
 	this.gfx = new GameBoyAdvanceGraphics(this);
 	this.sound = new GameBoyAdvanceSound(this);
+	this.timer = new GameBoyAdvanceTimer(this);
+	this.dma = new GameBoyAdvanceDMA(this);
+	this.state = new GameBoyAdvanceStateMachine(this);
 	//After all sub-objects initialized, initialize dispatches:
 	this.compileMemoryDispatches();
 }
