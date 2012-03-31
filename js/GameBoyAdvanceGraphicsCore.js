@@ -160,7 +160,6 @@ GameBoyAdvanceGraphics.prototype.initializeIO = function () {
 	this.VRAM = getUint8Array(0x18000);
 	this.OAMRAM = getUint8Array(0x400);
 	this.LCDTicks = 0;
-	this.LCDState = 0;
 }
 GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.initializeMatrixStorage();
@@ -210,7 +209,6 @@ GameBoyAdvanceGraphics.prototype.updateCore = function (clocks) {
 GameBoyAdvanceGraphics.prototype.updateScanLine = function (parentObj) {
 	if (parentObj.LCDTicks < 1006) {
 		parentObj.inHBlank = false;
-		parentObj.LCDState = 0;												//Flag for notifying the core itself is now in line draw.
 	}
 	else if (parentObj.LCDTicks < 1232) {
 		parentObj.updateHBlank();
@@ -228,7 +226,6 @@ GameBoyAdvanceGraphics.prototype.updateScanLine = function (parentObj) {
 GameBoyAdvanceGraphics.prototype.updateLastVisibleScanLine = function (parentObj) {
 	if (parentObj.LCDTicks < 1006) {
 		parentObj.inHBlank = false;
-		parentObj.LCDState = 0;												//Flag for notifying the core itself is now in line draw.
 	}
 	else if (parentObj.LCDTicks < 1232) {
 		parentObj.updateHBlank();
@@ -250,7 +247,6 @@ GameBoyAdvanceGraphics.prototype.updateLastVisibleScanLine = function (parentObj
 GameBoyAdvanceGraphics.prototype.updateVBlankScanLine226 = function (parentObj) {
 	if (parentObj.LCDTicks < 1006) {
 		parentObj.inHBlank = false;
-		parentObj.LCDState = 0;												//Flag for notifying the core itself is now in line draw.
 	}
 	else if (parentObj.LCDTicks < 1232) {
 		parentObj.updateHBlank();
@@ -267,12 +263,11 @@ GameBoyAdvanceGraphics.prototype.updateVBlankScanLine226 = function (parentObj) 
 	}
 }
 GameBoyAdvanceGraphics.prototype.updateHBlank = function () {
-	if (this.LCDState != 1) {												//If we were last in HBlank, don't run this again.
+	if (!this.inHBlank) {													//If we were last in HBlank, don't run this again.
 		this.inHBlank = true;
 		if (this.IRQHBlank) {
 			this.checkForHBlankIRQ();
 		}
-		this.LCDState = 1;													//Flag for notifying the core itself is now in h-blank.
 	}
 }
 GameBoyAdvanceGraphics.prototype.checkVCounter = function () {
