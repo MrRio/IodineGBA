@@ -159,10 +159,13 @@ GameBoyAdvanceGraphics.prototype.initializeIO = function () {
 	this.paletteRAM = getUint8Array(0x400);
 	this.VRAM = getUint8Array(0x18000);
 	this.OAMRAM = getUint8Array(0x400);
+	this.LCDTicks = 0;
+	this.LCDState = 0;
 }
 GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.initializeMatrixStorage();
 	this.initializePaletteStorage();
+	this.initializeLCDControlDispatch();
 	this.mode0Renderer = new mode0Renderer(this);
 	this.mode1Renderer = new mode1Renderer(this);
 	this.mode2Renderer = new mode2Renderer(this);
@@ -185,6 +188,102 @@ GameBoyAdvanceGraphics.prototype.initializePaletteStorage = function () {
 	this.palette16 = [];
 	for (var index = 0; index < 0x20;) {
 		this.palette16[index++] = getInt16Array(0x10);
+	}
+}
+GameBoyAdvanceGraphics.prototype.initializeLCDControlDispatch = function () {
+	this.LCDControlDispatch = [];
+	for (var scanlineBuild = 0; scanlineBuild < 159) {
+		this.LCDControlDispatch[scanlineBuild++] = this.updateScanLine;
+	}
+	this.LCDControlDispatch[scanlineBuild++] = this.updateLastVisibleScanLine;
+	while (scanlineBuild < 226) {
+		this.LCDControlDispatch[scanlineBuild++] = this.updateScanLine;
+	}
+	this.LCDControlDispatch[226] = this.updateVBlankScanLine226;
+	this.LCDControlDispatch[227] = this.updateScanLine;
+}
+GameBoyAdvanceGraphics.prototype.updateCore = function (clocks) {
+	//Call this when clocking the state some more:
+	this.LCDTicks += clocks;
+	this.LCDControlDispatch[this.currentScanLine](this);
+}
+GameBoyAdvanceGraphics.prototype.updateScanLine = function (parentObj) {
+	if (parentObj.LCDTicks < 1006) {
+		parentObj.inHBlank = false;
+		parentObj.LCDState = 0;												//Flag for notifying the core itself is now in line draw.
+	}
+	else if (parentObj.LCDTicks < 1232) {
+		parentObj.updateHBlank();
+	}
+	else {
+		//Make sure we ran the h-blank check this scan line:
+		parentObj.updateHBlank();
+		//Roll over to the next scan line and update state:
+		parentObj.LCDTicks -= 1232;											//We start out at the beginning of the next line.
+		++parentObj.currentScanLine;										//Increment scan line to the next one.
+		parentObj.checkVCounter();											//We're on a new scan line, so check the VCounter for match.
+		parentObj.LCDControlDispatch[parentObj.currentScanLine](parentObj);	//Recursive system to update the LCD state machine.
+	}
+}
+GameBoyAdvanceGraphics.prototype.updateLastVisibleScanLine = function (parentObj) {
+	if (parentObj.LCDTicks < 1006) {
+		parentObj.inHBlank = false;
+		parentObj.LCDState = 0;												//Flag for notifying the core itself is now in line draw.
+	}
+	else if (parentObj.LCDTicks < 1232) {
+		parentObj.updateHBlank();
+	}
+	else {
+		//Make sure we ran the h-blank check this scan line:
+		parentObj.updateHBlank();
+		//Roll over to the next scan line and update state:
+		parentObj.LCDTicks -= 1232;											//We start out at the beginning of the next line.
+		parentObj.inVBlank = true;											//Mark for VBlank.
+		if (parentObj.IRQVBlank) {											//Check for VBlank IRQ.
+			parentObj.checkForVBlankIRQ();
+		}
+		parentObj.currentScanLine = 160;									//Increment scan line to the next one.
+		parentObj.checkVCounter();											//We're on a new scan line, so check the VCounter for match.
+		parentObj.LCDControlDispatch[160](parentObj);						//Recursive system to update the LCD state machine.
+	}
+}
+GameBoyAdvanceGraphics.prototype.updateVBlankScanLine226 = function (parentObj) {
+	if (parentObj.LCDTicks < 1006) {
+		parentObj.inHBlank = false;
+		parentObj.LCDState = 0;												//Flag for notifying the core itself is now in line draw.
+	}
+	else if (parentObj.LCDTicks < 1232) {
+		parentObj.updateHBlank();
+	}
+	else {
+		//Make sure we ran the h-blank check this scan line:
+		parentObj.updateHBlank();
+		//Roll over to the next scan line and update state:
+		parentObj.LCDTicks -= 1232;											//We start out at the beginning of the next line.
+		parentObj.inVBlank = false;											//Mark for line 227 having the vblank flag off.
+		parentObj.currentScanLine = 227;									//Increment scan line to the next one.
+		parentObj.checkVCounter();											//We're on a new scan line, so check the VCounter for match.
+		parentObj.LCDControlDispatch[227](parentObj);						//Recursive system to update the LCD state machine.
+	}
+}
+GameBoyAdvanceGraphics.prototype.updateHBlank = function () {
+	if (this.LCDState != 1) {												//If we were last in HBlank, don't run this again.
+		this.inHBlank = true;
+		if (this.IRQHBlank) {
+			this.checkForHBlankIRQ();
+		}
+		this.LCDState = 1;													//Flag for notifying the core itself is now in h-blank.
+	}
+}
+GameBoyAdvanceGraphics.prototype.checkVCounter = function () {
+	if (this.currentScanLine == this.VCounter) {							//Check for VCounter match.
+		this.VCounterMatch = true;
+		if (this.IRQVCounter) {
+			this.checkForVCounterIRQ();
+		}
+	}
+	else {
+		this.VCounterMatch = false;
 	}
 }
 GameBoyAdvanceGraphics.prototype.writeDISPCNT0 = function (data) {
@@ -271,6 +370,7 @@ GameBoyAdvanceGraphics.prototype.readDISPSTAT0 = function () {
 GameBoyAdvanceGraphics.prototype.writeDISPSTAT1 = function (data) {
 	//V-Counter match value:
 	this.VCounter = data;
+	this.checkVCounter();
 }
 GameBoyAdvanceGraphics.prototype.readDISPSTAT1 = function () {
 	return this.VCounter;
