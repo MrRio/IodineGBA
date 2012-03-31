@@ -1219,11 +1219,11 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 	}
 	this.accessPostProcess8[1] = this.accessPostProcess16[1] = function (parentObj) {
 		//External WRAM state:
-		parentObj.emulatorCore.CPUClocks += parentObj.waitStateWRAM;
+		parentObj.cpu.CPUClocks += parentObj.waitStateWRAM;
 	}
 	this.accessPostProcess32[1] = function (parentObj) {
 		//External WRAM state:
-		parentObj.emulatorCore.CPUClocks += parentObj.waitStateWRAMLong;
+		parentObj.cpu.CPUClocks += parentObj.waitStateWRAMLong;
 	}
 	this.accessPostProcess8[2] = function (parentObj) {
 		//VRAM Write:
@@ -1236,7 +1236,7 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 	}
 	this.accessPostProcess32[2] = function (parentObj) {
 		//VRAM Write:
-		++parentObj.emulatorCore.CPUClocks;
+		++parentObj.cpu.CPUClocks;
 	}
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
@@ -1312,9 +1312,9 @@ GameBoyAdvanceIO.prototype.writeConfigureWRAM = function (address, data) {
 GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address) {
 	if (address < 0x4000) {
 		parentObj.memoryAccessType = 0;
-		if (parentObj.emulatorCore.register[0x15] < 0x4000) {
+		if (parentObj.cpu.register[0x15] < 0x4000) {
 			//If reading from BIOS while executing it:
-			parentObj.lastBIOSREAD[address & 0x3] = parentObj.emulatorCore.registers[0x15];
+			parentObj.lastBIOSREAD[address & 0x3] = parentObj.cpu.registers[0x15];
 			return parentObj.BIOS[address];
 		}
 		else {
@@ -1388,17 +1388,17 @@ GameBoyAdvanceIO.prototype.readZero = function (parentObj) {
 }
 GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address) {
 	parentObj.memoryAccessType = 0;
-	return (parentObj.emulatorCore.fetch >> ((address & 0x3) << 3)) & 0xFF;
+	return (parentObj.cpu.fetch >> ((address & 0x3) << 3)) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused0 = function (parentObj) {
-	return parentObj.emulatorCore.fetch & 0xFF;
+	return parentObj.cpu.fetch & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused1 = function (parentObj) {
-	return (parentObj.emulatorCore.fetch >> 8) & 0xFF;
+	return (parentObj.cpu.fetch >> 8) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused2 = function (parentObj) {
-	return (parentObj.emulatorCore.fetch >> 16) & 0xFF;
+	return (parentObj.cpu.fetch >> 16) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused3 = function (parentObj) {
-	return (parentObj.emulatorCore.fetch >> 24) & 0xFF;
+	return (parentObj.cpu.fetch >> 24) & 0xFF;
 }
