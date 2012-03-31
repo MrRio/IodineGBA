@@ -31,7 +31,7 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.sound = new GameBoyAdvanceSound(this);
 	this.timer = new GameBoyAdvanceTimer(this);
 	this.dma = new GameBoyAdvanceDMA(this);
-	this.state = new GameBoyAdvanceStateMachine(this);
+	this.cpu = new GameBoyAdvanceCPU(this);
 	//After all sub-objects initialized, initialize dispatches:
 	this.compileMemoryDispatches();
 }
