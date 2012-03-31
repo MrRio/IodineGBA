@@ -262,7 +262,7 @@ GameBoyAdvanceGraphics.prototype.updateVBlankStart = function () {
 		this.checkForVBlankIRQ();
 	}
 	//Ensure JIT framing alignment:
-	if (this.totalLinesPassed < 160 || (this.totalLinesPassed == 160 && parentObj.midScanLineOffset > 0)) {
+	if (this.totalLinesPassed < 160 || (this.totalLinesPassed == 160 && this.midScanLineOffset > 0)) {
 		//Make sure our gfx are up-to-date:
 		this.graphicsJITVBlank();
 		//Draw the frame:
