@@ -818,6 +818,70 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x8E] = this.NOP;
 	//400008Fh - NOT USED - ZERO
 	this.writeIO[0x8F] = this.NOP;
+	//4000090h - WAVE_RAM0_L - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x90] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(0, data);
+	}
+	//4000091h - WAVE_RAM0_L - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x91] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(2, data);
+	}
+	//4000092h - WAVE_RAM0_H - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x92] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(4, data);
+	}
+	//4000093h - WAVE_RAM0_H - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x93] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(6, data);
+	}
+	//4000094h - WAVE_RAM1_L - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x94] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(8, data);
+	}
+	//4000095h - WAVE_RAM1_L - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x95] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(10, data);
+	}
+	//4000096h - WAVE_RAM1_H - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x96] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(12, data);
+	}
+	//4000097h - WAVE_RAM1_H - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x97] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(14, data);
+	}
+	//4000098h - WAVE_RAM2_L - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x98] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(16, data);
+	}
+	//4000099h - WAVE_RAM2_L - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x99] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(18, data);
+	}
+	//400009Ah - WAVE_RAM2_H - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x9A] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(20, data);
+	}
+	//400009Bh - WAVE_RAM2_H - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x9B] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(22, data);
+	}
+	//400009Ch - WAVE_RAM3_L - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x9C] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(24, data);
+	}
+	//400009Dh - WAVE_RAM3_L - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x9D] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(26, data);
+	}
+	//400009Eh - WAVE_RAM3_H - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x9E] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(28, data);
+	}
+	//400009Fh - WAVE_RAM3_H - Channel 3 Wave Pattern RAM (W/R)
+	this.writeIO[0x9F] = function (parentObj, data) {
+		parentObj.sound.writeWAVE(30, data);
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -1204,6 +1268,70 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x8E] = this.readUnused2;
 	//400008Fh - NOT USED - GLITCHED
 	this.readIO[0x8F] = this.readUnused3;
+	//4000090h - WAVE_RAM0_L - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x90] = function (parentObj) {
+		return parentObj.sound.readWAVE(0);
+	}
+	//4000091h - WAVE_RAM0_L - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x91] = function (parentObj) {
+		return parentObj.sound.readWAVE(2);
+	}
+	//4000092h - WAVE_RAM0_H - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x92] = function (parentObj) {
+		return parentObj.sound.readWAVE(4);
+	}
+	//4000093h - WAVE_RAM0_H - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x93] = function (parentObj) {
+		return parentObj.sound.readWAVE(6);
+	}
+	//4000094h - WAVE_RAM1_L - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x94] = function (parentObj) {
+		return parentObj.sound.readWAVE(8);
+	}
+	//4000095h - WAVE_RAM1_L - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x95] = function (parentObj) {
+		return parentObj.sound.readWAVE(10);
+	}
+	//4000096h - WAVE_RAM1_H - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x96] = function (parentObj) {
+		return parentObj.sound.readWAVE(12);
+	}
+	//4000097h - WAVE_RAM1_H - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x97] = function (parentObj) {
+		return parentObj.sound.readWAVE(14);
+	}
+	//4000098h - WAVE_RAM2_L - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x98] = function (parentObj) {
+		return parentObj.sound.readWAVE(16);
+	}
+	//4000099h - WAVE_RAM2_L - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x99] = function (parentObj) {
+		return parentObj.sound.readWAVE(18);
+	}
+	//400009Ah - WAVE_RAM2_H - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x9A] = function (parentObj) {
+		return parentObj.sound.readWAVE(20);
+	}
+	//400009Bh - WAVE_RAM2_H - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x9B] = function (parentObj) {
+		return parentObj.sound.readWAVE(22);
+	}
+	//400009Ch - WAVE_RAM3_L - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x9C] = function (parentObj) {
+		return parentObj.sound.readWAVE(24);
+	}
+	//400009Dh - WAVE_RAM3_L - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x9D] = function (parentObj) {
+		return parentObj.sound.readWAVE(26);
+	}
+	//400009Eh - WAVE_RAM3_H - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x9E] = function (parentObj) {
+		return parentObj.sound.readWAVE(28);
+	}
+	//400009Fh - WAVE_RAM3_H - Channel 3 Wave Pattern RAM (W/R)
+	this.readIO[0x9F] = function (parentObj) {
+		return parentObj.sound.readWAVE(30);
+	}
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
