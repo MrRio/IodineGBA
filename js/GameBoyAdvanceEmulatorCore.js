@@ -124,8 +124,8 @@ GameBoyCore.prototype.recomputeDimension = function () {
 	}
 }
 GameBoyAdvanceEmulator.prototype.initializeCanvasTarget = function () {
-	this.recomputeDimension();
 	try {
+		this.recomputeDimension();
 		this.canvasOffscreen = document.createElement("canvas");
 		this.canvasOffscreen.width = this.offscreenWidth;
 		this.canvasOffscreen.height = this.offscreenHeight;
