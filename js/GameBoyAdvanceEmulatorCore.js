@@ -108,11 +108,11 @@ GameBoyAdvanceEmulator.prototype.attachCanvas = function (canvas) {
 		this.stopEmulator |= 0x1;
 	}
 }
-GameBoyCore.prototype.recomputeDimension = function () {
+GameBoyAdvanceEmulator.prototype.recomputeDimension = function () {
 	//Cache some dimension info:
 	this.canvasLastWidth = this.canvas.clientWidth;
 	this.canvasLastHeight = this.canvas.clientHeight;
-	if (window && window.mozRequestAnimationFrame) {
+	if (window.mozRequestAnimationFrame) {	//Sniff out firefox for selecting this path.
 		//Set target as unscaled:
 		this.onscreenWidth = this.canvas.width = this.offscreenWidth;
 		this.onscreenHeight = this.canvas.height = this.offscreenHeight;
