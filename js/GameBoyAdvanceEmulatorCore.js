@@ -54,11 +54,6 @@ GameBoyAdvanceEmulator.prototype.restart = function () {
 	this.save();
 	this.initializeROM();
 }
-GameBoyAdvanceEmulator.prototype.setFatal = function () {
-	//Call this method when a fatal action occurs:
-	this.stopEmulator |= 0x4;
-	this.clearTimer();
-}
 GameBoyAdvanceEmulator.prototype.clearTimer = function () {
 	if (this.timer !== null) {
 		clearInterval(this.timer);
@@ -71,6 +66,7 @@ GameBoyAdvanceEmulator.prototype.startTimer = function () {
 	this.timer = setInterval(parentObj.timerCallback, this.timerIntervalRate);
 }
 GameBoyAdvanceEmulator.prototype.timerCallback = function () {
+	//Check to see if web view is not hidden, if hidden don't run due to JS timers being inaccurate on page hide:
 	if (!document.hidden && !document.msHidden && !document.mozHidden && !document.webkitHidden) {
 		if (this.stopEmulator < 0x4) {		//Can run with either graphics or audio disabled.
 			this.stopEmulator |= 0x4;		//If the end routine doesn't unset this, then we are marked as having crashed.
@@ -81,10 +77,11 @@ GameBoyAdvanceEmulator.prototype.timerCallback = function () {
 				this.IOCore.iterate();
 			}
 			//Handle end of iteration block stuff (gfx blit, etc.):
-			if (clocksToIterate == this.CPUCyclesTotal) {
-				this.IOCore.iterationBlockEndHandle();
-				this.stopEmulator &= 0x1B;
-			}
+			this.IOCore.iterationBlockEndHandle();
+			this.stopEmulator &= 0x1B;		//If core did not throw while running, unset the fatal error flag.
+		}
+		else {
+			this.pause();					//Some pending error is preventing execution, so pause.
 		}
 	}
 }
