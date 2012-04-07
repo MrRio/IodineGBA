@@ -24,25 +24,26 @@ function GameBoyAdvanceEmulator() {
 		0x10								//No ROM loaded
 	);
 	this.audioVolume = 1;					//Starting audio volume.
+	this.audioSampleRate = 0x40000;			//Internal audio sample rate.
 	this.audioBufferUnderrunLimit = 10;		//Audio buffer minimum span amount over x interpreter iterations.
 	this.audioBufferSize = 25;				//Audio buffer maximum span amount over x interpreter iterations.
-	this.offscreenWidth = 240;
-	this.offscreenHeight = 160;
+	this.offscreenWidth = 240;				//Width of the GBA screen.
+	this.offscreenHeight = 160;				//Height of the GBA screen.
+	//Cache some frame buffer lengths:
 	this.offscreenRGBCount = this.offscreenWidth * this.offscreenHeight * 3;
 	this.offscreenRGBACount = this.offscreenWidth * this.offscreenHeight * 4;
-	this.swizzledFrame = getUint8Array(this.offscreenRGBCount);
-	this.frameBuffer = getInt32Array(this.offscreenRGBCount);
+	//Graphics buffers to generate in advance:
+	this.frameBuffer = getInt32Array(this.offscreenRGBCount);		//The internal buffer to composite to.
+	this.swizzledFrame = getUint8Array(this.offscreenRGBCount);		//The swizzled output buffer that syncs to the internal framebuffer on v-blank.
 	this.drewFrame = false;					//Did we draw the last iteration?
+	//Calculate some multipliers against the core emulator timer:
 	this.calculateTimings();
-}
-GameBoyAdvanceEmulator.prototype.pause = function () {
-	this.stopEmulator |= 0x8;
 }
 GameBoyAdvanceEmulator.prototype.play = function () {
 	this.stopEmulator &= 0x17;
 	this.startTimer();
 }
-GameBoyAdvanceEmulator.prototype.stop = function () {
+GameBoyAdvanceEmulator.prototype.pause = function () {
 	this.stopEmulator &= 0x3;
 	this.stopEmulator |= 0x18;
 	this.clearTimer();
@@ -203,7 +204,7 @@ GameBoyAdvanceEmulator.prototype.isCanvasEnabled = function () {
 GameBoyAdvanceEmulator.prototype.enableAudio = function () {
 	if (!this.isAudioOn()) {
 		try {
-			this.audio = new XAudioServer(2, 0x40000, 0, Math.max(this.sampleSize * this.audioBufferSize, 0x2000) << 1, null, this.audioVolume);
+			this.audio = new XAudioServer(2, this.audioSampleRate, 0, Math.max(this.sampleSize * this.audioBufferSize, 0x2000) << 1, null, this.audioVolume);
 			this.stopEmulator &= 0x1D;
 		}
 		catch (e) {
@@ -257,7 +258,7 @@ GameBoyAdvanceEmulator.prototype.isAudioOn = function () {
 }
 GameBoyAdvanceEmulator.prototype.calculateTimings = function () {
 	this.CPUCyclesTotal = this.CPUCyclesPerIteration = (0x1000000 / this.timerIntervalRate) | 0;
-	this.sampleSize = 0x40000 / 1000 * this.timerIntervalRate;
+	this.sampleSize = this.audioSampleRate / 1000 * this.timerIntervalRate;
 	this.samplesOut = this.sampleSize / this.CPUCyclesPerIteration;
 	this.machineOut = 1 / this.samplesOut;	//Clocks per sample.
 	this.audioBufferContainAmount = Math.max(this.sampleSize * this.audioBufferUnderrunLimit, 4096) << 1;
