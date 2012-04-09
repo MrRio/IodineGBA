@@ -25,8 +25,8 @@ function GameBoyAdvanceEmulator() {
 	);
 	this.audioVolume = 1;					//Starting audio volume.
 	this.audioSampleRate = 0x40000;			//Internal audio sample rate.
-	this.audioBufferUnderrunLimit = 10;		//Audio buffer minimum span amount over x interpreter iterations.
-	this.audioBufferSize = 25;				//Audio buffer maximum span amount over x interpreter iterations.
+	this.audioBufferUnderrunLimit = 15;		//Audio buffer minimum span amount over x interpreter iterations.
+	this.audioBufferSize = 30;				//Audio buffer maximum span amount over x interpreter iterations.
 	this.offscreenWidth = 240;				//Width of the GBA screen.
 	this.offscreenHeight = 160;				//Height of the GBA screen.
 	//Cache some frame buffer lengths:
