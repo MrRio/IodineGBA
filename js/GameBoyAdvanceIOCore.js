@@ -882,6 +882,70 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x9F] = function (parentObj, data) {
 		parentObj.sound.writeWAVE(30, data);
 	}
+	//40000A0h - FIFO_A_L - FIFO Channel A First Word (W)
+	this.writeIO[0xA0] = function (parentObj, data) {
+		parentObj.sound.writeFIFOA(0, data);
+	}
+	//40000A1h - FIFO_A_L - FIFO Channel A First Word (W)
+	this.writeIO[0xA1] = function (parentObj, data) {
+		parentObj.sound.writeFIFOA(1, data);
+	}
+	//40000A2h - FIFO_A_H - FIFO Channel A Second Word (W)
+	this.writeIO[0xA2] = function (parentObj, data) {
+		parentObj.sound.writeFIFOA(2, data);
+	}
+	//40000A3h - FIFO_A_H - FIFO Channel A Second Word (W)
+	this.writeIO[0xA3] = function (parentObj, data) {
+		parentObj.sound.writeFIFOA(3, data);
+	}
+	//40000A4h - FIFO_B_L - FIFO Channel B First Word (W)
+	this.writeIO[0xA4] = function (parentObj, data) {
+		parentObj.sound.writeFIFOB(0, data);
+	}
+	//40000A5h - FIFO_B_L - FIFO Channel B First Word (W)
+	this.writeIO[0xA5] = function (parentObj, data) {
+		parentObj.sound.writeFIFOB(1, data);
+	}
+	//40000A6h - FIFO_B_H - FIFO Channel B Second Word (W)
+	this.writeIO[0xA6] = function (parentObj, data) {
+		parentObj.sound.writeFIFOB(2, data);
+	}
+	//40000A7h - FIFO_B_H - FIFO Channel B Second Word (W)
+	this.writeIO[0xA7] = function (parentObj, data) {
+		parentObj.sound.writeFIFOB(3, data);
+	}
+	//40000A8h - NOT USED - ZERO
+	this.writeIO[0xA8] = this.NOP;
+	//40000A9h - NOT USED - ZERO
+	this.writeIO[0xA9] = this.NOP;
+	//40000AAh - NOT USED - ZERO
+	this.writeIO[0xAA] = this.NOP;
+	//40000ABh - NOT USED - ZERO
+	this.writeIO[0xAB] = this.NOP;
+	//40000ACh - NOT USED - ZERO
+	this.writeIO[0xAC] = this.NOP;
+	//40000ADh - NOT USED - ZERO
+	this.writeIO[0xAD] = this.NOP;
+	//40000AEh - NOT USED - ZERO
+	this.writeIO[0xAE] = this.NOP;
+	//40000AFh - NOT USED - ZERO
+	this.writeIO[0xAF] = this.NOP;
+	//40000B0h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
+	this.writeIO[0xB0] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Source(0, data);
+	}
+	//40000B1h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
+	this.writeIO[0xB1] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Source(1, data);
+	}
+	//40000B2h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
+	this.writeIO[0xB2] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Source(2, data);
+	}
+	//40000B3h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
+	this.writeIO[0xB3] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Source(3, data & 0x7);	//Mask out the unused bits.
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -1332,6 +1396,38 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x9F] = function (parentObj) {
 		return parentObj.sound.readWAVE(30);
 	}
+	//40000A0h - FIFO_A_L - FIFO Channel A First Word (W)
+	this.readIO[0xA0] = this.readZero;
+	//40000A1h - FIFO_A_L - FIFO Channel A First Word (W)
+	this.readIO[0xA1] = this.readZero;
+	//40000A2h - FIFO_A_H - FIFO Channel A Second Word (W)
+	this.readIO[0xA2] = this.readZero;
+	//40000A3h - FIFO_A_H - FIFO Channel A Second Word (W)
+	this.readIO[0xA3] = this.readZero;
+	//40000A4h - FIFO_B_L - FIFO Channel B First Word (W)
+	this.readIO[0xA4] = this.readZero;
+	//40000A5h - FIFO_B_L - FIFO Channel B First Word (W)
+	this.readIO[0xA5] = this.readZero;
+	//40000A6h - FIFO_B_H - FIFO Channel B Second Word (W)
+	this.readIO[0xA6] = this.readZero;
+	//40000A7h - FIFO_B_H - FIFO Channel B Second Word (W)
+	this.readIO[0xA7] = this.readZero;
+	//40000A8h - NOT USED - GLITCHED
+	this.readIO[0xA8] = this.readUnused0;
+	//40000A9h - NOT USED - GLITCHED
+	this.readIO[0xA9] = this.readUnused1;
+	//40000AAh - NOT USED - GLITCHED
+	this.readIO[0xAA] = this.readUnused2;
+	//40000ABh - NOT USED - GLITCHED
+	this.readIO[0xAB] = this.readUnused3;
+	//40000ACh - NOT USED - GLITCHED
+	this.readIO[0xAC] = this.readUnused0;
+	//40000ADh - NOT USED - GLITCHED
+	this.readIO[0xAD] = this.readUnused1;
+	//40000AEh - NOT USED - GLITCHED
+	this.readIO[0xAE] = this.readUnused2;
+	//40000AFh - NOT USED - GLITCHED
+	this.readIO[0xAF] = this.readUnused3;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
