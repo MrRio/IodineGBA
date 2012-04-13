@@ -938,13 +938,37 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0xB1] = function (parentObj, data) {
 		parentObj.sound.writeDMA0Source(1, data);
 	}
-	//40000B2h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
+	//40000B2h - DMA0SAH - DMA 0 Source Address (W) (internal memory)
 	this.writeIO[0xB2] = function (parentObj, data) {
 		parentObj.sound.writeDMA0Source(2, data);
 	}
-	//40000B3h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
+	//40000B3h - DMA0SAH - DMA 0 Source Address (W) (internal memory)
 	this.writeIO[0xB3] = function (parentObj, data) {
 		parentObj.sound.writeDMA0Source(3, data & 0x7);	//Mask out the unused bits.
+	}
+	//40000B4h - DMA0DAD - DMA 0 Destination Address (W) (internal memory)
+	this.writeIO[0xB4] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Destination(0, data);
+	}
+	//40000B5h - DMA0DAD - DMA 0 Destination Address (W) (internal memory)
+	this.writeIO[0xB5] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Destination(1, data);
+	}
+	//40000B6h - DMA0DAH - DMA 0 Destination Address (W) (internal memory)
+	this.writeIO[0xB6] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Destination(2, data);
+	}
+	//40000B7h - DMA0DAH - DMA 0 Destination Address (W) (internal memory)
+	this.writeIO[0xB7] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Destination(3, data & 0x7);
+	}
+	//40000B8h - DMA0CNT_L - DMA 0 Word Count (W) (14 bit, 1..4000h)
+	this.writeIO[0xB8] = function (parentObj, data) {
+		parentObj.sound.writeDMA0WordCount0(data);
+	}
+	//40000B9h - DMA0CNT_L - DMA 0 Word Count (W) (14 bit, 1..4000h)
+	this.writeIO[0xB9] = function (parentObj, data) {
+		parentObj.sound.writeDMA0WordCount1(data & 0x3F);
 	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
@@ -1428,6 +1452,26 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xAE] = this.readUnused2;
 	//40000AFh - NOT USED - GLITCHED
 	this.readIO[0xAF] = this.readUnused3;
+	//40000B0h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
+	this.readIO[0xB0] = this.readZero;
+	//40000B1h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
+	this.readIO[0xB1] = this.readZero;
+	//40000B2h - DMA0SAH - DMA 0 Source Address (W) (internal memory)
+	this.readIO[0xB2] = this.readZero;
+	//40000B3h - DMA0SAH - DMA 0 Source Address (W) (internal memory)
+	this.readIO[0xB3] = this.readZero;
+	//40000B4h - DMA0DAD - DMA 0 Destination Address (W) (internal memory)
+	this.readIO[0xB4] = this.readZero;
+	//40000B5h - DMA0DAD - DMA 0 Destination Address (W) (internal memory)
+	this.readIO[0xB5] = this.readZero;
+	//40000B6h - DMA0DAH - DMA 0 Destination Address (W) (internal memory)
+	this.readIO[0xB6] = this.readZero;
+	//40000B7h - DMA0DAH - DMA 0 Destination Address (W) (internal memory)
+	this.readIO[0xB7] = this.readZero;
+	//40000B8h - DMA0CNT_L - DMA 0 Word Count (W) (14 bit, 1..4000h)
+	this.readIO[0xB8] = this.readZero;
+	//40000B9h - DMA0CNT_L - DMA 0 Word Count (W) (14 bit, 1..4000h)
+	this.readIO[0xB9] = this.readZero;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
