@@ -1696,16 +1696,19 @@ GameBoyAdvanceIO.prototype.iterate = function () {
 			case 0: //Normal Exit
 				this.endNormal();
 				break;
-			case 1: //Handle Halt State
+			case 1:	//DMA Handle State
+				this.handleDMA();
+				break;
+			case 2: //Handle Halt State
 				this.handleHalt();
 				break;
-			case 2: //Handle Stop State
+			case 3: //Handle Stop State
 				this.handleStop();
 		}
 	}
 }
 GameBoyAdvanceIO.prototype.fatalError = function () {
 	//Way to ensure we short-circuit the iteration core:
-	this.systemStatus = 3;
+	this.systemStatus = 4;
 	this.cyclesToIterate = 0;
 }
