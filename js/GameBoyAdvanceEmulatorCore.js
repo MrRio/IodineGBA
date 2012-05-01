@@ -69,17 +69,23 @@ GameBoyAdvanceEmulator.prototype.timerCallback = function () {
 	//Check to see if web view is not hidden, if hidden don't run due to JS timers being inaccurate on page hide:
 	if (!document.hidden && !document.msHidden && !document.mozHidden && !document.webkitHidden) {
 		if (this.stopEmulator < 0x4) {		//Can run with either graphics or audio disabled.
-			this.stopEmulator |= 0x4;		//If the end routine doesn't unset this, then we are marked as having crashed.
-			this.drewFrame = false;			//Audio has not drawn yet for this iteration block.
-			this.audioUnderrunAdjustment();	//If audio is enabled, look to see how much we should overclock by to maintain the audio buffer.
-			//Step through the emulation core loop:
-			this.IOCore.iterate();
-			this.stopEmulator &= 0x1B;		//If core did not throw while running, unset the fatal error flag.
+			this.iterationStartSequence();	//Run start of iteration stuff.
+			this.IOCore.iterate();			//Step through the emulation core loop.
+			this.iterationEndSequence();	//Run end of iteration stuff.
 		}
 		else {
 			this.pause();					//Some pending error is preventing execution, so pause.
 		}
 	}
+}
+GameBoyAdvanceEmulator.prototype.iterationStartSequence = function () {
+	this.stopEmulator |= 0x4;		//If the end routine doesn't unset this, then we are marked as having crashed.
+	this.drewFrame = false;			//Graphics has not drawn yet for this iteration block.
+	this.audioUnderrunAdjustment();	//If audio is enabled, look to see how much we should overclock by to maintain the audio buffer.
+}
+GameBoyAdvanceEmulator.prototype.iterationEndSequence = function () {
+	this.requestDraw();				//If drewFrame is true, blit buffered frame out.
+	this.stopEmulator &= 0x1B;		//If core did not throw while running, unset the fatal error flag.
 }
 GameBoyAdvanceEmulator.prototype.attachROM = function (ROM, encodingType) {
 	this.stop();
