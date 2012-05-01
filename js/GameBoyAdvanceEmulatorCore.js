@@ -73,11 +73,7 @@ GameBoyAdvanceEmulator.prototype.timerCallback = function () {
 			this.drewFrame = false;			//Audio has not drawn yet for this iteration block.
 			this.audioUnderrunAdjustment();	//If audio is enabled, look to see how much we should overclock by to maintain the audio buffer.
 			//Step through the emulation core loop:
-			for (var clocksToIterate = 0; clocksToIterate < this.CPUCyclesTotal; ++clocksToIterate) {
-				this.IOCore.iterate();
-			}
-			//Handle end of iteration block stuff (gfx blit, etc.):
-			this.IOCore.iterationBlockEndHandle();
+			this.IOCore.iterate();
 			this.stopEmulator &= 0x1B;		//If core did not throw while running, unset the fatal error flag.
 		}
 		else {
@@ -257,10 +253,11 @@ GameBoyAdvanceEmulator.prototype.calculateTimings = function () {
 	this.CPUCyclesTotal = this.CPUCyclesPerIteration = (0x1000000 / this.timerIntervalRate) | 0;
 	this.sampleSize = this.audioSampleRate / 1000 * this.timerIntervalRate;
 	this.samplesOut = this.sampleSize / this.CPUCyclesPerIteration;
-	this.machineOut = 1 / this.samplesOut;	//Clocks per sample.
-	this.audioBufferContainAmount = Math.max(this.sampleSize * this.audioBufferUnderrunLimit, 4096) << 1;
-	this.audioNumSamplesTotal = this.sampleSize << 1;
-	this.audioCurrentBuffer = getFloat32Array(this.audioNumSamplesTotal);
+	this.machineOut = this.audioPreMixdownRate / this.samplesOut;	//Clocks per sample.
+	this.audioBufferContainAmount = Math.max(this.sampleSize * this.audioBufferUnderrunLimit / this.audioPreMixdownRate, 4096) << 1;
+	this.audioNumSamplesTotal = this.sampleSize  - (this.sampleSize % this.audioPreMixdownRate);
+	this.audioCurrentBuffer = getInt32Array(this.audioNumSamplesTotal);
+	this.audioSecondaryBuffer = getFloat32Array(this.audioNumSamplesTotal / this.audioPreMixdownRate);
 }
 GameBoyAdvanceEmulator.prototype.changeCoreTimer = function (newTimerIntervalRate) {
 	this.timerIntervalRate = Math.max(parseInt(newTimerIntervalRate), 1);

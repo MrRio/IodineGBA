@@ -17,6 +17,8 @@
 function GameBoyAdvanceIO(emulatorCore) {
 	//Reference to the emulator core:
 	this.emulatorCore = emulatorCore;
+	//State Machine Tracking:
+	this.systemStatus = 0;
 	//Game Pak Wait State setting:
 	this.waitStateGamePak = 0;
 	//WRAM Settings:
@@ -970,6 +972,14 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0xB9] = function (parentObj, data) {
 		parentObj.sound.writeDMA0WordCount1(data & 0x3F);
 	}
+	//40000BAh - DMA0 CNT_H - DMA 0 Word Count (W) (14 bit, 1..4000h)
+	this.writeIO[0xBA] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Control0(data & 0x3F);
+	}
+	//40000BBh - DMA0 CNT_H - DMA 0 Word Count (W) (14 bit, 1..4000h)
+	this.writeIO[0xBB] = function (parentObj, data) {
+		parentObj.sound.writeDMA0Control1(data);
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -1669,4 +1679,33 @@ GameBoyAdvanceIO.prototype.readUnused2 = function (parentObj) {
 }
 GameBoyAdvanceIO.prototype.readUnused3 = function (parentObj) {
 	return (parentObj.cpu.fetch >> 24) & 0xFF;
+}
+GameBoyAdvanceIO.prototype.iterate = function () {
+	this.cyclesToIterate = this.emulatorCore.CPUCyclesTotal;
+	//Loop until we run out of clocks:
+	while (this.cyclesToIterate > 0) {
+		if (this.systemStatus == 0) {
+			//If there are clocks left to clock down and in normal state:
+			while (this.cyclesToIterate-- > 0) {
+				this.cpu.executeIteration();
+				this.updateCore();
+			}
+		}
+		//Either ran out of clocks this iteration or in halt or stop mode:
+		switch (this.systemStatus) {
+			case 0: //Normal Exit
+				this.endNormal();
+				break;
+			case 1: //Handle Halt State
+				this.handleHalt();
+				break;
+			case 2: //Handle Stop State
+				this.handleStop();
+		}
+	}
+}
+GameBoyAdvanceIO.prototype.fatalError = function () {
+	//Way to ensure we short-circuit the iteration core:
+	this.systemStatus = 3;
+	this.cyclesToIterate = 0;
 }
