@@ -1708,7 +1708,5 @@ GameBoyAdvanceIO.prototype.iterate = function () {
 	}
 }
 GameBoyAdvanceIO.prototype.fatalError = function () {
-	//Way to ensure we short-circuit the iteration core:
-	this.systemStatus = 4;
-	this.cyclesToIterate = 0;
+	throw(new Error("Emulator core faulted."));
 }
