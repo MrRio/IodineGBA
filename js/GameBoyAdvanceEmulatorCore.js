@@ -35,6 +35,7 @@ function GameBoyAdvanceEmulator() {
 	//Graphics buffers to generate in advance:
 	this.frameBuffer = getInt32Array(this.offscreenRGBCount);		//The internal buffer to composite to.
 	this.swizzledFrame = getUint8Array(this.offscreenRGBCount);		//The swizzled output buffer that syncs to the internal framebuffer on v-blank.
+	this.initializeGraphicsBuffer();								//Pre-set the swizzled buffer for first frame.
 	this.drewFrame = false;					//Did we draw the last iteration?
 	//Calculate some multipliers against the core emulator timer:
 	this.calculateTimings();
@@ -125,7 +126,9 @@ GameBoyAdvanceEmulator.prototype.recomputeDimension = function () {
 }
 GameBoyAdvanceEmulator.prototype.initializeCanvasTarget = function () {
 	try {
+		//Obtain dimensional information:
 		this.recomputeDimension();
+		//Get handles on the canvases:
 		this.canvasOffscreen = document.createElement("canvas");
 		this.canvasOffscreen.width = this.offscreenWidth;
 		this.canvasOffscreen.height = this.offscreenHeight;
@@ -138,19 +141,26 @@ GameBoyAdvanceEmulator.prototype.initializeCanvasTarget = function () {
 		catch (error) {
 			this.canvasBuffer = this.drawContextOffscreen.getImageData(0, 0, this.offscreenWidth, this.offscreenHeight);
 		}
-		for (var indexGFXIterate = this.offscreenRGBACount; indexGFXIterate > 0;) {
-			this.canvasBuffer.data[indexGFXIterate -= 4] = 0xF8;
-			this.canvasBuffer.data[indexGFXIterate + 1] = 0xF8;
-			this.canvasBuffer.data[indexGFXIterate + 2] = 0xF8;
-			this.canvasBuffer.data[indexGFXIterate + 3] = 0xFF;
+		//Initialize Alpha Channel:
+		for (var indexGFXIterate = 3; indexGFXIterate < this.offscreenRGBACount; indexGFXIterate += 4) {
+			this.canvasBuffer.data[indexGFXIterate] = 0xFF;
 		}
-		this.graphicsBlit();
-		this.drewFrame = true;										//Copy the latest graphics to buffer.
+		//Draw swizzled buffer out as a test:
+		this.drewFrame = true;
 		this.requestDraw();
+		//Success:
 		return true;
 	}
 	catch (error) {
+		//Failure:
 		return false;
+	}
+}
+GameBoyAdvanceEmulator.prototype.initializeGraphicsBuffer = function () {
+	//Initialize the first frame to a white screen:
+	var bufferIndex = 0;
+	while (bufferIndex < this.offscreenRGBCount) {
+		this.swizzledFrame[bufferIndex++] = 0xF8;
 	}
 }
 GameBoyAdvanceEmulator.prototype.swizzleFrameBuffer = function () {
