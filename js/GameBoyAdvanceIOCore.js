@@ -19,6 +19,8 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.emulatorCore = emulatorCore;
 	//State Machine Tracking:
 	this.systemStatus = 0;
+	this.cyclesToIterate = 0;
+	this.cyclesIteratedPreviously = 0;
 	//Game Pak Wait State setting:
 	this.waitStateGamePak = 0;
 	//WRAM Settings:
@@ -886,35 +888,35 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//40000A0h - FIFO_A_L - FIFO Channel A First Word (W)
 	this.writeIO[0xA0] = function (parentObj, data) {
-		parentObj.sound.writeFIFOA(0, data);
+		parentObj.sound.writeFIFOA(data);
 	}
 	//40000A1h - FIFO_A_L - FIFO Channel A First Word (W)
 	this.writeIO[0xA1] = function (parentObj, data) {
-		parentObj.sound.writeFIFOA(1, data);
+		parentObj.sound.writeFIFOA(data);
 	}
 	//40000A2h - FIFO_A_H - FIFO Channel A Second Word (W)
 	this.writeIO[0xA2] = function (parentObj, data) {
-		parentObj.sound.writeFIFOA(2, data);
+		parentObj.sound.writeFIFOA(data);
 	}
 	//40000A3h - FIFO_A_H - FIFO Channel A Second Word (W)
 	this.writeIO[0xA3] = function (parentObj, data) {
-		parentObj.sound.writeFIFOA(3, data);
+		parentObj.sound.writeFIFOA(data);
 	}
 	//40000A4h - FIFO_B_L - FIFO Channel B First Word (W)
 	this.writeIO[0xA4] = function (parentObj, data) {
-		parentObj.sound.writeFIFOB(0, data);
+		parentObj.sound.writeFIFOB(data);
 	}
 	//40000A5h - FIFO_B_L - FIFO Channel B First Word (W)
 	this.writeIO[0xA5] = function (parentObj, data) {
-		parentObj.sound.writeFIFOB(1, data);
+		parentObj.sound.writeFIFOB(data);
 	}
 	//40000A6h - FIFO_B_H - FIFO Channel B Second Word (W)
 	this.writeIO[0xA6] = function (parentObj, data) {
-		parentObj.sound.writeFIFOB(2, data);
+		parentObj.sound.writeFIFOB(data);
 	}
 	//40000A7h - FIFO_B_H - FIFO Channel B Second Word (W)
 	this.writeIO[0xA7] = function (parentObj, data) {
-		parentObj.sound.writeFIFOB(3, data);
+		parentObj.sound.writeFIFOB(data);
 	}
 	//40000A8h - NOT USED - ZERO
 	this.writeIO[0xA8] = this.NOP;
@@ -1497,11 +1499,11 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 	}
 	this.accessPostProcess8[1] = this.accessPostProcess16[1] = function (parentObj) {
 		//External WRAM state:
-		parentObj.cpu.CPUClocks += parentObj.waitStateWRAM;
+		parentObj.cpu.clocks += parentObj.waitStateWRAM;
 	}
 	this.accessPostProcess32[1] = function (parentObj) {
 		//External WRAM state:
-		parentObj.cpu.CPUClocks += parentObj.waitStateWRAMLong;
+		parentObj.cpu.clocks += parentObj.waitStateWRAMLong;
 	}
 	this.accessPostProcess8[2] = function (parentObj) {
 		//VRAM Write:
@@ -1514,7 +1516,7 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 	}
 	this.accessPostProcess32[2] = function (parentObj) {
 		//VRAM Write:
-		++parentObj.cpu.CPUClocks;
+		++parentObj.cpu.clocks;
 	}
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
@@ -1681,30 +1683,92 @@ GameBoyAdvanceIO.prototype.readUnused3 = function (parentObj) {
 	return (parentObj.cpu.fetch >> 24) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.iterate = function () {
-	this.cyclesToIterate = this.emulatorCore.CPUCyclesTotal;
-	//Loop until we run out of clocks:
+	//Find out how many clocks to iterate through this run:
+	this.cyclesToIterate = this.emulatorCore.CPUCyclesTotal - this.cyclesIteratedPreviously;
+	//If clocks remaining, run iterator:
+	this.runIterator();
+	//Ensure audio buffers at least once per iteration:
+	this.sound.audioJIT();
+	//If we clocked just a little too much, subtract the extra from the next run:
+	this.cyclesIteratedPreviously = this.cyclesToIterate;
+}
+GameBoyAdvanceIO.prototype.runIterator = function () {
+	//Clock through interpreter:
 	while (this.cyclesToIterate > 0) {
-		if (this.systemStatus == 0) {
-			//If there are clocks left to clock down and in normal state:
-			while (this.cyclesToIterate-- > 0) {
-				this.cpu.executeIteration();
-				this.updateCore();
-			}
+		if (this.systemStatus > 0) {
+			//Handle HALT/STOP/DMA here:
+			this.handleCPUStallEvents();
 		}
-		//Either ran out of clocks this iteration or in halt or stop mode:
-		switch (this.systemStatus) {
-			case 0: //Normal Exit
-				this.endNormal();
-				break;
-			case 1:	//DMA Handle State
-				this.handleDMA();
-				break;
-			case 2: //Handle Halt State
-				this.handleHalt();
-				break;
-			case 3: //Handle Stop State
-				this.handleStop();
+		else {
+			//Execute next instruction:
+			this.cpu.executeIteration();
+			//Update State:
+			this.updateCore(this.cpu.clocks);
+			//Reset clocks from last instruction:
+			this.cpu.clocks = 0;
 		}
+	}
+}
+GameBoyAdvanceIO.prototype.updateCore = function (clocks) {
+	//This is used during normal/dma modes of operation:
+	//Decrement the clocks per iteration counter:
+	this.cyclesToIterate -= clocks;
+	//Clock all components:
+	this.gfx.addClocks(clocks);
+	this.sound.addClocks(clocks);
+	this.timer.addClocks(clocks);
+}
+GameBoyAdvanceIO.prototype.handleCPUStallEvents = function () {
+	switch (this.systemStatus) {
+		case 1:	//DMA Handle State
+			this.handleDMA();
+			break;
+		case 2: //Handle Halt State
+			this.handleHalt();
+			break;
+		case 3: //DMA Inside Halt State
+			this.handleDMA();
+			break;
+		case 4: //Handle Stop State
+			this.handleStop();
+	}
+}
+GameBoyAdvanceIO.prototype.handleDMA = function () {
+	if (this.dma.perform()) {
+		//If DMA is done, exit it:
+		this.systemStatus -= 0x1;
+	}
+	this.updateCore(this.dma.clocks);
+	this.dma.clocks = 0;
+}
+GameBoyAdvanceIO.prototype.handleHalt = function () {
+	if (!this.cpu.IRQMatch()) {
+		//Clock up to next IRQ match or DMA:
+		var clocks = this.gfx.nextIRQMatchOrDMA();
+		clocks = this.compareHaltClocks(clocks, this.sound.nextIRQMatchOrDMA());
+		clocks = this.compareHaltClocks(clocks, this.timer.nextIRQMatchOrDMA());
+		clocks = (clocks == -1 || clocks > this.cyclesToIterate) ? this.cyclesToIterate : clocks;
+		this.updateCore(clocks);
+	}
+	else {
+		//Exit HALT promptly:
+		this.systemStatus -= 0x2;
+	}
+}
+GameBoyAdvanceIO.prototype.handleStop = function () {
+	//Update sound system to add silence to buffer:
+	this.sound.addClocks(this.cyclesToIterate);
+	//Exits when user presses joypad or from an external irq outside of GBA internal.
+}
+GameBoyAdvanceIO.prototype.compareHaltClocks = (original, clocks) {
+	if (clocks == -1) {
+		return original;
+	}
+	else if (original == -1) {
+		return clocks;
+	}
+	else {
+		return Math.min(original, clocks);
 	}
 }
 GameBoyAdvanceIO.prototype.fatalError = function () {
