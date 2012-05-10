@@ -24,7 +24,6 @@ function GameBoyAdvanceEmulator() {
 		0x10								//No ROM loaded
 	);
 	this.audioVolume = 1;					//Starting audio volume.
-	this.audioSampleRate = 0x40000;			//Internal audio sample rate.
 	this.audioBufferUnderrunLimit = 15;		//Audio buffer minimum span amount over x interpreter iterations.
 	this.audioBufferSize = 30;				//Audio buffer maximum span amount over x interpreter iterations.
 	this.offscreenWidth = 240;				//Width of the GBA screen.
@@ -241,17 +240,32 @@ GameBoyAdvanceEmulator.prototype.disableAudio = function () {
 		this.stopEmulator |= 0x2;
 	}
 }
-GameBoyAdvanceEmulator.prototype.writeAudioToBuffer = function () {
+GameBoyAdvanceEmulator.prototype.outputAudio = function () {
 	if (this.isAudioOn()) {
+		var sampleFactor = 0;
+		var dirtySample = 0;
+		var averageL = 0;
+		var averageR = 0;
+		var destinationPosition = 0;
+		var divisor = this.audioPreMixdownRate * 0x3FF;
+		for (var sourcePosition = 0; sourcePosition < this.audioNumSamplesTotal;) {
+			for (sampleFactor = averageL = averageR = 0; sampleFactor < this.audioPreMixdownRate; ++sampleFactor) {
+				dirtySample = this.audioCurrentBuffer[sourcePosition++];
+				averageL += dirtySample >> 10;
+				averageR += dirtySample & 0x3FF;
+			}
+			this.audioSecondaryBuffer[destinationPosition++] = averageL / divisor - 2;
+			this.audioSecondaryBuffer[destinationPosition++] = averageR / divisor - 2;
+		}
 		try {
-			this.audio.writeAudioNoCallback(this.audioCurrentBuffer);
+			this.audio.writeAudioNoCallback(this.audioSecondaryBuffer);
 		}
 		catch (e) {
 			this.stopEmulator |= 0x2;
 		}
 	}
 }
-GameBoyCore.prototype.audioUnderrunAdjustment = function () {
+GameBoyAdvanceEmulator.prototype.audioUnderrunAdjustment = function () {
 	if (this.isAudioOn()) {
 		var underrunAmount = this.audioBufferContainAmount - this.audio.remainingBuffer();
 		if (underrunAmount > 0) {
@@ -267,9 +281,10 @@ GameBoyAdvanceEmulator.prototype.isAudioOn = function () {
 }
 GameBoyAdvanceEmulator.prototype.calculateTimings = function () {
 	this.CPUCyclesTotal = this.CPUCyclesPerIteration = (0x1000000 / this.timerIntervalRate) | 0;
-	this.sampleSize = this.audioSampleRate / 1000 * this.timerIntervalRate;
-	this.samplesOut = this.sampleSize / this.CPUCyclesPerIteration;
-	this.machineOut = this.audioPreMixdownRate / this.samplesOut;	//Clocks per sample.
+	this.audioPreMixdownRate = Math.floor(0x1000000 / 44100);
+	this.audioSampleRate = 0x1000000 / this.audioPreMixdownRate;
+	this.sampleSize = 0x1000000 / 1000 * this.timerIntervalRate;
+	this.machineOut = this.audioPreMixdownRate;	//Clocks per sample.
 	this.audioBufferContainAmount = Math.max(this.sampleSize * this.audioBufferUnderrunLimit / this.audioPreMixdownRate, 4096) << 1;
 	this.audioNumSamplesTotal = this.sampleSize  - (this.sampleSize % this.audioPreMixdownRate);
 	this.audioCurrentBuffer = getInt32Array(this.audioNumSamplesTotal);

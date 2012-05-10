@@ -1374,63 +1374,63 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	}
 	//4000091h - WAVE_RAM0_L - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x91] = function (parentObj) {
-		return parentObj.sound.readWAVE(2);
+		return parentObj.sound.readWAVE(1);
 	}
 	//4000092h - WAVE_RAM0_H - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x92] = function (parentObj) {
-		return parentObj.sound.readWAVE(4);
+		return parentObj.sound.readWAVE(2);
 	}
 	//4000093h - WAVE_RAM0_H - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x93] = function (parentObj) {
-		return parentObj.sound.readWAVE(6);
+		return parentObj.sound.readWAVE(3);
 	}
 	//4000094h - WAVE_RAM1_L - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x94] = function (parentObj) {
-		return parentObj.sound.readWAVE(8);
+		return parentObj.sound.readWAVE(4);
 	}
 	//4000095h - WAVE_RAM1_L - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x95] = function (parentObj) {
-		return parentObj.sound.readWAVE(10);
+		return parentObj.sound.readWAVE(5);
 	}
 	//4000096h - WAVE_RAM1_H - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x96] = function (parentObj) {
-		return parentObj.sound.readWAVE(12);
+		return parentObj.sound.readWAVE(6);
 	}
 	//4000097h - WAVE_RAM1_H - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x97] = function (parentObj) {
-		return parentObj.sound.readWAVE(14);
+		return parentObj.sound.readWAVE(7);
 	}
 	//4000098h - WAVE_RAM2_L - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x98] = function (parentObj) {
-		return parentObj.sound.readWAVE(16);
+		return parentObj.sound.readWAVE(8);
 	}
 	//4000099h - WAVE_RAM2_L - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x99] = function (parentObj) {
-		return parentObj.sound.readWAVE(18);
+		return parentObj.sound.readWAVE(9);
 	}
 	//400009Ah - WAVE_RAM2_H - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x9A] = function (parentObj) {
-		return parentObj.sound.readWAVE(20);
+		return parentObj.sound.readWAVE(10);
 	}
 	//400009Bh - WAVE_RAM2_H - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x9B] = function (parentObj) {
-		return parentObj.sound.readWAVE(22);
+		return parentObj.sound.readWAVE(11);
 	}
 	//400009Ch - WAVE_RAM3_L - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x9C] = function (parentObj) {
-		return parentObj.sound.readWAVE(24);
+		return parentObj.sound.readWAVE(12);
 	}
 	//400009Dh - WAVE_RAM3_L - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x9D] = function (parentObj) {
-		return parentObj.sound.readWAVE(26);
+		return parentObj.sound.readWAVE(13);
 	}
 	//400009Eh - WAVE_RAM3_H - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x9E] = function (parentObj) {
-		return parentObj.sound.readWAVE(28);
+		return parentObj.sound.readWAVE(14);
 	}
 	//400009Fh - WAVE_RAM3_H - Channel 3 Wave Pattern RAM (W/R)
 	this.readIO[0x9F] = function (parentObj) {
-		return parentObj.sound.readWAVE(30);
+		return parentObj.sound.readWAVE(15);
 	}
 	//40000A0h - FIFO_A_L - FIFO Channel A First Word (W)
 	this.readIO[0xA0] = this.readZero;
@@ -1770,7 +1770,4 @@ GameBoyAdvanceIO.prototype.compareHaltClocks = (original, clocks) {
 	else {
 		return Math.min(original, clocks);
 	}
-}
-GameBoyAdvanceIO.prototype.fatalError = function () {
-	throw(new Error("Emulator core faulted."));
 }
