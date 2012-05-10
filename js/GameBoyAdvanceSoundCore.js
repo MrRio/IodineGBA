@@ -18,6 +18,8 @@ GameBoyAdvanceSound.prototype.initializePAPU = function () {
 	this.channel3PCM = getInt8Array(0x40);
 	this.WAVERAM = getUint8Array(0x20);
 	this.soundMasterEnabled = true;
+	this.audioTicks = 0;
+	this.rolloverClocks = 0;
 	this.audioNumSamplesTotal = this.emulatorCore.audioNumSamplesTotal;
 	this.intializeWhiteNoise();
 	this.initializeAudioStartState();
@@ -168,6 +170,11 @@ GameBoyAdvanceSound.prototype.initializeAudioStartState = function () {
 	this.channel3OutputLevelCache();
 	this.channel4OutputLevelCache();
 }
+GameBoyAdvanceSound.prototype.addClocks = function (clocks) {
+	this.rolloverClocks += clocks & 0x3;
+	this.audioTicks += (clocks >> 2) + (this.rolloverClocks >> 2);
+	this.rolloverClocks &= 0x3;
+}
 //Below are the audio generation functions timed against the CPU:
 GameBoyAdvanceSound.prototype.generateAudio = function (numSamples) {
 	if (!this.soundMasterEnabled && this.IOCore.systemStatus < 4) {
@@ -251,7 +258,7 @@ GameBoyAdvanceSound.prototype.clockAudioLength = function () {
 	else if (this.channel1totalLength == 1) {
 		this.channel1totalLength = 0;
 		this.channel1EnableCheck();
-		this.memory[0xFF26] &= 0xFE;	//Channel #1 On Flag Off
+		this.channelsEnabledBits &= 0xFE;	//Channel #1 On Flag Off
 	}
 	//Channel 2:
 	if (this.channel2totalLength > 1) {
@@ -260,7 +267,7 @@ GameBoyAdvanceSound.prototype.clockAudioLength = function () {
 	else if (this.channel2totalLength == 1) {
 		this.channel2totalLength = 0;
 		this.channel2EnableCheck();
-		this.memory[0xFF26] &= 0xFD;	//Channel #2 On Flag Off
+		this.channelsEnabledBits &= 0xFD;	//Channel #2 On Flag Off
 	}
 	//Channel 3:
 	if (this.channel3totalLength > 1) {
@@ -269,7 +276,7 @@ GameBoyAdvanceSound.prototype.clockAudioLength = function () {
 	else if (this.channel3totalLength == 1) {
 		this.channel3totalLength = 0;
 		this.channel3EnableCheck();
-		this.memory[0xFF26] &= 0xFB;	//Channel #3 On Flag Off
+		this.channelsEnabledBits &= 0xFB;	//Channel #3 On Flag Off
 	}
 	//Channel 4:
 	if (this.channel4totalLength > 1) {
@@ -278,7 +285,7 @@ GameBoyAdvanceSound.prototype.clockAudioLength = function () {
 	else if (this.channel4totalLength == 1) {
 		this.channel4totalLength = 0;
 		this.channel4EnableCheck();
-		this.memory[0xFF26] &= 0xF7;	//Channel #4 On Flag Off
+		this.channelsEnabledBits &= 0xF7;	//Channel #4 On Flag Off
 	}
 }
 GameBoyAdvanceSound.prototype.clockAudioSweep = function () {
@@ -309,14 +316,14 @@ GameBoyAdvanceSound.prototype.runAudioSweep = function () {
 						if ((this.channel1ShadowFrequency + (this.channel1ShadowFrequency >> this.channel1frequencySweepDivider)) > 0x7FF) {
 							this.channel1SweepFault = true;
 							this.channel1EnableCheck();
-							this.memory[0xFF26] &= 0xFE;	//Channel #1 On Flag Off
+							this.channelsEnabledBits &= 0xFE;	//Channel #1 On Flag Off
 						}
 					}
 					else {
 						this.channel1frequency &= 0x7FF;
 						this.channel1SweepFault = true;
 						this.channel1EnableCheck();
-						this.memory[0xFF26] &= 0xFE;	//Channel #1 On Flag Off
+						this.channelsEnabledBits &= 0xFE;	//Channel #1 On Flag Off
 					}
 				}
 			}
@@ -339,13 +346,13 @@ GameBoyAdvanceSound.prototype.channel1AudioSweepPerformDummy = function () {
 				if ((channel1ShadowFrequency + (channel1ShadowFrequency >> this.channel1frequencySweepDivider)) > 0x7FF) {
 					this.channel1SweepFault = true;
 					this.channel1EnableCheck();
-					this.memory[0xFF26] &= 0xFE;	//Channel #1 On Flag Off
+					this.channelsEnabledBits &= 0xFE;	//Channel #1 On Flag Off
 				}
 			}
 			else {
 				this.channel1SweepFault = true;
 				this.channel1EnableCheck();
-				this.memory[0xFF26] &= 0xFE;	//Channel #1 On Flag Off
+				this.channelsEnabledBits &= 0xFE;	//Channel #1 On Flag Off
 			}
 		}
 	}
@@ -463,7 +470,7 @@ GameBoyAdvanceSound.prototype.channel1EnableCheck = function () {
 	this.channel1OutputLevelSecondaryCache();
 }
 GameBoyAdvanceSound.prototype.channel1VolumeEnableCheck = function () {
-	this.channel1canPlay = (this.memory[0xFF12] > 7);
+	this.channel1canPlay = (this.nr12 > 7);
 	this.channel1EnableCheck();
 	this.channel1OutputLevelSecondaryCache();
 }
@@ -499,7 +506,7 @@ GameBoyAdvanceSound.prototype.channel2EnableCheck = function () {
 	this.channel2OutputLevelSecondaryCache();
 }
 GameBoyAdvanceSound.prototype.channel2VolumeEnableCheck = function () {
-	this.channel2canPlay = (this.memory[0xFF17] > 7);
+	this.channel2canPlay = (this.nr22 > 7);
 	this.channel2EnableCheck();
 	this.channel2OutputLevelSecondaryCache();
 }
@@ -555,7 +562,7 @@ GameBoyAdvanceSound.prototype.channel4EnableCheck = function () {
 	this.channel4OutputLevelSecondaryCache();
 }
 GameBoyAdvanceSound.prototype.channel4VolumeEnableCheck = function () {
-	this.channel4canPlay = (this.memory[0xFF21] > 7);
+	this.channel4canPlay = (this.nr42 > 7);
 	this.channel4EnableCheck();
 	this.channel4OutputLevelSecondaryCache();
 }

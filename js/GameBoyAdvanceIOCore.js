@@ -974,11 +974,11 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0xB9] = function (parentObj, data) {
 		parentObj.dma.writeDMA0WordCount1(data & 0x3F);
 	}
-	//40000BAh - DMA0 CNT_H - DMA 0 Word Count (W) (14 bit, 1..4000h)
+	//40000BAh - DMA0CNT_H - DMA 0 Control (R/W)
 	this.writeIO[0xBA] = function (parentObj, data) {
 		parentObj.dma.writeDMA0Control0(data & 0x3F);
 	}
-	//40000BBh - DMA0 CNT_H - DMA 0 Word Count (W) (14 bit, 1..4000h)
+	//40000BBh - DMA0CNT_H - DMA 0 Control (R/W)
 	this.writeIO[0xBB] = function (parentObj, data) {
 		parentObj.dma.writeDMA0Control1(data);
 	}
