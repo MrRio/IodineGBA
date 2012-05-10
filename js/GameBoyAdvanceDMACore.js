@@ -21,6 +21,91 @@ GameBoyAdvanceDMA.prototype.initialize = function () {
 	this.FIFOADMARequesting = false;	//If true, trigger FIFO A DMA when DMA control bits enabled for it.
 	this.FIFOBDMARequesting = false;	//If true, trigger FIFO B DMA when DMA control bits enabled for it.
 }
+GameBoyAdvanceDMA.prototype.writeDMA0Source = function (byteNumber, data) {
+	this.sourceSource[0] &= ~(0xFF << (byteNumber << 3));
+	this.sourceSource[0] |= data << (byteNumber << 3);
+	this.source[0] = this.sourceSource[0];
+}
+GameBoyAdvanceDMA.prototype.writeDMA0Destination = function (byteNumber, data) {
+	this.destinationSource[0] &= ~(0xFF << (byteNumber << 3));
+	this.destinationSource[0] |= data << (byteNumber << 3);
+	this.destination[0] = this.destinationSource[0];
+}
+GameBoyAdvanceDMA.prototype.writeDMA0WordCount0 = function (data) {
+	this.wordCountSource[0] &= 0x3F00;
+	this.wordCountSource[0] |= data;
+	this.wordCount[0] = this.wordCountSource[0];
+}
+GameBoyAdvanceDMA.prototype.writeDMA0WordCount1 = function (data) {
+	this.wordCountSource[0] &= 0xFF;
+	this.wordCountSource[0] |= data << 8;
+	this.wordCount[0] = this.wordCountSource[0];
+}
+GameBoyAdvanceDMA.prototype.writeDMA0Control0 = function (data) {
+	this.control[0][5] = (data >> 5) & 0x3;
+	this.control[0][4] &= 0x2;
+	this.control[0][4] |= (data >> 7) & 0x1;
+}
+GameBoyAdvanceDMA.prototype.writeDMA1Source = function (byteNumber, data) {
+	this.sourceSource[1] &= ~(0xFF << (byteNumber << 3));
+	this.sourceSource[1] |= data << (byteNumber << 3);
+	this.source[1] = this.sourceSource[1];
+}
+GameBoyAdvanceDMA.prototype.writeDMA1Destination = function (byteNumber, data) {
+	this.destinationSource[1] &= ~(0xFF << (byteNumber << 3));
+	this.destinationSource[1] |= data << (byteNumber << 3);
+	this.destination[1] = this.destinationSource[1];
+}
+GameBoyAdvanceDMA.prototype.writeDMA1WordCount0 = function (data) {
+	this.wordCountSource[1] &= 0x3F00;
+	this.wordCountSource[1] |= data;
+	this.wordCount[1] = this.wordCountSource[1];
+}
+GameBoyAdvanceDMA.prototype.writeDMA1WordCount1 = function (data) {
+	this.wordCountSource[1] &= 0xFF;
+	this.wordCountSource[1] |= data << 8;
+	this.wordCount[1] = this.wordCountSource[1];
+}
+GameBoyAdvanceDMA.prototype.writeDMA2Source = function (byteNumber, data) {
+	this.sourceSource[2] &= ~(0xFF << (byteNumber << 3));
+	this.sourceSource[2] |= data << (byteNumber << 3);
+	this.source[2] = this.sourceSource[2];
+}
+GameBoyAdvanceDMA.prototype.writeDMA2Destination = function (byteNumber, data) {
+	this.destinationSource[2] &= ~(0xFF << (byteNumber << 3));
+	this.destinationSource[2] |= data << (byteNumber << 3);
+	this.destination[2] = this.destinationSource[2];
+}
+GameBoyAdvanceDMA.prototype.writeDMA2WordCount0 = function (data) {
+	this.wordCountSource[2] &= 0x3F00;
+	this.wordCountSource[2] |= data;
+	this.wordCount[2] = this.wordCountSource[2];
+}
+GameBoyAdvanceDMA.prototype.writeDMA2WordCount1 = function (data) {
+	this.wordCountSource[2] &= 0xFF;
+	this.wordCountSource[2] |= data << 8;
+	this.wordCount[2] = this.wordCountSource[2];
+}
+GameBoyAdvanceDMA.prototype.writeDMA3Source = function (byteNumber, data) {
+	this.sourceSource[3] &= ~(0xFF << (byteNumber << 3));
+	this.sourceSource[3] |= data << (byteNumber << 3);
+	this.source[3] = this.sourceSource[3];
+}
+GameBoyAdvanceDMA.prototype.writeDMA3Destination = function (byteNumber, data) {
+	this.destinationSource[3] &= ~(0xFF << (byteNumber << 3));
+	this.destinationSource[3] |= data << (byteNumber << 3);
+	this.destination[3] = this.destinationSource[3];
+}
+GameBoyAdvanceDMA.prototype.writeDMA3WordCount0 = function (data) {
+	this.wordCountSource[3] &= 0x3F00;
+	this.wordCountSource[3] |= data;
+	this.wordCount[3] = this.wordCountSource[3];
+}
+GameBoyAdvanceDMA.prototype.writeDMA3WordCount1 = function (data) {
+	this.wordCountSource[3] &= 0xFF;
+	this.wordCountSource[3] |= data << 8;
+	this.wordCount[3] = this.wordCountSource[3];
+}
 GameBoyAdvanceDMA.prototype.process = function () {
 	//Solve for the highest priority DMA to process:
 	for (var dmaPriority = 0; dmaPriority < 4; ++dmaPriority) {
