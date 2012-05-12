@@ -671,3 +671,43 @@ GameBoyAdvanceSound.prototype.mixerOutputLevelCache = function () {
 	this.mixerSoundBIAS, 0), 0x3FF);
 	this.mixerOutputCache = (leftSample << 10) + rightSample;
 }
+GameBoyAdvanceSound.prototype.readSOUND1CNT_L = function () {
+	//NR10:
+	return 0x80 | this.nr10;
+}
+GameBoyAdvanceSound.prototype.readSOUND1CNT_H0 = function () {
+	//NR11:
+	return 0x3F | this.nr11;
+}
+GameBoyAdvanceSound.prototype.readSOUND1CNT_H1 = function () {
+	//NR12:
+	return this.nr12;
+}
+GameBoyAdvanceSound.prototype.readSOUND1CNT_X = function () {
+	//NR14:
+	return 0xBF | this.nr14;
+}
+GameBoyAdvanceSound.prototype.readSOUND2CNT_L0 = function () {
+	//NR21:
+	return 0x3F | this.nr21;
+}
+GameBoyAdvanceSound.prototype.readSOUND2CNT_L1 = function () {
+	//NR22:
+	return this.nr22;
+}
+GameBoyAdvanceSound.prototype.readSOUND2CNT_H = function () {
+	//NR24:
+	return 0xBF | this.nr24;
+}
+GameBoyAdvanceSound.prototype.readSOUND3CNT_L = function () {
+	//NR30:
+	return 0x1F | this.nr30;
+}
+GameBoyAdvanceSound.prototype.readSOUND3CNT_H = function () {
+	//NR32:
+	return 0x1F | this.nr32;
+}
+GameBoyAdvanceSound.prototype.readSOUND3CNT_X = function () {
+	//NR34:
+	return 0xBF | this.nr32;
+}

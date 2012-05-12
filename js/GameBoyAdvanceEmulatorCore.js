@@ -15,7 +15,7 @@
  *
  */
 function GameBoyAdvanceEmulator() {
-	this.timerIntervalRate = 10;
+	this.timerIntervalRate = 4;
 	this.stopEmulator = (
 		0x1 |								//No Canvas Target
 		0x2 |								//No Audio Target
