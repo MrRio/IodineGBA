@@ -709,5 +709,25 @@ GameBoyAdvanceSound.prototype.readSOUND3CNT_H = function () {
 }
 GameBoyAdvanceSound.prototype.readSOUND3CNT_X = function () {
 	//NR34:
-	return 0xBF | this.nr32;
+	return 0xBF | this.nr34;
+}
+GameBoyAdvanceSound.prototype.readSOUND4CNT_L = function () {
+	//NR42:
+	return this.nr42;
+}
+GameBoyAdvanceSound.prototype.readSOUND4CNT_H0 = function () {
+	//NR43:
+	return this.nr43;
+}
+GameBoyAdvanceSound.prototype.readSOUND4CNT_H1 = function () {
+	//NR44:
+	return 0xBF | this.nr44;
+}
+GameBoyAdvanceSound.prototype.readSOUNDCNT_L0 = function () {
+	//NR50:
+	return 0x88 | this.nr50;
+}
+GameBoyAdvanceSound.prototype.readSOUNDCNT_L1 = function () {
+	//NR51:
+	return this.nr51;
 }
