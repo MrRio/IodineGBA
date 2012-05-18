@@ -66,6 +66,11 @@ GameBoyAdvanceDMA.prototype.writeDMA1WordCount1 = function (data) {
 	this.wordCountSource[1] |= data << 8;
 	this.wordCount[1] = this.wordCountSource[1];
 }
+GameBoyAdvanceDMA.prototype.writeDMA1Control0 = function (data) {
+	this.control[1][5] = (data >> 5) & 0x3;
+	this.control[1][4] &= 0x2;
+	this.control[1][4] |= (data >> 7) & 0x1;
+}
 GameBoyAdvanceDMA.prototype.writeDMA2Source = function (byteNumber, data) {
 	this.sourceSource[2] &= ~(0xFF << (byteNumber << 3));
 	this.sourceSource[2] |= data << (byteNumber << 3);
@@ -86,6 +91,11 @@ GameBoyAdvanceDMA.prototype.writeDMA2WordCount1 = function (data) {
 	this.wordCountSource[2] |= data << 8;
 	this.wordCount[2] = this.wordCountSource[2];
 }
+GameBoyAdvanceDMA.prototype.writeDMA2Control0 = function (data) {
+	this.control[2][5] = (data >> 5) & 0x3;
+	this.control[2][4] &= 0x2;
+	this.control[2][4] |= (data >> 7) & 0x1;
+}
 GameBoyAdvanceDMA.prototype.writeDMA3Source = function (byteNumber, data) {
 	this.sourceSource[3] &= ~(0xFF << (byteNumber << 3));
 	this.sourceSource[3] |= data << (byteNumber << 3);
@@ -105,6 +115,11 @@ GameBoyAdvanceDMA.prototype.writeDMA3WordCount1 = function (data) {
 	this.wordCountSource[3] &= 0xFF;
 	this.wordCountSource[3] |= data << 8;
 	this.wordCount[3] = this.wordCountSource[3];
+}
+GameBoyAdvanceDMA.prototype.writeDMA3Control0 = function (data) {
+	this.control[3][5] = (data >> 5) & 0x3;
+	this.control[3][4] &= 0x2;
+	this.control[3][4] |= (data >> 7) & 0x1;
 }
 GameBoyAdvanceDMA.prototype.process = function () {
 	//Solve for the highest priority DMA to process:
