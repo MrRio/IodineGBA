@@ -181,16 +181,14 @@ GameBoyAdvanceSound.prototype.addClocks = function (clocks) {
 //Below are the audio generation functions timed against the CPU:
 GameBoyAdvanceSound.prototype.generateAudio = function (numSamples) {
 	if (!this.soundMasterEnabled && this.IOCore.systemStatus < 4) {
-		for (var samplesToGenerate = 0; numSamples > 0;) {
-			samplesToGenerate = (numSamples < this.sequencerClocks) ? numSamples : this.sequencerClocks;
-			this.sequencerClocks -= samplesToGenerate;
-			numSamples -= samplesToGenerate;
-			while (--samplesToGenerate > -1) {
-				if (--this.audioClocksUntilNextEventCounter == 0) {
-					this.computeAudioChannels();
-				}
+		for (var clockUpTo = 0; numSamples > 0;) {
+			clockUpTo = Math.min(this.audioClocksUntilNextEventCounter, this.sequencerClocks, numSamples);
+			this.audioClocksUntilNextEventCounter -= clockUpTo;
+			this.sequencerClocks -= clockUpTo;
+			numSamples -= clockUpTo;
+			while (--clockUpTo > -1) {
 				this.currentBuffer[this.audioIndex++] = this.mixerOutputCache;
-				if (this.audioIndex == this.audioNumSamplesTotal) {
+				if (this.audioIndex == this.numSamplesTotal) {
 					this.audioIndex = 0;
 					this.outputAudio();
 				}
@@ -198,6 +196,9 @@ GameBoyAdvanceSound.prototype.generateAudio = function (numSamples) {
 			if (this.sequencerClocks == 0) {
 				this.audioComputeSequencer();
 				this.sequencerClocks = 0x2000;
+			}
+			if (this.audioClocksUntilNextEventCounter == 0) {
+				this.computeAudioChannels();
 			}
 		}
 	}
@@ -215,13 +216,17 @@ GameBoyAdvanceSound.prototype.generateAudio = function (numSamples) {
 //Generate audio, but don't actually output it (Used for when sound is disabled by user/browser):
 GameBoyAdvanceSound.prototype.generateAudioFake = function (numSamples) {
 	if (!this.soundMasterEnabled && this.IOCore.systemStatus < 4) {
-		while (--numSamples > -1) {
-			if (--this.audioClocksUntilNextEventCounter == 0) {
-				this.computeAudioChannels();
-			}
-			if (--this.sequencerClocks == 0) {
+		for (var clockUpTo = 0; numSamples > 0;) {
+			clockUpTo = Math.min(this.audioClocksUntilNextEventCounter, this.sequencerClocks, numSamples);
+			this.audioClocksUntilNextEventCounter -= clockUpTo;
+			this.sequencerClocks -= clockUpTo;
+			numSamples -= clockUpTo;
+			if (this.sequencerClocks == 0) {
 				this.audioComputeSequencer();
 				this.sequencerClocks = 0x2000;
+			}
+			if (this.audioClocksUntilNextEventCounter == 0) {
+				this.computeAudioChannels();
 			}
 		}
 	}
