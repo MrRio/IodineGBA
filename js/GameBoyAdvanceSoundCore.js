@@ -1,3 +1,19 @@
+/* 
+ * This file is part of IodineGBA
+ *
+ * Copyright (C) 2012 Grant Galitz
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ * The full license is available at http://www.gnu.org/licenses/gpl.html
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ */
 function GameBoyAdvanceSound(IOCore) {
 	//Build references:
 	this.IOCore = IOCore;
@@ -886,7 +902,7 @@ GameBoyAdvanceSound.prototype.readSOUND3CNT_L = function () {
 	//NR30:
 	return 0x1F | this.nr30;
 }
-GameBoyAdvanceSound.prototype.writeSOUND3CNT_L = function () {
+GameBoyAdvanceSound.prototype.writeSOUND3CNT_L = function (data) {
 	//NR30:
 	if (this.soundMasterEnabled) {
 		this.audioJIT();
@@ -903,9 +919,34 @@ GameBoyAdvanceSound.prototype.writeSOUND3CNT_L = function () {
 		this.nr30 = data;
 	}
 }
+GameBoyAdvanceSound.prototype.writeSOUND3CNT_H0 = function (data) {
+	//NR31:
+	if (this.soundMasterEnabled) {
+		this.audioJIT();
+		this.channel3totalLength = 0x100 - data;
+		this.channel3EnableCheck();
+		this.nr31 = data;
+	}
+}
 GameBoyAdvanceSound.prototype.readSOUND3CNT_H = function () {
 	//NR32:
 	return 0x1F | this.nr32;
+}
+GameBoyAdvanceSound.prototype.writeSOUND3CNT_H1 = function (data) {
+	//NR32:
+	if (this.soundMasterEnabled) {
+		this.audioJIT();
+		this.channel3patternType = (data < 0x20) ? 4 : ((data >> 5) - 1);
+		this.nr32 = data;
+	}
+}
+GameBoyAdvanceSound.prototype.writeSOUND3CNT_X0 = function (data) {
+	//NR33:
+	if (this.soundMasterEnabled) {
+		this.audioJIT();
+		this.channel3frequency = (this.channel3frequency & 0x700) | data;
+		this.channel3FrequencyPeriod = (0x800 - this.channel3frequency) << 1;
+	}
 }
 GameBoyAdvanceSound.prototype.readSOUND3CNT_X = function () {
 	//NR34:
