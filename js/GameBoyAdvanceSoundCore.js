@@ -108,10 +108,17 @@ GameBoyAdvanceSound.prototype.initializeAudioStartState = function () {
 	this.nr23 = 0;
 	this.nr24 = 0;
 	this.nr30 = 0;
-	this.nr31 = 0;
 	this.nr32 = 0;
 	this.nr33 = 0;
 	this.nr34 = 0;
+	this.nr42 = 0;
+	this.nr43 = 0;
+	this.nr44 = 0;
+	this.nr50 = 0;
+	this.nr51 = 0;
+	this.nr52 = 0;
+	this.nr60 = 0;
+	this.nr61 = 0;
 	this.channel1FrequencyTracker = 0x2000;
 	this.channel1DutyTracker = 0;
 	this.channel1CachedDuty = this.dutyLookup[2];
@@ -939,7 +946,6 @@ GameBoyAdvanceSound.prototype.writeSOUND3CNT_H0 = function (data) {
 		this.audioJIT();
 		this.channel3totalLength = 0x100 - data;
 		this.channel3EnableCheck();
-		this.nr31 = data;
 	}
 }
 GameBoyAdvanceSound.prototype.readSOUND3CNT_H = function () {
@@ -984,6 +990,42 @@ GameBoyAdvanceSound.prototype.writeSOUND3CNT_X1 = function (data) {
 		this.channel3FrequencyPeriod = (0x800 - this.channel3frequency) << 1;
 		this.channel3EnableCheck();
 		this.nr34 = data;
+	}
+}
+GameBoyAdvanceSound.prototype.writeSOUND4CNT_L0 = function (data) {
+	//NR41:
+	if (this.soundMasterEnabled) {
+		this.audioJIT();
+		this.channel4totalLength = 0x40 - (data & 0x3F);
+		this.channel4EnableCheck();
+	}
+}
+GameBoyAdvanceSound.prototype.writeSOUND4CNT_L1 = function (data) {
+	//NR42:
+	if (this.soundMasterEnabled) {
+		this.audioJIT();
+		if (this.channel4Enabled && this.channel4envelopeSweeps == 0) {
+			//Zombie Volume PAPU Bug:
+			if (((this.nr42 ^ data) & 0x8) == 0x8) {
+				if ((this.nr42 & 0x8) == 0) {
+					if ((this.nr42 & 0x7) == 0x7) {
+						this.channel4envelopeVolume += 2;
+					}
+					else {
+						++this.channel4envelopeVolume;
+					}
+				}
+				this.channel4envelopeVolume = (16 - this.channel4envelopeVolume) & 0xF;
+			}
+			else if ((this.nr42 & 0xF) == 0x8) {
+				this.channel4envelopeVolume = (1 + this.channel4envelopeVolume) & 0xF;
+			}
+			this.channel4currentVolume = this.channel4envelopeVolume << this.channel4VolumeShifter;
+		}
+		this.channel4envelopeType = ((data & 0x08) == 0x08);
+		this.nr42 = data;
+		this.channel4UpdateCache();
+		this.channel4VolumeEnableCheck();
 	}
 }
 GameBoyAdvanceSound.prototype.readSOUND4CNT_L = function () {
