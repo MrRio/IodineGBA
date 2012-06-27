@@ -1144,5 +1144,5 @@ GameBoyAdvanceSound.prototype.readSOUNDBIAS0 = function () {
 }
 GameBoyAdvanceSound.prototype.readSOUNDBIAS1 = function () {
 	//NR63:
-	return this.nr63;
+	return 0x2C | this.nr63;
 }
