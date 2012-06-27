@@ -1077,9 +1077,38 @@ GameBoyAdvanceSound.prototype.readSOUND4CNT_H1 = function () {
 	//NR44:
 	return 0xBF | this.nr44;
 }
+GameBoyAdvanceSound.prototype.writeSOUNDCNT_L0 = function (data) {
+	//NR50:
+	if (this.soundMasterEnabled && this.nr50 != data) {
+		this.audioJIT();
+		this.nr50 = data;
+		this.VinLeftChannelMasterVolume = ((data >> 4) & 0x07) + 1;
+		this.VinRightChannelMasterVolume = (data & 0x07) + 1;
+		this.mixerOutputLevelCache();
+	}
+}
 GameBoyAdvanceSound.prototype.readSOUNDCNT_L0 = function () {
 	//NR50:
 	return 0x88 | this.nr50;
+}
+GameBoyAdvanceSound.prototype.writeSOUNDCNT_L1 = function (data) {
+	//NR51:
+	if (this.soundMasterEnabled && this.nr51 != data) {
+		this.audioJIT();
+		this.nr51 = data;
+		this.rightChannel1 = ((data & 0x01) == 0x01);
+		this.rightChannel2 = ((data & 0x02) == 0x02);
+		this.rightChannel3 = ((data & 0x04) == 0x04);
+		this.rightChannel4 = ((data & 0x08) == 0x08);
+		this.leftChannel1 = ((data & 0x10) == 0x10);
+		this.leftChannel2 = ((data & 0x20) == 0x20);
+		this.leftChannel3 = ((data & 0x40) == 0x40);
+		this.leftChannel4 = (data > 0x7F);
+		this.channel1OutputLevelCache();
+		this.channel2OutputLevelCache();
+		this.channel3OutputLevelCache();
+		this.channel4OutputLevelCache();
+	}
 }
 GameBoyAdvanceSound.prototype.readSOUNDCNT_L1 = function () {
 	//NR51:
@@ -1093,7 +1122,27 @@ GameBoyAdvanceSound.prototype.readSOUNDCNT_H1 = function () {
 	//NR61:
 	return this.nr61;
 }
+GameBoyAdvanceSound.prototype.writeSOUNDCNT_X = function (data) {
+	//NR52:
+	if (!this.soundMasterEnabled && data > 0x7F) {
+		this.nr52 = 0x80;
+		this.soundMasterEnabled = true;
+		this.initializeAudioStartState();
+	}
+	else if (this.soundMasterEnabled && data < 0x80) {
+		this.nr52 = 0;
+		this.soundMasterEnabled = false;
+	}
+}
 GameBoyAdvanceSound.prototype.readSOUNDCNT_X = function () {
 	//NR52:
 	return this.nr52;
+}
+GameBoyAdvanceSound.prototype.readSOUNDBIAS0 = function () {
+	//NR62:
+	return this.nr62;
+}
+GameBoyAdvanceSound.prototype.readSOUNDBIAS1 = function () {
+	//NR63:
+	return this.nr63;
 }
