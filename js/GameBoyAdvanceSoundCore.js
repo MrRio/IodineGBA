@@ -789,12 +789,10 @@ GameBoyAdvanceSound.prototype.CGBFolder = function () {
 GameBoyAdvanceSound.prototype.mixerOutputLevelCache = function () {
 	var leftSample = Math.min(Math.max(((this.AGBDirectSoundALeftCanPlay) ? this.AGBDirectSoundAFolded : 0) +
 	((this.AGBDirectSoundBLeftCanPlay) ? this.AGBDirectSoundBFolded : 0) +
-	this.CGBMixerOutputCacheLeftFolded +
-	this.mixerSoundBIAS, 0), 0x3FF);
+	this.CGBMixerOutputCacheLeftFolded + this.mixerSoundBIAS, 0), 0x3FF);
 	var rightSample = Math.min(Math.max(((this.AGBDirectSoundARightCanPlay) ? this.AGBDirectSoundAFolded : 0) +
 	((this.AGBDirectSoundBRightCanPlay) ? this.AGBDirectSoundBFolded : 0) +
-	this.CGBMixerOutputCacheRightFolded +
-	this.mixerSoundBIAS, 0), 0x3FF);
+	this.CGBMixerOutputCacheRightFolded + this.mixerSoundBIAS, 0), 0x3FF);
 	this.mixerOutputCache = (leftSample << 10) + rightSample;
 }
 GameBoyAdvanceSound.prototype.readSOUND1CNT_L = function () {
@@ -1234,9 +1232,24 @@ GameBoyAdvanceSound.prototype.readSOUNDCNT_X = function () {
 	//NR52:
 	return 0x70 | this.nr52;
 }
+GameBoyAdvanceSound.prototype.writeSOUNDBIAS0 = function (data) {
+	//NR62:
+	this.audioJIT();
+	this.mixerSoundBIAS &= 0x300;
+	this.mixerSoundBIAS |= data;
+	this.nr62 = data;
+}
 GameBoyAdvanceSound.prototype.readSOUNDBIAS0 = function () {
 	//NR62:
 	return this.nr62;
+}
+GameBoyAdvanceSound.prototype.writeSOUNDBIAS0 = function (data) {
+	//NR63:
+	this.audioJIT();
+	this.mixerSoundBIAS &= 0xFF;
+	this.mixerSoundBIAS |= (data & 0x3) << 8;
+	//Should we implement the PWM modulation (It only lower audio quality on a real device)?
+	this.nr63 = data;
 }
 GameBoyAdvanceSound.prototype.readSOUNDBIAS1 = function () {
 	//NR63:
