@@ -302,7 +302,7 @@ GameBoyAdvanceSound.prototype.generateAudio = function (numSamples) {
 		while (--numSamples > -1) {
 			this.currentBuffer[this.audioIndex++] = 0;
 			if (this.audioIndex == this.audioNumSamplesTotal) {
-				this.audioIndex = 0;
+				this.audioIndex = this.mixerSoundBIAS;
 				this.emulatorCore.outputAudio();
 			}
 		}
