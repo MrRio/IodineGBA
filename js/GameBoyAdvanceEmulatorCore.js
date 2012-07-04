@@ -247,15 +247,15 @@ GameBoyAdvanceEmulator.prototype.outputAudio = function () {
 		var averageL = 0;
 		var averageR = 0;
 		var destinationPosition = 0;
-		var divisor = this.audioPreMixdownRate * 0x3FF;
+		var divisor = this.audioPreMixdownRate * 0x3FF / 2;
 		for (var sourcePosition = 0; sourcePosition < this.audioNumSamplesTotal;) {
 			for (sampleFactor = averageL = averageR = 0; sampleFactor < this.audioPreMixdownRate; ++sampleFactor) {
 				dirtySample = this.audioCurrentBuffer[sourcePosition++];
 				averageL += dirtySample >> 10;
 				averageR += dirtySample & 0x3FF;
 			}
-			this.audioSecondaryBuffer[destinationPosition++] = averageL / divisor - 2;
-			this.audioSecondaryBuffer[destinationPosition++] = averageR / divisor - 2;
+			this.audioSecondaryBuffer[destinationPosition++] = averageL / divisor - 1;
+			this.audioSecondaryBuffer[destinationPosition++] = averageR / divisor - 1;
 		}
 		try {
 			this.audio.writeAudioNoCallback(this.audioSecondaryBuffer);
