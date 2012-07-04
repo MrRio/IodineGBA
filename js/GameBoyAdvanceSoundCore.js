@@ -128,6 +128,8 @@ GameBoyAdvanceSound.prototype.initializeAudioStartState = function () {
 	this.CGBMixerOutputCacheLeftFolded = 0;
 	this.CGBMixerOutputCacheRight = 0;
 	this.CGBMixerOutputCacheRightFolded = 0;
+	this.AGBDirectSoundATimer = 0;
+	this.AGBDirectSoundBTimer = 0;
 	this.AGBDirectSoundA = 0;
 	this.AGBDirectSoundAFolded = 0;
 	this.AGBDirectSoundB = 0;
@@ -140,6 +142,10 @@ GameBoyAdvanceSound.prototype.initializeAudioStartState = function () {
 	this.AGBDirectSoundBRightCanPlay = false;
 	this.mixerSoundBIAS = 0;
 	this.CGBOutputRatio = 2;
+	this.FIFOABuffer = [];
+	this.FIFOBBuffer = [];
+	this.AGBDirectSoundAFIFOClear();
+	this.AGBDirectSoundBFIFOClear();
 }
 GameBoyAdvanceSound.prototype.audioDisabled = function () {
 	//Clear NR10:
@@ -737,6 +743,22 @@ GameBoyAdvanceSound.prototype.AGBDirectSoundBFIFOClear = function () {
 	this.FIFOBBuffer = [];
 	this.AGBDirectSoundBTimerIncrement();
 }
+GameBoyAdvanceSound.prototype.AGBDirectSoundTimer0ClockTick = function () {
+	if (this.AGBDirectSoundATimer == 0) {
+		this.AGBDirectSoundATimerIncrement();
+	}
+	if (this.AGBDirectSoundBTimer == 0) {
+		this.AGBDirectSoundBTimerIncrement();
+	}
+}
+GameBoyAdvanceSound.prototype.AGBDirectSoundTimer1ClockTick = function () {
+	if (this.AGBDirectSoundATimer == 1) {
+		this.AGBDirectSoundATimerIncrement();
+	}
+	if (this.AGBDirectSoundBTimer == 1) {
+		this.AGBDirectSoundBTimerIncrement();
+	}
+}
 GameBoyAdvanceSound.prototype.AGBDirectSoundATimerIncrement = function () {
 	this.AGBDirectSoundA = (this.FIFOABuffer.length) ? ((this.FIFOABuffer.shift() << 24) >> 22) : 0;
 	if (this.FIFOBBuffer.length < 5) {
@@ -1181,11 +1203,13 @@ GameBoyAdvanceSound.prototype.writeSOUNDCNT_H1 = function (data) {
 	this.audioJIT();
 	this.AGBDirectSoundARightCanPlay = ((data & 0x1) == 0x1);
 	this.AGBDirectSoundALeftCanPlay = ((data & 0x2) == 0x2);
+	this.AGBDirectSoundATimer = (data & 0x4) >> 2;
 	if ((data & 0x08) == 0x08) {
 		this.AGBDirectSoundAFIFOClear();
 	}
 	this.AGBDirectSoundBRightCanPlay = ((data & 0x10) == 0x10);
 	this.AGBDirectSoundBLeftCanPlay = ((data & 0x20) == 0x20);
+	this.AGBDirectSoundBTimer = (data & 0x40) >> 6;
 	if ((data & 0x80) == 0x80) {
 		this.AGBDirectSoundBFIFOClear();
 	}
