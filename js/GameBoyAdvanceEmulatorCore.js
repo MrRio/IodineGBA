@@ -93,9 +93,9 @@ GameBoyAdvanceEmulator.prototype.iterationEndSequence = function () {
 	this.requestDraw();				//If drewFrame is true, blit buffered frame out.
 	this.faultFound = false;		//If core did not throw while running, unset the fatal error flag.
 }
-GameBoyAdvanceEmulator.prototype.attachROM = function (ROM, encodingType) {
+GameBoyAdvanceEmulator.prototype.attachROM = function (ROM) {
 	this.stop();
-	this.ROM = this.decodeROM(ROM, encodingType);
+	this.ROM = this.decodeROM(ROM);
 	this.initializeCore();
 	this.romFound = true;
 }
