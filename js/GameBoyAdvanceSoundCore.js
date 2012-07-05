@@ -744,6 +744,7 @@ GameBoyAdvanceSound.prototype.AGBDirectSoundBFIFOClear = function () {
 	this.AGBDirectSoundBTimerIncrement();
 }
 GameBoyAdvanceSound.prototype.AGBDirectSoundTimer0ClockTick = function () {
+	this.audioJIT();
 	if (this.AGBDirectSoundATimer == 0) {
 		this.AGBDirectSoundATimerIncrement();
 	}
@@ -752,6 +753,7 @@ GameBoyAdvanceSound.prototype.AGBDirectSoundTimer0ClockTick = function () {
 	}
 }
 GameBoyAdvanceSound.prototype.AGBDirectSoundTimer1ClockTick = function () {
+	this.audioJIT();
 	if (this.AGBDirectSoundATimer == 1) {
 		this.AGBDirectSoundATimerIncrement();
 	}

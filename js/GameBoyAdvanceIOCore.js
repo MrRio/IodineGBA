@@ -35,6 +35,7 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.sound = new GameBoyAdvanceSound(this);
 	this.timer = new GameBoyAdvanceTimer(this);
 	this.dma = new GameBoyAdvanceDMA(this);
+	this.irq = new GameBoyAdvanceIRQ(this);
 	this.cpu = new GameBoyAdvanceCPU(this);
 	//After all sub-objects initialized, initialize dispatches:
 	this.compileMemoryDispatches();
@@ -1742,7 +1743,7 @@ GameBoyAdvanceIO.prototype.handleDMA = function () {
 	this.dma.clocks = 0;
 }
 GameBoyAdvanceIO.prototype.handleHalt = function () {
-	if (!this.cpu.IRQMatch()) {
+	if (!this.irq.IRQMatch()) {
 		//Clock up to next IRQ match or DMA:
 		var clocks = this.gfx.nextIRQMatchOrDMA();
 		clocks = this.compareHaltClocks(clocks, this.sound.nextIRQMatchOrDMA());
