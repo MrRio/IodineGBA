@@ -15,7 +15,8 @@
  *
  */
 function GameBoyAdvanceEmulator() {
-	this.timerIntervalRate = 4;
+	this.emulatorSpeed = 1;					//Speed multiplier of the emulator.
+	this.timerIntervalRate = 4;				//How often the emulator core is called into (in milliseconds).
 	this.graphicsFound = false;				//Do we have graphics output sink found yet?
 	this.audioFound = false;				//Do we have audio output sink found yet?
 	this.romFound = false;					//Do we have a ROM loaded in?
@@ -34,6 +35,7 @@ function GameBoyAdvanceEmulator() {
 	this.swizzledFrame = getUint8Array(this.offscreenRGBCount);		//The swizzled output buffer that syncs to the internal framebuffer on v-blank.
 	this.initializeGraphicsBuffer();								//Pre-set the swizzled buffer for first frame.
 	this.drewFrame = false;					//Did we draw the last iteration?
+	this.audioUpdateState = false;			//Do we need to update the sound core with new info?
 	//Calculate some multipliers against the core emulator timer:
 	this.calculateTimings();
 }
@@ -85,6 +87,7 @@ GameBoyAdvanceEmulator.prototype.iterationStartSequence = function () {
 	this.faultFound = true;			//If the end routine doesn't unset this, then we are marked as having crashed.
 	this.drewFrame = false;			//Graphics has not drawn yet for this iteration block.
 	this.audioUnderrunAdjustment();	//If audio is enabled, look to see how much we should overclock by to maintain the audio buffer.
+	this.audioPushNewState();		//Check to see if we need to update the audio core for any output changes.
 }
 GameBoyAdvanceEmulator.prototype.iterationEndSequence = function () {
 	this.requestDraw();				//If drewFrame is true, blit buffered frame out.
@@ -209,14 +212,27 @@ GameBoyAdvanceEmulator.prototype.graphicsBlit = function () {
 }
 GameBoyAdvanceEmulator.prototype.enableAudio = function () {
 	if (!this.audioFound) {
+		this.preinitializeAudioBuffering();
 		try {
-			this.audio = new XAudioServer(2, this.audioSampleRate, 0, Math.max(this.sampleSize * this.audioBufferSize, 0x2000) << 1, null, this.audioVolume);
-			this.audioFound = true;
+			var parentObj = this;
+			this.audio = new XAudioServer(2, this.clocksPerSecond / this.audioResamplerFirstPassFactor, 0, Math.max(this.CPUCyclesPerIteration * this.audioBufferSize / this.audioResamplerFirstPassFactor, 8192) << 1, null, this.audioVolume, function () {
+				parentObj.disableAudio();
+			});
+			this.initializeAudioBuffering();
+			this.audioSetState(true);
 		}
-		catch (e) {
-			this.audioFound = false;
-		}
+		catch (e) {}
 	}
+}
+GameBoyAdvanceEmulator.prototype.preinitializeAudioBuffering = function () {
+	this.audioResamplerFirstPassFactor = Math.max(Math.min(Math.floor(this.clocksPerSecond / 44100), Math.floor(0xFFFF / 0x3FF)), 1);
+	this.audioDownSampleInputDivider = 0.5 / (this.audioResamplerFirstPassFactor * 0x3FF);
+}
+GameBoyAdvanceEmulator.prototype.initializeAudioBuffering = function () {
+	this.audioDestinationPosition = 0;
+	this.audioBufferContainAmount = Math.max(this.CPUCyclesPerIteration * audioBufferUnderrunLimit / this.audioResamplerFirstPassFactor, 4096) << 1;
+	this.audioNumSamplesTotal = (this.CPUCyclesPerIteration / this.audioResamplerFirstPassFactor) << 1;
+	this.audioBuffer = this.getTypedArray(this.audioNumSamplesTotal, 0, "float32");
 }
 GameBoyAdvanceEmulator.prototype.changeVolume = function (newVolume) {
 	this.audioVolume = Math.min(Math.max(parseFloat(newVolume), 0), 1);
@@ -225,7 +241,7 @@ GameBoyAdvanceEmulator.prototype.changeVolume = function (newVolume) {
 			this.audio.changeVolume(this.audioVolume);
 		}
 		catch (e) {
-			this.audioFound = false;
+			this.audioSetState(false);
 		}
 	}
 }
@@ -235,63 +251,62 @@ GameBoyAdvanceEmulator.prototype.disableAudio = function () {
 			this.audio.changeVolume(0);
 		}
 		catch (e) {}
-		this.audioFound = false;
+		this.audioSetState(false);
 	}
 }
-GameBoyAdvanceEmulator.prototype.outputAudio = function () {
-	if (this.audioFound) {
-		var sampleFactor = 0;
-		var dirtySample = 0;
-		var averageL = 0;
-		var averageR = 0;
-		var destinationPosition = 0;
-		var divisor = this.audioPreMixdownRate * 0x3FF / 2;
-		for (var sourcePosition = 0; sourcePosition < this.audioNumSamplesTotal;) {
-			for (sampleFactor = averageL = averageR = 0; sampleFactor < this.audioPreMixdownRate; ++sampleFactor) {
-				dirtySample = this.audioCurrentBuffer[sourcePosition++];
-				averageL += dirtySample >> 10;
-				averageR += dirtySample & 0x3FF;
-			}
-			this.audioSecondaryBuffer[destinationPosition++] = averageL / divisor - 1;
-			this.audioSecondaryBuffer[destinationPosition++] = averageR / divisor - 1;
-		}
-		try {
-			this.audio.writeAudioNoCallback(this.audioSecondaryBuffer);
-		}
-		catch (e) {
-			this.audioFound = false;
-		}
+GameBoyAdvanceEmulator.prototype.outputAudio = function (downsampleInput) {
+	this.audioBuffer[this.audioDestinationPosition++] = (downsampleInput >>> 16) * this.downSampleInputDivider - 1;
+	this.audioBuffer[this.audioDestinationPosition++] = (downsampleInput & 0xFFFF) * this.downSampleInputDivider - 1;
+	if (this.audioDestinationPosition == this.audioNumSamplesTotal) {
+		this.audioHandle.writeAudioNoCallback(this.audioBuffer);
+		this.audioDestinationPosition = 0;
 	}
 }
 GameBoyAdvanceEmulator.prototype.audioUnderrunAdjustment = function () {
 	if (this.audioFound) {
-		var underrunAmount = this.audioBufferContainAmount - this.audio.remainingBuffer();
-		if (underrunAmount > 0) {
-			this.CPUCyclesTotal = this.CPUCyclesPerIteration + ((underrunAmount >> 1) * this.machineOut);
+		var underrunAmount = this.audioHandle.remainingBuffer();
+		if (typeof underrunAmount == "number") {
+			underrunAmount = this.audioBufferContainAmount - Math.max(underrunAmount, 0);
+			if (underrunAmount > 0) {
+				this.CPUCyclesTotal += (underrunAmount >> 1) * this.audioResamplerFirstPassFactor;
+			}
 		}
 	}
 	else {
 		this.CPUCyclesTotal = this.CPUCyclesPerIteration;
 	}
 }
+GameBoyAdvanceEmulator.prototype.audioPushNewState = function () {
+	if (this.audioUpdateState) {
+		this.IOCore.sound.initializeOutput(this.audioFound, this.audioResamplerFirstPassFactor);
+		this.audioUpdateState = false;
+	}
+}
+GameBoyAdvanceEmulator.prototype.audioSetState = function (audioFound) {
+	if (this.audioFound != audioFound) {
+		this.audioFound = audioFound;
+		this.audioUpdateState = true;
+	}
+}
+GameBoyAdvanceEmulator.prototype.setSpeed = function (speed) {
+	this.emulatorSpeed = speed;
+	this.calculateTimings();
+	this.reinitializeAudio();
+}
 GameBoyAdvanceEmulator.prototype.calculateTimings = function () {
-	this.CPUCyclesTotal = this.CPUCyclesPerIteration = (0x1000000 / this.timerIntervalRate) | 0;
-	this.audioPreMixdownRate = Math.floor(0x1000000 / 44100);
-	this.audioSampleRate = 0x1000000 / this.audioPreMixdownRate;
-	this.sampleSize = 0x1000000 / 1000 * this.timerIntervalRate;
-	this.machineOut = this.audioPreMixdownRate;	//Clocks per sample.
-	this.audioBufferContainAmount = Math.max(this.sampleSize * this.audioBufferUnderrunLimit / this.audioPreMixdownRate, 4096) << 1;
-	this.audioNumSamplesTotal = this.sampleSize  - (this.sampleSize % this.audioPreMixdownRate);
-	this.audioCurrentBuffer = getInt32Array(this.audioNumSamplesTotal);
-	this.audioSecondaryBuffer = getFloat32Array(this.audioNumSamplesTotal / this.audioPreMixdownRate);
+	this.clocksPerSecond = this.emulatorSpeed * 0x1000000;
+	this.CPUCyclesTotal = this.CPUCyclesPerIteration = (this.clocksPerSecond / 1000 * this.timerIntervalRate) | 0;
 }
 GameBoyAdvanceEmulator.prototype.changeCoreTimer = function (newTimerIntervalRate) {
 	this.timerIntervalRate = Math.max(parseInt(newTimerIntervalRate), 1);
-	this.calculateTimings();
 	if (!this.paused) {						//Set up the timer again if running.
 		this.clearTimer();
 		this.startTimer();
 	}
+	this.calculateTimings();
+	this.reinitializeAudio();
+}
+GameBoyAdvanceEmulator.prototype.reinitializeAudio = function () {
 	if (this.audioFound) {					//Set up the audio again if enabled.
 		this.disableAudio();
 		this.enableAudio();
