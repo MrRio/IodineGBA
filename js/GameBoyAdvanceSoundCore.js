@@ -20,16 +20,16 @@ function GameBoyAdvanceSound(IOCore) {
 	this.emulatorCore = this.IOCore.emulatorCore;
 	this.initializePAPU();
 }
+GameBoyAdvanceSound.prototype.dutyLookup = [
+	[false, false, false, false, false, false, false, true],
+	[true, false, false, false, false, false, false, true],
+	[true, false, false, false, false, true, true, true],
+	[false, true, true, true, true, true, true, false]
+];
 GameBoyAdvanceSound.prototype.initializePAPU = function () {
 	//Did the emulator core initialize us for output yet?
 	this.audioInitialized = false;
 	//Initialize start:
-	this.dutyLookup = [								//Map the duty values given to ones we can work with.
-		[false, false, false, false, false, false, false, true],
-		[true, false, false, false, false, false, false, true],
-		[true, false, false, false, false, true, true, true],
-		[false, true, true, true, true, true, true, false]
-	];
 	this.channel3PCM = getInt8Array(0x40);
 	this.WAVERAM = getUint8Array(0x20);
 	this.audioTicks = 0;
