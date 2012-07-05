@@ -17,6 +17,7 @@
 function GameBoyAdvanceSound(IOCore) {
 	//Build references:
 	this.IOCore = IOCore;
+	this.emulatorCore = this.IOCore.emulatorCore;
 	this.initializePAPU();
 }
 GameBoyAdvanceSound.prototype.initializePAPU = function () {
@@ -285,7 +286,7 @@ GameBoyAdvanceSound.prototype.generateAudio = function (numSamples) {
 				this.downsampleInput += this.mixerOutputCache;
 				if (++this.audioIndex == this.audioResamplerFirstPassFactor) {
 					this.audioIndex = 0;
-					this.outputAudio(this.downsampleInput);
+					this.emulatorCore.outputAudio(this.downsampleInput);
 					this.downsampleInput = 0;
 				}
 			}
@@ -304,7 +305,7 @@ GameBoyAdvanceSound.prototype.generateAudio = function (numSamples) {
 			this.downsampleInput += this.mixerOutputCache;
 			if (++this.audioIndex == this.audioResamplerFirstPassFactor) {
 				this.audioIndex = 0;
-				this.outputAudio(this.downsampleInput);
+				this.emulatorCore.outputAudio(this.downsampleInput);
 				this.downsampleInput = 0;
 			}
 		}
