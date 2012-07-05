@@ -1745,9 +1745,9 @@ GameBoyAdvanceIO.prototype.handleDMA = function () {
 GameBoyAdvanceIO.prototype.handleHalt = function () {
 	if (!this.irq.IRQMatch()) {
 		//Clock up to next IRQ match or DMA:
-		var clocks = this.gfx.nextIRQMatchOrDMA();
-		clocks = this.compareHaltClocks(clocks, this.sound.nextIRQMatchOrDMA());
-		clocks = this.compareHaltClocks(clocks, this.timer.nextIRQMatchOrDMA());
+		var clocks = this.gfx.nextEventTime();
+		clocks = this.compareHaltClocks(clocks, this.dma.nextEventTime());
+		clocks = this.compareHaltClocks(clocks, this.timer.nextEventTime());
 		clocks = (clocks == -1 || clocks > this.cyclesToIterate) ? this.cyclesToIterate : clocks;
 		this.updateCore(clocks);
 	}

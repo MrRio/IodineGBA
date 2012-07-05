@@ -276,15 +276,19 @@ GameBoyAdvanceSound.prototype.addClocks = function (clocks) {
 }
 //Below are the audio generation functions timed against the CPU:
 GameBoyAdvanceSound.prototype.generateAudio = function (numSamples) {
+	var multiplier = 0;
 	if (!this.soundMasterEnabled && this.IOCore.systemStatus < 4) {
 		for (var clockUpTo = 0; numSamples > 0;) {
 			clockUpTo = Math.min(this.audioClocksUntilNextEventCounter, this.sequencerClocks, numSamples);
 			this.audioClocksUntilNextEventCounter -= clockUpTo;
 			this.sequencerClocks -= clockUpTo;
 			numSamples -= clockUpTo;
-			while (--clockUpTo > -1) {
-				this.downsampleInput += this.mixerOutputCache;
-				if (++this.audioIndex == this.audioResamplerFirstPassFactor) {
+			while (clockUpTo > 0) {
+				multiplier = Math.min(clockUpTo, this.audioResamplerFirstPassFactor - this.audioIndex);
+				clockUpTo -= multiplier;
+				this.audioIndex += multiplier;
+				this.downsampleInput += this.mixerOutputCache * multiplier;
+				if (this.audioIndex == this.audioResamplerFirstPassFactor) {
 					this.audioIndex = 0;
 					this.emulatorCore.outputAudio(this.downsampleInput);
 					this.downsampleInput = 0;
@@ -301,9 +305,12 @@ GameBoyAdvanceSound.prototype.generateAudio = function (numSamples) {
 	}
 	else {
 		//SILENT OUTPUT:
-		while (--numSamples > -1) {
+		while (numSamples > 0) {
+			multiplier = Math.min(numSamples, this.audioResamplerFirstPassFactor - this.audioIndex);
+			numSamples -= multiplier;
+			this.audioIndex += multiplier;
 			this.downsampleInput += this.mixerOutputCache;
-			if (++this.audioIndex == this.audioResamplerFirstPassFactor) {
+			if (this.audioIndex == this.audioResamplerFirstPassFactor) {
 				this.audioIndex = 0;
 				this.emulatorCore.outputAudio(this.downsampleInput);
 				this.downsampleInput = 0;
