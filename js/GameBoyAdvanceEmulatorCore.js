@@ -233,24 +233,22 @@ GameBoyAdvanceEmulator.prototype.enableAudio = function () {
 		//Calculate the variables for the preliminary downsampler first:
 		this.audioResamplerFirstPassFactor = Math.max(Math.min(Math.floor(this.clocksPerSecond / 44100), Math.floor(0xFFFF / 0x3FF)), 1);
 		this.audioDownSampleInputDivider = 0.5 / (this.audioResamplerFirstPassFactor * 0x3FF);
+		this.audioSetState(true);	//Set audio to 'found' by default.
 		//Attempt to enable audio:
-		try {
-			var parentObj = this;
-			this.audio = new XAudioServer(2, this.clocksPerSecond / this.audioResamplerFirstPassFactor, 0, Math.max(this.CPUCyclesPerIteration * this.audioBufferSize / this.audioResamplerFirstPassFactor, 8192) << 1, null, this.audioVolume, function () {
-				parentObj.disableAudio();
-			});
+		var parentObj = this;
+		this.audio = new XAudioServer(2, this.clocksPerSecond / this.audioResamplerFirstPassFactor, 0, Math.max(this.CPUCyclesPerIteration * this.audioBufferSize / this.audioResamplerFirstPassFactor, 8192) << 1, null, this.audioVolume, function () {
+			//Disable audio in the callback here:
+			parentObj.disableAudio();
+		});
+		if (this.audioFound) {
+			//Only run this if audio was found to save memory on disabled output:
 			this.initializeAudioBuffering();
-			this.audioSetState(true);
 		}
-		catch (e) {}
 	}
 }
 GameBoyAdvanceEmulator.prototype.disableAudio = function () {
 	if (this.audioFound) {
-		try {
-			this.audio.changeVolume(0);
-		}
-		catch (e) {}
+		this.audio.changeVolume(0);
 		this.audioSetState(false);
 	}
 }
@@ -263,12 +261,7 @@ GameBoyAdvanceEmulator.prototype.initializeAudioBuffering = function () {
 GameBoyAdvanceEmulator.prototype.changeVolume = function (newVolume) {
 	this.audioVolume = Math.min(Math.max(parseFloat(newVolume), 0), 1);
 	if (this.audioFound) {
-		try {
-			this.audio.changeVolume(this.audioVolume);
-		}
-		catch (e) {
-			this.audioSetState(false);
-		}
+		this.audio.changeVolume(this.audioVolume);
 	}
 }
 GameBoyAdvanceEmulator.prototype.outputAudio = function (downsampleInput) {
