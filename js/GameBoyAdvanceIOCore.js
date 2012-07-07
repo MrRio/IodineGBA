@@ -1543,57 +1543,57 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xB9] = this.readZero;
 	//4000100h - TM0CNT_L - Timer 0 Counter/Reload (R/W)
 	this.readIO[0x100] = function (parentObj) {
-		return parentObj.timer.readTM0CNT_L0(data);
+		return parentObj.timer.readTM0CNT_L0();
 	}
 	//4000101h - TM0CNT_L - Timer 0 Counter/Reload (R/W)
 	this.readIO[0x101] = function (parentObj) {
-		return parentObj.timer.readTM0CNT_L1(data);
+		return parentObj.timer.readTM0CNT_L1();
 	}
 	//4000102h - TM0CNT_H - Timer 0 Control (R/W)
 	this.readIO[0x102] = function (parentObj) {
-		return parentObj.timer.readTM0CNT_H(data);
+		return parentObj.timer.readTM0CNT_H();
 	}
 	//4000103h - TM0CNT_H - Timer 0 Control (R/W)
 	this.readIO[0x103] = this.readZero;
 	//4000104h - TM1CNT_L - Timer 1 Counter/Reload (R/W)
 	this.readIO[0x104] = function (parentObj) {
-		return parentObj.timer.readTM1CNT_L0(data);
+		return parentObj.timer.readTM1CNT_L0();
 	}
 	//4000105h - TM1CNT_L - Timer 1 Counter/Reload (R/W)
 	this.readIO[0x105] = function (parentObj) {
-		return parentObj.timer.readTM1CNT_L1(data);
+		return parentObj.timer.readTM1CNT_L1();
 	}
 	//4000106h - TM1CNT_H - Timer 1 Control (R/W)
 	this.readIO[0x106] = function (parentObj) {
-		return parentObj.timer.readTM1CNT_H(data);
+		return parentObj.timer.readTM1CNT_H();
 	}
 	//4000107h - TM1CNT_H - Timer 1 Control (R/W)
 	this.readIO[0x107] = this.readZero;
 	//4000108h - TM2CNT_L - Timer 2 Counter/Reload (R/W)
 	this.readIO[0x108] = function (parentObj) {
-		return parentObj.timer.readTM2CNT_L0(data);
+		return parentObj.timer.readTM2CNT_L0();
 	}
 	//4000109h - TM2CNT_L - Timer 2 Counter/Reload (R/W)
 	this.readIO[0x109] = function (parentObj) {
-		return parentObj.timer.readTM2CNT_L1(data);
+		return parentObj.timer.readTM2CNT_L1();
 	}
 	//400010Ah - TM2CNT_H - Timer 2 Control (R/W)
 	this.readIO[0x10A] = function (parentObj) {
-		return parentObj.timer.readTM2CNT_H(data);
+		return parentObj.timer.readTM2CNT_H();
 	}
 	//400010Bh - TM2CNT_H - Timer 2 Control (R/W)
 	this.readIO[0x10B] = this.readZero;
 	//400010Ch - TM3CNT_L - Timer 3 Counter/Reload (R/W)
 	this.readIO[0x10C] = function (parentObj) {
-		return parentObj.timer.readTM3CNT_L0(data);
+		return parentObj.timer.readTM3CNT_L0();
 	}
 	//400010Dh - TM3CNT_L - Timer 3 Counter/Reload (R/W)
 	this.readIO[0x10D] = function (parentObj) {
-		return parentObj.timer.readTM3CNT_L1(data);
+		return parentObj.timer.readTM3CNT_L1();
 	}
 	//400010Eh - TM3CNT_H - Timer 3 Control (R/W)
 	this.readIO[0x10E] = function (parentObj) {
-		return parentObj.timer.readTM3CNT_H(data);
+		return parentObj.timer.readTM3CNT_H();
 	}
 	//400010Fh - TM3CNT_H - Timer 3 Control (R/W)
 	this.readIO[0x10F] = this.readZero;
