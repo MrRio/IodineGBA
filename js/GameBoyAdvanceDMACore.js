@@ -3,9 +3,17 @@ function GameBoyAdvanceDMA(IOCore) {
 	this.emulatorCore = IOCore.emulatorCore;
 	this.initialize();
 }
+GameBoyAdvanceDMA.prototype.DMA_TYPE = {
+	IMMEDIATE:		0x1,
+	V_BLANK:		0x2,
+	H_BLANK:		0x4,
+	FIFO_A:			0x8,
+	FIFO_B:			0x10,
+	DISPLAY_SYNC:	0x20
+}
 GameBoyAdvanceDMA.prototype.initialize = function () {
-	this.enabled = [false, false, false, false];
-	this.pending = [false, false, false, false];
+	this.enabled = [0, 0, 0, 0];
+	this.pending = this.DMA_TYPE.FIFO_A | this.DMA_TYPE.FIFO_B;
 	this.source = [0, 0, 0, 0];
 	this.sourceSource = [0, 0, 0, 0];
 	this.destination = [0, 0, 0, 0];
@@ -18,8 +26,6 @@ GameBoyAdvanceDMA.prototype.initialize = function () {
 		[false, 0, false, false, 0, 0],
 		[false, 0, false, false, 0, 0]
 	];
-	this.FIFOADMARequesting = false;	//If true, trigger FIFO A DMA when DMA control bits enabled for it.
-	this.FIFOBDMARequesting = false;	//If true, trigger FIFO B DMA when DMA control bits enabled for it.
 }
 GameBoyAdvanceDMA.prototype.writeDMA0Source = function (byteNumber, data) {
 	this.sourceSource[0] &= ~(0xFF << (byteNumber << 3));
@@ -121,10 +127,21 @@ GameBoyAdvanceDMA.prototype.writeDMA3Control0 = function (data) {
 	this.control[3][4] &= 0x2;
 	this.control[3][4] |= (data >> 7) & 0x1;
 }
+GameBoyAdvanceDMA.prototype.soundFIFOARequest = function () {
+	this.requestDMA(this.DMA_TYPE.FIFO_A);
+}
+GameBoyAdvanceDMA.prototype.soundFIFOBRequest = function () {
+	this.requestDMA(this.DMA_TYPE.FIFO_B);
+}
+GameBoyAdvanceDMA.prototype.requestDMA = function (DMAType) {
+	this.pending |= DMAType;
+	this.IOCore.systemStatus |= 0x1;
+}
 GameBoyAdvanceDMA.prototype.process = function () {
 	//Solve for the highest priority DMA to process:
 	for (var dmaPriority = 0; dmaPriority < 4; ++dmaPriority) {
-		if (this.enabled[dmaPriority] && this.pending[dmaPriority]) {
+		this.currentMatch = this.enabled[dmaPriority] & this.pending;
+		if (this.currentMatch != 0) {
 			this.handleDMACopy(dmaPriority);
 			return false;
 		}
@@ -141,7 +158,7 @@ GameBoyAdvanceDMA.prototype.handleDMACopy = function (dmaChannel) {
 		//Load in the control register:
 		var control = this.control[dmaChannel];
 		//Transfer Data:
-		if (this.soundDMA(dmaChannel)(
+		if (this.isSoundDMA()) {
 			//32-bit FIFO Transfer:
 			destination = 0x40000A0 | ((dmaChannel - 1) << 2);
 			this.IOCore.memoryWrite32(destination, this.IOCore.memoryRead32(source));
@@ -164,13 +181,13 @@ GameBoyAdvanceDMA.prototype.decrementWordCount = function (control, dmaChannel, 
 	if (wordCount == 0) {
 		if (!control[3]) {
 			//Disable the enable bit:
-			this.enabled[dmaChannel] = false;
+			this.enabled[dmaChannel] = 0;
 		}
 		//DMA period has ended:
-		this.pending[dmaChannel] = false;
+		this.pending -= this.currentMatch;
 		//Check to see if we should flag for IRQ:
 		if (control[0]) {
-			this.IOCore.cpu.setIF(dmaChannel << 8);
+			this.IOCore.irq.requestIRQ(dmaChannel << 8);
 		}
 		//Update source address:
 		switch (control[4]) {
@@ -185,7 +202,7 @@ GameBoyAdvanceDMA.prototype.decrementWordCount = function (control, dmaChannel, 
 				this.source[dmaChannel] = this.sourceSource[dmaChannel];
 		}
 		//FIFO DMA cannot update destination register:
-		if (!this.soundDMA(dmaChannel)) {
+		if (!this.isSoundDMA()) {
 			//Update destination address:
 			switch (control[5]) {
 				case 0:	//Increment
@@ -212,7 +229,7 @@ GameBoyAdvanceDMA.prototype.decrementWordCount = function (control, dmaChannel, 
 				this.source[dmaChannel] = (source - transferred) & -1;
 		}
 		//FIFO DMA cannot update destination register:
-		if (!this.soundDMA(dmaChannel)) {
+		if (!this.isSoundDMA()) {
 			//Update destination address:
 			switch (control[5]) {
 				case 0:	//Increment
@@ -224,4 +241,7 @@ GameBoyAdvanceDMA.prototype.decrementWordCount = function (control, dmaChannel, 
 			}
 		}
 	}
+}
+GameBoyAdvanceDMA.prototype.isSoundDMA = function () {
+	return (this.currentMatch == this.DMA_TYPE.FIFO_A || this.currentMatch == this.DMA_TYPE.FIFO_B);
 }

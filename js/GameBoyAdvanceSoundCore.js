@@ -736,12 +736,12 @@ GameBoyAdvanceSound.prototype.channel4UpdateCache = function () {
 	this.channel4OutputLevelCache();
 }
 GameBoyAdvanceSound.prototype.writeFIFOA = function (data) {
-	if (this.FIFOABuffer.length < 8) {
+	if (this.FIFOABuffer.length < 32) {
 		this.FIFOABuffer.push(data);
 	}
 }
 GameBoyAdvanceSound.prototype.writeFIFOB = function (data) {
-	if (this.FIFOBBuffer.length < 8) {
+	if (this.FIFOBBuffer.length < 32) {
 		this.FIFOBBuffer.push(data);
 	}
 }
@@ -773,14 +773,14 @@ GameBoyAdvanceSound.prototype.AGBDirectSoundTimer1ClockTick = function () {
 }
 GameBoyAdvanceSound.prototype.AGBDirectSoundATimerIncrement = function () {
 	this.AGBDirectSoundA = (this.FIFOABuffer.length) ? ((this.FIFOABuffer.shift() << 24) >> 22) : 0;
-	if (this.FIFOBBuffer.length < 5) {
+	if (this.FIFOBBuffer.length <= 16) {
 		this.IOCore.dma.soundFIFOARequest();
 	}
 	this.AGBFIFOAFolder();
 }
 GameBoyAdvanceSound.prototype.AGBDirectSoundBTimerIncrement = function () {
 	this.AGBDirectSoundB = (this.FIFOBBuffer.length) ? ((this.FIFOBBuffer.shift() << 24) >> 22) : 0;
-	if (this.FIFOBBuffer.length < 5) {
+	if (this.FIFOBBuffer.length <= 16) {
 		this.IOCore.dma.soundFIFOBRequest();
 	}
 	this.AGBFIFOBFolder();
