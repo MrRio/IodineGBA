@@ -635,28 +635,8 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x54] = function (parentObj, data) {
 		parentObj.gfx.writeBLDY(data);
 	}
-	//4000055h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
-	this.writeIO[0x55] = this.NOP;
-	//4000056h - NOT USED - ZERO
-	this.writeIO[0x56] = this.NOP;
-	//4000057h - NOT USED - ZERO
-	this.writeIO[0x57] = this.NOP;
-	//4000058h - NOT USED - GLITCHED
-	this.writeIO[0x58] = this.NOP;
-	//4000059h - NOT USED - GLITCHED
-	this.writeIO[0x59] = this.NOP;
-	//400005Ah - NOT USED - GLITCHED
-	this.writeIO[0x5A] = this.NOP;
-	//400005Bh - NOT USED - GLITCHED
-	this.writeIO[0x5B] = this.NOP;
-	//400005Ch - NOT USED - GLITCHED
-	this.writeIO[0x5C] = this.NOP;
-	//400005Dh - NOT USED - GLITCHED
-	this.writeIO[0x5D] = this.NOP;
-	//400005Eh - NOT USED - GLITCHED
-	this.writeIO[0x5E] = this.NOP;
-	//400005Fh - NOT USED - GLITCHED
-	this.writeIO[0x5F] = this.NOP;
+	//4000055h through 400005Fh - NOT USED - ZERO/GLITCHED
+	this.fillWriteTableNOP(0x55, 0x5F);
 	//4000060h - SOUND1CNT_L (NR10) - Channel 1 Sweep register (R/W)
 	this.writeIO[0x60] = function (parentObj, data) {
 		//NR10:
@@ -811,18 +791,8 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x89] = function (parentObj, data) {
 		parentObj.sound.writeSOUNDBIAS1(data);
 	}
-	//400008Ah - NOT USED - ZERO
-	this.writeIO[0x8A] = this.NOP;
-	//400008Bh - NOT USED - ZERO
-	this.writeIO[0x8B] = this.NOP;
-	//400008Ch - NOT USED - ZERO
-	this.writeIO[0x8C] = this.NOP;
-	//400008Dh - NOT USED - ZERO
-	this.writeIO[0x8D] = this.NOP;
-	//400008Eh - NOT USED - ZERO
-	this.writeIO[0x8E] = this.NOP;
-	//400008Fh - NOT USED - ZERO
-	this.writeIO[0x8F] = this.NOP;
+	//400008Ah through 400008Fh - NOT USED - ZERO/GLITCHED
+	this.fillWriteTableNOP(0x8A, 0x8F);
 	//4000090h - WAVE_RAM0_L - Channel 3 Wave Pattern RAM (W/R)
 	this.writeIO[0x90] = function (parentObj, data) {
 		parentObj.sound.writeWAVE(0, data);
@@ -919,22 +889,8 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0xA7] = function (parentObj, data) {
 		parentObj.sound.writeFIFOB(data);
 	}
-	//40000A8h - NOT USED - ZERO
-	this.writeIO[0xA8] = this.NOP;
-	//40000A9h - NOT USED - ZERO
-	this.writeIO[0xA9] = this.NOP;
-	//40000AAh - NOT USED - ZERO
-	this.writeIO[0xAA] = this.NOP;
-	//40000ABh - NOT USED - ZERO
-	this.writeIO[0xAB] = this.NOP;
-	//40000ACh - NOT USED - ZERO
-	this.writeIO[0xAC] = this.NOP;
-	//40000ADh - NOT USED - ZERO
-	this.writeIO[0xAD] = this.NOP;
-	//40000AEh - NOT USED - ZERO
-	this.writeIO[0xAE] = this.NOP;
-	//40000AFh - NOT USED - ZERO
-	this.writeIO[0xAF] = this.NOP;
+	//40000A8h through 40000AFh - NOT USED - GLITCHED
+	this.fillWriteTableNOP(0xA8, 0xAF);
 	//40000B0h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
 	this.writeIO[0xB0] = function (parentObj, data) {
 		parentObj.dma.writeDMASource(0, 0, data);
@@ -1127,6 +1083,8 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0xDF] = function (parentObj, data) {
 		parentObj.dma.writeDMAControl1(3, data);
 	}
+	//40000E0h through 40000FFh - NOT USED - GLITCHED
+	this.fillWriteTableNOP(0xE0, 0xFF);
 	//4000100h - TM0CNT_L - Timer 0 Counter/Reload (R/W)
 	this.writeIO[0x100] = function (parentObj, data) {
 		parentObj.timer.writeTM0CNT_L0(data);
@@ -1183,6 +1141,12 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//400010Fh - TM3CNT_H - Timer 3 Control (R/W)
 	this.writeIO[0x10F] = this.NOP;
+}
+GameBoyCoreAdvanceIO.prototype.fillWriteTableNOP = function (from, to) {
+	//Fill in slots of the i/o write table:
+	while (from < to) {
+		this.writeIO[from++] = this.NOP;
+	}
 }
 GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO = [];
@@ -1247,117 +1211,117 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.gfx.readBG3CNT1();
 	}
 	//4000010h - BG0HOFS - BG0 X-Offset (W)
-	this.readIO[0x10] = this.readZero;
+	this.readIO[0x10] = this.readUnused0;
 	//4000011h - BG0HOFS - BG0 X-Offset (W)
-	this.readIO[0x11] = this.readZero;
+	this.readIO[0x11] = this.readUnused1;
 	//4000012h - BG0VOFS - BG0 Y-Offset (W)
-	this.readIO[0x12] = this.readZero;
+	this.readIO[0x12] = this.readUnused2;
 	//4000013h - BG0VOFS - BG0 Y-Offset (W)
-	this.readIO[0x13] = this.readZero;
+	this.readIO[0x13] = this.readUnused3;
 	//4000014h - BG1HOFS - BG1 X-Offset (W)
-	this.readIO[0x14] = this.readZero;
+	this.readIO[0x14] = this.readUnused0;
 	//4000015h - BG1HOFS - BG1 X-Offset (W)
-	this.readIO[0x15] = this.readZero;
+	this.readIO[0x15] = this.readUnused1;
 	//4000016h - BG1VOFS - BG1 Y-Offset (W)
-	this.readIO[0x16] = this.readZero;
+	this.readIO[0x16] = this.readUnused2;
 	//4000017h - BG1VOFS - BG1 Y-Offset (W)
-	this.readIO[0x17] = this.readZero;
+	this.readIO[0x17] = this.readUnused3;
 	//4000018h - BG2HOFS - BG2 X-Offset (W)
-	this.readIO[0x18] = this.readZero;
+	this.readIO[0x18] = this.readUnused0;
 	//4000019h - BG2HOFS - BG2 X-Offset (W)
-	this.readIO[0x19] = this.readZero;
+	this.readIO[0x19] = this.readUnused1;
 	//400001Ah - BG2VOFS - BG2 Y-Offset (W)
-	this.readIO[0x1A] = this.readZero;
+	this.readIO[0x1A] = this.readUnused2;
 	//400001Bh - BG2VOFS - BG2 Y-Offset (W)
-	this.readIO[0x1B] = this.readZero;
+	this.readIO[0x1B] = this.readUnused3;
 	//400001Ch - BG3HOFS - BG3 X-Offset (W)
-	this.readIO[0x1C] = this.readZero;
+	this.readIO[0x1C] = this.readUnused0;
 	//400001Dh - BG3HOFS - BG3 X-Offset (W)
-	this.readIO[0x1D] = this.readZero;
+	this.readIO[0x1D] = this.readUnused1;
 	//400001Eh - BG3VOFS - BG3 Y-Offset (W)
-	this.readIO[0x1E] = this.readZero;
+	this.readIO[0x1E] = this.readUnused2;
 	//400001Fh - BG3VOFS - BG3 Y-Offset (W)
-	this.readIO[0x1F] = this.readZero;
+	this.readIO[0x1F] = this.readUnused3;
 	//4000020h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
-	this.readIO[0x20] = this.readZero;
+	this.readIO[0x20] = this.readUnused0;
 	//4000021h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
-	this.readIO[0x21] = this.readZero;
+	this.readIO[0x21] = this.readUnused1;
 	//4000022h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
-	this.readIO[0x22] = this.readZero;
+	this.readIO[0x22] = this.readUnused2;
 	//4000023h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
-	this.readIO[0x23] = this.readZero;
+	this.readIO[0x23] = this.readUnused3;
 	//4000024h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
-	this.readIO[0x24] = this.readZero;
+	this.readIO[0x24] = this.readUnused0;
 	//4000025h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
-	this.readIO[0x25] = this.readZero;
+	this.readIO[0x25] = this.readUnused1;
 	//4000026h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
-	this.readIO[0x26] = this.readZero;
+	this.readIO[0x26] = this.readUnused2;
 	//4000027h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
-	this.readIO[0x27] = this.readZero;
+	this.readIO[0x27] = this.readUnused3;
 	//4000028h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
-	this.readIO[0x28] = this.readZero;
+	this.readIO[0x28] = this.readUnused0;
 	//4000029h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
-	this.readIO[0x29] = this.readZero;
+	this.readIO[0x29] = this.readUnused1;
 	//400002Ah - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
-	this.readIO[0x2A] = this.readZero;
+	this.readIO[0x2A] = this.readUnused2;
 	//400002Bh - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
-	this.readIO[0x2B] = this.readZero;
+	this.readIO[0x2B] = this.readUnused3;
 	//400002Ch - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
-	this.readIO[0x2C] = this.readZero;
+	this.readIO[0x2C] = this.readUnused0;
 	//400002Dh - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
-	this.readIO[0x2D] = this.readZero;
+	this.readIO[0x2D] = this.readUnused1;
 	//400002Eh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
-	this.readIO[0x2E] = this.readZero;
+	this.readIO[0x2E] = this.readUnused2;
 	//400002Fh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
-	this.readIO[0x2F] = this.readZero;
+	this.readIO[0x2F] = this.readUnused3;
 	//4000030h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
-	this.readIO[0x30] = this.readZero;
+	this.readIO[0x30] = this.readUnused0;
 	//4000031h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
-	this.readIO[0x31] = this.readZero;
+	this.readIO[0x31] = this.readUnused1;
 	//4000032h - BG3PB - BG3 Rotation/Scaling Parameter B (alias dmx) (W)
-	this.readIO[0x32] = this.readZero;
+	this.readIO[0x32] = this.readUnused2;
 	//4000033h - BG3PB - BG3 Rotation/Scaling Parameter B (alias dmx) (W)
-	this.readIO[0x33] = this.readZero;
+	this.readIO[0x33] = this.readUnused3;
 	//4000034h - BG3PC - BG3 Rotation/Scaling Parameter C (alias dy) (W)
-	this.readIO[0x34] = this.readZero;
+	this.readIO[0x34] = this.readUnused0;
 	//4000035h - BG3PC - BG3 Rotation/Scaling Parameter C (alias dy) (W)
-	this.readIO[0x35] = this.readZero;
+	this.readIO[0x35] = this.readUnused1;
 	//4000036h - BG3PD - BG3 Rotation/Scaling Parameter D (alias dmy) (W)
-	this.readIO[0x36] = this.readZero;
+	this.readIO[0x36] = this.readUnused2;
 	//4000037h - BG3PD - BG3 Rotation/Scaling Parameter D (alias dmy) (W)
-	this.readIO[0x37] = this.readZero;
+	this.readIO[0x37] = this.readUnused3;
 	//4000038h - BG3X_L - BG3 Reference Point X-Coordinate, lower 16 bit (W)
-	this.readIO[0x38] = this.readZero;
+	this.readIO[0x38] = this.readUnused0;
 	//4000039h - BG3X_L - BG3 Reference Point X-Coordinate, lower 16 bit (W)
-	this.readIO[0x39] = this.readZero;
+	this.readIO[0x39] = this.readUnused1;
 	//400003Ah - BG3X_H - BG3 Reference Point X-Coordinate, upper 12 bit (W)
-	this.readIO[0x3A] = this.readZero;
+	this.readIO[0x3A] = this.readUnused2;
 	//400003Bh - BG3X_H - BG3 Reference Point X-Coordinate, upper 12 bit (W)
-	this.readIO[0x3B] = this.readZero;
+	this.readIO[0x3B] = this.readUnused3;
 	//400003Ch - BG3Y_L - BG3 Reference Point Y-Coordinate, lower 16 bit (W)
-	this.readIO[0x3C] = this.readZero;
+	this.readIO[0x3C] = this.readUnused0;
 	//400003Dh - BGY_L - BG3 Reference Point Y-Coordinate, lower 16 bit (W)
-	this.readIO[0x3D] = this.readZero;
+	this.readIO[0x3D] = this.readUnused1;
 	//400003Eh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
-	this.readIO[0x3E] = this.readZero;
+	this.readIO[0x3E] = this.readUnused2;
 	//400003Fh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
-	this.readIO[0x3F] = this.readZero;
+	this.readIO[0x3F] = this.readUnused3;
 	//4000040h - WIN0H - Window 0 Horizontal Dimensions (W)
-	this.readIO[0x40] = this.readZero;
+	this.readIO[0x40] = this.readUnused0;
 	//4000041h - WIN0H - Window 0 Horizontal Dimensions (W)
-	this.readIO[0x41] = this.readZero;
+	this.readIO[0x41] = this.readUnused1;
 	//4000042h - WIN1H - Window 1 Horizontal Dimensions (W)
-	this.readIO[0x42] = this.readZero;
+	this.readIO[0x42] = this.readUnused2;
 	//4000043h - WIN1H - Window 1 Horizontal Dimensions (W)
-	this.readIO[0x43] = this.readZero;
+	this.readIO[0x43] = this.readUnused3;
 	//4000044h - WIN0V - Window 0 Vertical Dimensions (W)
-	this.readIO[0x44] = this.readZero;
+	this.readIO[0x44] = this.readUnused0;
 	//4000045h - WIN0V - Window 0 Vertical Dimensions (W)
-	this.readIO[0x45] = this.readZero;
+	this.readIO[0x45] = this.readUnused1;
 	//4000046h - WIN1V - Window 1 Vertical Dimensions (W)
-	this.readIO[0x46] = this.readZero;
+	this.readIO[0x46] = this.readUnused2;
 	//4000047h - WIN1V - Window 1 Vertical Dimensions (W)
-	this.readIO[0x47] = this.readZero;
+	this.readIO[0x47] = this.readUnused3;
 	//4000048h - WININ - Control of Inside of Window(s) (R/W)
 	this.readIO[0x48] = function (parentObj) {
 		return parentObj.gfx.readWININ0();
@@ -1375,13 +1339,13 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.gfx.readWINOUT1();
 	}
 	//400004Ch - MOSAIC - Mosaic Size (W)
-	this.readIO[0x4C] = this.readZero;
+	this.readIO[0x4C] = this.readUnused0;
 	//400004Dh - MOSAIC - Mosaic Size (W)
-	this.readIO[0x4D] = this.readZero;
+	this.readIO[0x4D] = this.readUnused1;
 	//400004Eh - NOT USED - ZERO
-	this.readIO[0x4E] = this.readZero;
+	this.readIO[0x4E] = this.readUnused2;
 	//400004Fh - NOT USED - ZERO
-	this.readIO[0x4F] = this.readZero;
+	this.readIO[0x4F] = this.readUnused3;
 	//4000050h - BLDCNT - Color Special Effects Selection (R/W)
 	this.readIO[0x50] = function (parentObj) {
 		return parentObj.gfx.readBLDCNT0();
@@ -1395,13 +1359,13 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//4000053h - BLDALPHA - Alpha Blending Coefficients (W)
 	this.readIO[0x53] = this.readZero;
 	//4000054h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
-	this.readIO[0x54] = this.readZero;
+	this.readIO[0x54] = this.readUnused0;
 	//4000055h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
-	this.readIO[0x55] = this.readZero;
+	this.readIO[0x55] = this.readUnused1;
 	//4000056h - NOT USED - ZERO
-	this.readIO[0x56] = this.readZero;
+	this.readIO[0x56] = this.readUnused2;
 	//4000057h - NOT USED - ZERO
-	this.readIO[0x57] = this.readZero;
+	this.readIO[0x57] = this.readUnused3;
 	//4000058h - NOT USED - GLITCHED
 	this.readIO[0x58] = this.readUnused0;
 	//4000059h - NOT USED - GLITCHED
@@ -1634,21 +1598,21 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.sound.readWAVE(15);
 	}
 	//40000A0h - FIFO_A_L - FIFO Channel A First Word (W)
-	this.readIO[0xA0] = this.readZero;
+	this.readIO[0xA0] = this.readUnused0;
 	//40000A1h - FIFO_A_L - FIFO Channel A First Word (W)
-	this.readIO[0xA1] = this.readZero;
+	this.readIO[0xA1] = this.readUnused1;
 	//40000A2h - FIFO_A_H - FIFO Channel A Second Word (W)
-	this.readIO[0xA2] = this.readZero;
+	this.readIO[0xA2] = this.readUnused2;
 	//40000A3h - FIFO_A_H - FIFO Channel A Second Word (W)
-	this.readIO[0xA3] = this.readZero;
+	this.readIO[0xA3] = this.readUnused3;
 	//40000A4h - FIFO_B_L - FIFO Channel B First Word (W)
-	this.readIO[0xA4] = this.readZero;
+	this.readIO[0xA4] = this.readUnused0;
 	//40000A5h - FIFO_B_L - FIFO Channel B First Word (W)
-	this.readIO[0xA5] = this.readZero;
+	this.readIO[0xA5] = this.readUnused1;
 	//40000A6h - FIFO_B_H - FIFO Channel B Second Word (W)
-	this.readIO[0xA6] = this.readZero;
+	this.readIO[0xA6] = this.readUnused2;
 	//40000A7h - FIFO_B_H - FIFO Channel B Second Word (W)
-	this.readIO[0xA7] = this.readZero;
+	this.readIO[0xA7] = this.readUnused3;
 	//40000A8h - NOT USED - GLITCHED
 	this.readIO[0xA8] = this.readUnused0;
 	//40000A9h - NOT USED - GLITCHED
@@ -1666,25 +1630,165 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//40000AFh - NOT USED - GLITCHED
 	this.readIO[0xAF] = this.readUnused3;
 	//40000B0h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
-	this.readIO[0xB0] = this.readZero;
+	this.readIO[0xB0] = this.readUnused0;
 	//40000B1h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
-	this.readIO[0xB1] = this.readZero;
+	this.readIO[0xB1] = this.readUnused1;
 	//40000B2h - DMA0SAH - DMA 0 Source Address (W) (internal memory)
-	this.readIO[0xB2] = this.readZero;
+	this.readIO[0xB2] = this.readUnused2;
 	//40000B3h - DMA0SAH - DMA 0 Source Address (W) (internal memory)
-	this.readIO[0xB3] = this.readZero;
+	this.readIO[0xB3] = this.readUnused3;
 	//40000B4h - DMA0DAD - DMA 0 Destination Address (W) (internal memory)
-	this.readIO[0xB4] = this.readZero;
+	this.readIO[0xB4] = this.readUnused0;
 	//40000B5h - DMA0DAD - DMA 0 Destination Address (W) (internal memory)
-	this.readIO[0xB5] = this.readZero;
+	this.readIO[0xB5] = this.readUnused1;
 	//40000B6h - DMA0DAH - DMA 0 Destination Address (W) (internal memory)
-	this.readIO[0xB6] = this.readZero;
+	this.readIO[0xB6] = this.readUnused2;
 	//40000B7h - DMA0DAH - DMA 0 Destination Address (W) (internal memory)
-	this.readIO[0xB7] = this.readZero;
+	this.readIO[0xB7] = this.readUnused3;
 	//40000B8h - DMA0CNT_L - DMA 0 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xB8] = this.readZero;
+	this.readIO[0xB8] = this.readUnused0;
 	//40000B9h - DMA0CNT_L - DMA 0 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xB9] = this.readZero;
+	this.readIO[0xB9] = this.readUnused1;
+	//40000BAh - DMA0CNT_H - DMA 0 Control (R/W)
+	this.readIO[0xBA] = this.readUnused2;
+	//40000BBh - DMA0CNT_H - DMA 0 Control (R/W)
+	this.readIO[0xBB] = this.readUnused3;
+	//40000BCh - DMA1SAD - DMA 1 Source Address (W) (internal memory)
+	this.readIO[0xBC] = this.readUnused0;
+	//40000BDh - DMA1SAD - DMA 1 Source Address (W) (internal memory)
+	this.readIO[0xBD] = this.readUnused1;
+	//40000BEh - DMA1SAH - DMA 1 Source Address (W) (internal memory)
+	this.readIO[0xBE] = this.readUnused2;
+	//40000BFh - DMA1SAH - DMA 1 Source Address (W) (internal memory)
+	this.readIO[0xBF] = this.readUnused3;
+	//40000C0h - DMA1DAD - DMA 1 Destination Address (W) (internal memory)
+	this.readIO[0xC0] = this.readUnused0;
+	//40000C1h - DMA1DAD - DMA 1 Destination Address (W) (internal memory)
+	this.readIO[0xC1] = this.readUnused1;
+	//40000C2h - DMA1DAH - DMA 1 Destination Address (W) (internal memory)
+	this.readIO[0xC2] = this.readUnused2;
+	//40000C3h - DMA1DAH - DMA 1 Destination Address (W) (internal memory)
+	this.readIO[0xC3] = this.readUnused3;
+	//40000C4h - DMA1CNT_L - DMA 1 Word Count (W) (14 bit, 1..4000h)
+	this.readIO[0xC4] = this.readUnused0;
+	//40000C5h - DMA1CNT_L - DMA 1 Word Count (W) (14 bit, 1..4000h)
+	this.readIO[0xC5] = this.readUnused1;
+	//40000C6h - DMA1CNT_H - DMA 1 Control (R/W)
+	this.readIO[0xC6] = this.readUnused2;
+	//40000C7h - DMA1CNT_H - DMA 1 Control (R/W)
+	this.readIO[0xC7] = this.readUnused3;
+	//40000C8h - DMA2SAD - DMA 2 Source Address (W) (internal memory)
+	this.readIO[0xC8] = this.readUnused0;
+	//40000C9h - DMA2SAD - DMA 2 Source Address (W) (internal memory)
+	this.readIO[0xC9] = this.readUnused1;
+	//40000CAh - DMA2SAH - DMA 2 Source Address (W) (internal memory)
+	this.readIO[0xCA] = this.readUnused2;
+	//40000CBh - DMA2SAH - DMA 2 Source Address (W) (internal memory)
+	this.readIO[0xCB] = this.readUnused3;
+	//40000CCh - DMA2DAD - DMA 2 Destination Address (W) (internal memory)
+	this.readIO[0xCC] = this.readUnused0;
+	//40000CDh - DMA2DAD - DMA 2 Destination Address (W) (internal memory)
+	this.readIO[0xCD] = this.readUnused1;
+	//40000CEh - DMA2DAH - DMA 2 Destination Address (W) (internal memory)
+	this.readIO[0xCE] = this.readUnused2;
+	//40000CFh - DMA2DAH - DMA 2 Destination Address (W) (internal memory)
+	this.readIO[0xCF] = this.readUnused3;
+	//40000D0h - DMA2CNT_L - DMA 2 Word Count (W) (14 bit, 1..4000h)
+	this.readIO[0xD0] = this.readUnused0;
+	//40000D1h - DMA2CNT_L - DMA 2 Word Count (W) (14 bit, 1..4000h)
+	this.readIO[0xD1] = this.readUnused1;
+	//40000D2h - DMA2CNT_H - DMA 2 Control (R/W)
+	this.readIO[0xD2] = this.readUnused2;
+	//40000D3h - DMA2CNT_H - DMA 2 Control (R/W)
+	this.readIO[0xD3] = this.readUnused3;
+	//40000D4h - DMA3SAD - DMA 3 Source Address (W) (internal memory)
+	this.readIO[0xD4] = this.readUnused0;
+	//40000D5h - DMA3SAD - DMA 3 Source Address (W) (internal memory)
+	this.readIO[0xD5] = this.readUnused1;
+	//40000D6h - DMA3SAH - DMA 3 Source Address (W) (internal memory)
+	this.readIO[0xD6] = this.readUnused2;
+	//40000D7h - DMA3SAH - DMA 3 Source Address (W) (internal memory)
+	this.readIO[0xD7] = this.readUnused3;
+	//40000D8h - DMA3DAD - DMA 3 Destination Address (W) (internal memory)
+	this.readIO[0xD8] = this.readUnused0;
+	//40000D9h - DMA3DAD - DMA 3 Destination Address (W) (internal memory)
+	this.readIO[0xD9] = this.readUnused1;
+	//40000DAh - DMA3DAH - DMA 3 Destination Address (W) (internal memory)
+	this.readIO[0xDA] = this.readUnused2;
+	//40000DBh - DMA3DAH - DMA 3 Destination Address (W) (internal memory)
+	this.readIO[0xDB] = this.readUnused3;
+	//40000DCh - DMA3CNT_L - DMA 3 Word Count (W) (14 bit, 1..4000h)
+	this.readIO[0xDC] = this.readUnused0;
+	//40000DDh - DMA3CNT_L - DMA 3 Word Count (W) (14 bit, 1..4000h)
+	this.readIO[0xDD] = this.readUnused1;
+	//40000DEh - DMA3CNT_H - DMA 3 Control (R/W)
+	this.readIO[0xDE] = this.readUnused2;
+	//40000DFh - DMA3CNT_H - DMA 3 Control (R/W)
+	this.readIO[0xDF] = this.readUnused3;
+	//40000E0h - NOT USED - GLITCHED
+	this.readIO[0xE0] = this.readUnused0;
+	//40000E1h - NOT USED - GLITCHED
+	this.readIO[0xE1] = this.readUnused1;
+	//40000E2h - NOT USED - GLITCHED
+	this.readIO[0xE2] = this.readUnused2;
+	//40000E3h - NOT USED - GLITCHED
+	this.readIO[0xE3] = this.readUnused3;
+	//40000E4h - NOT USED - GLITCHED
+	this.readIO[0xE4] = this.readUnused0;
+	//40000E5h - NOT USED - GLITCHED
+	this.readIO[0xE5] = this.readUnused1;
+	//40000E6h - NOT USED - GLITCHED
+	this.readIO[0xE6] = this.readUnused2;
+	//40000E7h - NOT USED - GLITCHED
+	this.readIO[0xE7] = this.readUnused3;
+	//40000E8h - NOT USED - GLITCHED
+	this.readIO[0xE8] = this.readUnused0;
+	//40000E9h - NOT USED - GLITCHED
+	this.readIO[0xE9] = this.readUnused1;
+	//40000EAh - NOT USED - GLITCHED
+	this.readIO[0xEA] = this.readUnused2;
+	//40000EBh - NOT USED - GLITCHED
+	this.readIO[0xEB] = this.readUnused3;
+	//40000ECh - NOT USED - GLITCHED
+	this.readIO[0xEC] = this.readUnused0;
+	//40000EDh - NOT USED - GLITCHED
+	this.readIO[0xED] = this.readUnused1;
+	//40000EEh - NOT USED - GLITCHED
+	this.readIO[0xEE] = this.readUnused2;
+	//40000EFh - NOT USED - GLITCHED
+	this.readIO[0xEF] = this.readUnused3;
+	//40000F0h - NOT USED - GLITCHED
+	this.readIO[0xF0] = this.readUnused0;
+	//40000F1h - NOT USED - GLITCHED
+	this.readIO[0xF1] = this.readUnused1;
+	//40000F2h - NOT USED - GLITCHED
+	this.readIO[0xF2] = this.readUnused2;
+	//40000F3h - NOT USED - GLITCHED
+	this.readIO[0xF3] = this.readUnused3;
+	//40000F4h - NOT USED - GLITCHED
+	this.readIO[0xF4] = this.readUnused0;
+	//40000F5h - NOT USED - GLITCHED
+	this.readIO[0xF5] = this.readUnused1;
+	//40000F6h - NOT USED - GLITCHED
+	this.readIO[0xF6] = this.readUnused2;
+	//40000F7h - NOT USED - GLITCHED
+	this.readIO[0xF7] = this.readUnused3;
+	//40000F8h - NOT USED - GLITCHED
+	this.readIO[0xF8] = this.readUnused0;
+	//40000F9h - NOT USED - GLITCHED
+	this.readIO[0xF9] = this.readUnused1;
+	//40000FAh - NOT USED - GLITCHED
+	this.readIO[0xFA] = this.readUnused2;
+	//40000FBh - NOT USED - GLITCHED
+	this.readIO[0xFB] = this.readUnused3;
+	//40000FCh - NOT USED - GLITCHED
+	this.readIO[0xFC] = this.readUnused0;
+	//40000FDh - NOT USED - GLITCHED
+	this.readIO[0xFD] = this.readUnused1;
+	//40000FEh - NOT USED - GLITCHED
+	this.readIO[0xFE] = this.readUnused2;
+	//40000FFh - NOT USED - GLITCHED
+	this.readIO[0xFF] = this.readUnused3;
 	//4000100h - TM0CNT_L - Timer 0 Counter/Reload (R/W)
 	this.readIO[0x100] = function (parentObj) {
 		return parentObj.timer.readTM0CNT_L0();
