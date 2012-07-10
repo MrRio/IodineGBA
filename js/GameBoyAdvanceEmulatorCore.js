@@ -121,6 +121,16 @@ GameBoyAdvanceEmulator.prototype.initializeCore = function () {
 	//Setup a new instance of the i/o core:
 	this.IOCore = new GameBoyAdvanceIO(this);
 }
+GameBoyAdvanceEmulator.prototype.keyDown = function (keyPressed) {
+	if (!this.paused && this.romFound) {
+		this.IOCore.joypad.keyPress(keyPressed);
+	}
+}
+GameBoyAdvanceEmulator.prototype.keyUp = function (keyReleased) {
+	if (!this.paused && this.romFound) {
+		this.IOCore.joypad.keyRelease(keyReleased);
+	}
+}
 GameBoyAdvanceEmulator.prototype.attachCanvas = function (canvas) {
 	this.canvas = canvas;
 	if (this.initializeCanvasTarget()) {

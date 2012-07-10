@@ -116,16 +116,8 @@ GameBoyAdvanceJoyPad.prototype.checkForIRQ = function () {
 	//Always return -1 here, as we don't input joypad updates at the same time we're running the interp loop:
 	return -1;
 }*/
-GameBoyAdvanceJoyPad.prototype.writeKeyStatus0 = function (data) {
-	this.keyInput &= 0x300;
-	this.keyInput |= data;
-}
 GameBoyAdvanceJoyPad.prototype.readKeyStatus0 = function () {
 	return this.keyInput & 0xFF;
-}
-GameBoyAdvanceJoyPad.prototype.writeKeyStatus1 = function (data) {
-	this.keyInput &= 0xFF;
-	this.keyInput |= data << 8;
 }
 GameBoyAdvanceJoyPad.prototype.readKeyStatus1 = function () {
 	return ((this.keyInput >> 8) & 0x3) | 0xFC;

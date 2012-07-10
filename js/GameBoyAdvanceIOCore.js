@@ -1144,6 +1144,18 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//400010Fh - TM3CNT_H - Timer 3 Control (R/W)
 	this.writeIO[0x10F] = this.NOP;
+	//4000130h - KEYINPUT - Key Status (R)
+	this.writeIO[0x130] = this.NOP;
+	//4000131h - KEYINPUT - Key Status (R)
+	this.writeIO[0x131] = this.NOP;
+	//4000132h - KEYCNT - Key Interrupt Control (R/W)
+	this.writeIO[0x132] = function (parentObj, data) {
+		parentObj.joypad.writeKeyControl0(data);
+	}
+	//4000133h - KEYCNT - Key Interrupt Control (R/W)
+	this.writeIO[0x133] = function (parentObj, data) {
+		parentObj.joypad.writeKeyControl1(data);
+	}
 }
 GameBoyCoreAdvanceIO.prototype.fillWriteTableNOP = function (from, to) {
 	//Fill in slots of the i/o write table:
@@ -1864,6 +1876,22 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	}
 	//400010Fh - TM3CNT_H - Timer 3 Control (R/W)
 	this.readIO[0x10F] = this.readWriteOnly;
+	//4000130h - KEYINPUT - Key Status (R)
+	this.readIO[0x130] = function (parentObj) {
+		return parentObj.joypad.readKeyStatus0();
+	}
+	//4000131h - KEYINPUT - Key Status (R)
+	this.readIO[0x131] = function (parentObj) {
+		return parentObj.joypad.readKeyStatus1();
+	}
+	//4000132h - KEYCNT - Key Interrupt Control (R/W)
+	this.readIO[0x132] = function (parentObj) {
+		return parentObj.joypad.readKeyControl0();
+	}
+	//4000133h - KEYCNT - Key Interrupt Control (R/W)
+	this.readIO[0x133] = function (parentObj) {
+		return parentObj.joypad.readKeyControl1();
+	}
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
