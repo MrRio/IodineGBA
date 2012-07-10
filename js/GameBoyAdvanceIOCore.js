@@ -2095,9 +2095,12 @@ GameBoyAdvanceIO.prototype.handleCPUStallEvents = function () {
 	}
 }
 GameBoyAdvanceIO.prototype.handleDMA = function () {
-	this.dma.perform();
+	this.clocks = 0;
+	if (this.dma.perform()) {
+		//If DMA is done, exit it:
+		this.systemStatus -= 0x1;
+	}
 	this.updateCore(this.clocks);
-	this.systemStatus -= 0x1;
 }
 GameBoyAdvanceIO.prototype.handleHalt = function () {
 	if (!this.irq.IRQMatch()) {
