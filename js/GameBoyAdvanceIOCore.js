@@ -1653,9 +1653,13 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//40000B9h - DMA0CNT_L - DMA 0 Word Count (W) (14 bit, 1..4000h)
 	this.readIO[0xB9] = this.readUnused1;
 	//40000BAh - DMA0CNT_H - DMA 0 Control (R/W)
-	this.readIO[0xBA] = this.readUnused2;
+	this.readIO[0xBA] = function (parentObj) {
+		return parentObj.dma.readDMAControl0(0);
+	}
 	//40000BBh - DMA0CNT_H - DMA 0 Control (R/W)
-	this.readIO[0xBB] = this.readUnused3;
+	this.readIO[0xBB] = function (parentObj) {
+		return parentObj.dma.readDMAControl1(0);
+	}
 	//40000BCh - DMA1SAD - DMA 1 Source Address (W) (internal memory)
 	this.readIO[0xBC] = this.readUnused0;
 	//40000BDh - DMA1SAD - DMA 1 Source Address (W) (internal memory)
@@ -1677,9 +1681,13 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//40000C5h - DMA1CNT_L - DMA 1 Word Count (W) (14 bit, 1..4000h)
 	this.readIO[0xC5] = this.readUnused1;
 	//40000C6h - DMA1CNT_H - DMA 1 Control (R/W)
-	this.readIO[0xC6] = this.readUnused2;
+	this.readIO[0xC6] = function (parentObj) {
+		return parentObj.dma.readDMAControl0(1);
+	}
 	//40000C7h - DMA1CNT_H - DMA 1 Control (R/W)
-	this.readIO[0xC7] = this.readUnused3;
+	this.readIO[0xC7] = function (parentObj) {
+		return parentObj.dma.readDMAControl1(1);
+	}
 	//40000C8h - DMA2SAD - DMA 2 Source Address (W) (internal memory)
 	this.readIO[0xC8] = this.readUnused0;
 	//40000C9h - DMA2SAD - DMA 2 Source Address (W) (internal memory)
@@ -1701,9 +1709,13 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//40000D1h - DMA2CNT_L - DMA 2 Word Count (W) (14 bit, 1..4000h)
 	this.readIO[0xD1] = this.readUnused1;
 	//40000D2h - DMA2CNT_H - DMA 2 Control (R/W)
-	this.readIO[0xD2] = this.readUnused2;
+	this.readIO[0xD2] = function (parentObj) {
+		return parentObj.dma.readDMAControl0(2);
+	}
 	//40000D3h - DMA2CNT_H - DMA 2 Control (R/W)
-	this.readIO[0xD3] = this.readUnused3;
+	this.readIO[0xD3] = function (parentObj) {
+		return parentObj.dma.readDMAControl1(2);
+	}
 	//40000D4h - DMA3SAD - DMA 3 Source Address (W) (internal memory)
 	this.readIO[0xD4] = this.readUnused0;
 	//40000D5h - DMA3SAD - DMA 3 Source Address (W) (internal memory)
@@ -1725,9 +1737,13 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//40000DDh - DMA3CNT_L - DMA 3 Word Count (W) (14 bit, 1..4000h)
 	this.readIO[0xDD] = this.readUnused1;
 	//40000DEh - DMA3CNT_H - DMA 3 Control (R/W)
-	this.readIO[0xDE] = this.readUnused2;
+	this.readIO[0xDE] = function (parentObj) {
+		return parentObj.dma.readDMAControl0(3);
+	}
 	//40000DFh - DMA3CNT_H - DMA 3 Control (R/W)
-	this.readIO[0xDF] = this.readUnused3;
+	this.readIO[0xDF] = function (parentObj) {
+		return parentObj.dma.readDMAControl1(3);
+	}
 	//40000E0h - NOT USED - GLITCHED
 	this.readIO[0xE0] = this.readUnused0;
 	//40000E1h - NOT USED - GLITCHED

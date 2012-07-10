@@ -264,6 +264,35 @@ GameBoyAdvanceGraphics.prototype.checkVCounter = function () {
 		this.VCounterMatch = false;
 	}
 }
+GameBoyAdvanceGraphics.prototype.nextVBlankEventTime = function () {
+	return ((1 + ((387 - this.currentScanLine) % 228)) * 1232) - this.LCDTicks;
+}
+GameBoyAdvanceGraphics.prototype.nextVBlankIRQEventTime = function () {
+	return (this.IRQVBlank) ? this.nextVBlankEventTime() : -1;
+}
+GameBoyAdvanceGraphics.prototype.nextHBlankEventTime = function () {
+	return (2238 - this.LCDTicks) % 1232;
+}
+GameBoyAdvanceGraphics.prototype.nextHBlankIRQEventTime = function () {
+	return (this.IRQHBlank) ? this.nextHBlankEventTime() : -1;
+}
+GameBoyAdvanceGraphics.prototype.nextVCounterEventTime = function () {
+	return ((1 + ((227 + this.VCounter - this.currentScanLine) % 228)) * 1232) - this.LCDTicks;
+}
+GameBoyAdvanceGraphics.prototype.nextVCounterIRQEventTime = function () {
+	return (this.IRQVBlank) ? this.nextVCounterEventTime() : -1;
+}
+GameBoyAdvanceGraphics.prototype.nextDisplaySyncEventTime = function () {
+	if (this.currentScanLine < 2) {
+		return ((2 - this.currentScanLine) * 1232) - this.LCDTicks;
+	}
+	else if (this.currentScanLine < 161) {
+		return 1232 - this.LCDTicks;
+	}
+	else {
+		return ((68 - this.currentScanLine) * 1232) - this.LCDTicks;
+	}
+}
 GameBoyAdvanceGraphics.prototype.updateVBlankStart = function () {
 	this.inVBlank = true;								//Mark VBlank.
 	this.VBlankFlagged = true;							//Flag for the state updater so we can handle DMAs later on.
