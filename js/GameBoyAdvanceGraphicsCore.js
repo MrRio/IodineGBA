@@ -280,7 +280,7 @@ GameBoyAdvanceGraphics.prototype.nextVCounterEventTime = function () {
 	return ((1 + ((227 + this.VCounter - this.currentScanLine) % 228)) * 1232) - this.LCDTicks;
 }
 GameBoyAdvanceGraphics.prototype.nextVCounterIRQEventTime = function () {
-	return (this.IRQVBlank) ? this.nextVCounterEventTime() : -1;
+	return (this.IRQVCounter) ? this.nextVCounterEventTime() : -1;
 }
 GameBoyAdvanceGraphics.prototype.nextDisplaySyncEventTime = function () {
 	if (this.currentScanLine < 2) {

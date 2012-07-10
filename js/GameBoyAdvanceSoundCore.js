@@ -771,9 +771,25 @@ GameBoyAdvanceSound.prototype.AGBDirectSoundTimer1ClockTick = function () {
 		this.AGBDirectSoundBTimerIncrement();
 	}
 }
+GameBoyAdvanceSound.prototype.nextFIFOAEventTime = function () {
+	if (this.FIFOABuffer.length > 16) {
+		return this.IOCore.timer.nextTimer1Overflow(this.FIFOABuffer.length - 16);
+	}
+	else {
+		return 0;
+	}
+}
+GameBoyAdvanceSound.prototype.nextFIFOBEventTime = function () {
+	if (this.FIFOBBuffer.length > 16) {
+		return this.IOCore.timer.nextTimer2Overflow(this.FIFOBBuffer.length - 16);
+	}
+	else {
+		return 0;
+	}
+}
 GameBoyAdvanceSound.prototype.AGBDirectSoundATimerIncrement = function () {
 	this.AGBDirectSoundA = (this.FIFOABuffer.length) ? ((this.FIFOABuffer.shift() << 24) >> 22) : 0;
-	if (this.FIFOBBuffer.length <= 16) {
+	if (this.FIFOABuffer.length <= 16) {
 		this.IOCore.dma.soundFIFOARequest();
 	}
 	this.AGBFIFOAFolder();

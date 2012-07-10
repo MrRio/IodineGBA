@@ -291,23 +291,23 @@ GameBoyAdvanceDMA.prototype.nextEventTime = function () {
 		switch (this.enabled[dmaChannel]) {
 			//V_BLANK
 			case 0x2:
-				workbench = this.IOCore.gfx.clocksToNextVBlank();
+				workbench = this.IOCore.gfx.nextVBlankEventTime();
 				break;
 			//H_BLANK:
 			case 0x4:
-				workbench = this.IOCore.gfx.clocksToNextHBlank();
+				workbench = this.IOCore.gfx.nextHBlankEventTime();
 				break;
 			//FIFO_A:
 			case 0x8:
-				workbench = this.IOCore.sound.clocksToNextFIFOA();
+				workbench = this.IOCore.sound.nextFIFOAEventTime();
 				break;
 			//FIFO_B:
 			case 0x10:
-				workbench = this.IOCore.sound.clocksToNextFIFOB();
+				workbench = this.IOCore.sound.nextFIFOBEventTime();
 				break;
 			//DISPLAY_SYNC:
 			case 0x20:
-				workbench = this.IOCore.gfx.clocksToNextDisplaySync();
+				workbench = this.IOCore.gfx.nextDisplaySyncEventTime();
 		}
 		clocks = (clocks > -1) ? ((workbench > -1) ? Math.min(clocks, workbench) : clocks) : workbench;
 	}
