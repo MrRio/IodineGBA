@@ -81,7 +81,8 @@ GameBoyAdvanceIRQ.prototype.nextEventTime = function () {
 	clocks = this.findClosestEvent(clocks, this.IOCore.timer.nextTimer3IRQEventTime());
 	clocks = this.findClosestEvent(clocks, this.IOCore.serial.nextIRQEventTime());
 	clocks = this.findClosestEvent(clocks, this.IOCore.dma.nextIRQEventTime());
-	clocks = this.findClosestEvent(clocks, this.IOCore.joypad.nextIRQEventTime());
+	//JoyPad input state should never update while we're in halt:
+	//clocks = this.findClosestEvent(clocks, this.IOCore.joypad.nextIRQEventTime());
 	clocks = this.findClosestEvent(clocks, this.IOCore.cartridge.nextIRQEventTime());
 	return clocks;
 }
