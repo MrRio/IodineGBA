@@ -1860,11 +1860,11 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 	}
 	this.accessPostProcess8[1] = this.accessPostProcess16[1] = function (parentObj) {
 		//External WRAM state:
-		parentObj.cpu.clocks += parentObj.waitStateWRAM;
+		parentObj.clocks += parentObj.waitStateWRAM;
 	}
 	this.accessPostProcess32[1] = function (parentObj) {
 		//External WRAM state:
-		parentObj.cpu.clocks += parentObj.waitStateWRAMLong;
+		parentObj.clocks += parentObj.waitStateWRAMLong;
 	}
 	this.accessPostProcess8[2] = function (parentObj) {
 		//VRAM Write:
@@ -1877,7 +1877,7 @@ GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () 
 	}
 	this.accessPostProcess32[2] = function (parentObj) {
 		//VRAM Write:
-		++parentObj.cpu.clocks;
+		++parentObj.clocks;
 	}
 }
 GameBoyAdvanceIO.prototype.writeExternalWRAM = function (parentObj, address, data) {
@@ -2061,23 +2061,23 @@ GameBoyAdvanceIO.prototype.runIterator = function () {
 			this.handleCPUStallEvents();
 		}
 		else {
+			//Reset clocks from last operation:
+			this.clocks = 0;
 			//Execute next instruction:
 			this.cpu.executeIteration();
 			//Update State:
-			this.updateCore(this.cpu.clocks);
-			//Reset clocks from last instruction:
-			this.cpu.clocks = 0;
+			this.updateCore();
 		}
 	}
 }
-GameBoyAdvanceIO.prototype.updateCore = function (clocks) {
+GameBoyAdvanceIO.prototype.updateCore = function () {
 	//This is used during normal/dma modes of operation:
 	//Decrement the clocks per iteration counter:
-	this.cyclesToIterate -= clocks;
+	this.cyclesToIterate -= this.clocks;
 	//Clock all components:
-	this.gfx.addClocks(clocks);
-	this.sound.addClocks(clocks);
-	this.timer.addClocks(clocks);
+	this.gfx.addClocks(this.clocks);
+	this.sound.addClocks(this.clocks);
+	this.timer.addClocks(this.clocks);
 }
 GameBoyAdvanceIO.prototype.handleCPUStallEvents = function () {
 	switch (this.systemStatus) {
@@ -2095,19 +2095,16 @@ GameBoyAdvanceIO.prototype.handleCPUStallEvents = function () {
 	}
 }
 GameBoyAdvanceIO.prototype.handleDMA = function () {
-	if (this.dma.perform()) {
-		//If DMA is done, exit it:
-		this.systemStatus -= 0x1;
-	}
-	this.updateCore(this.dma.clocks);
-	this.dma.clocks = 0;
+	this.dma.perform();
+	this.updateCore(this.clocks);
+	this.systemStatus -= 0x1;
 }
 GameBoyAdvanceIO.prototype.handleHalt = function () {
 	if (!this.irq.IRQMatch()) {
 		//Clock up to next IRQ match or DMA:
-		var clocks = this.gfx.nextEventTime();
-		clocks = this.compareHaltClocks(clocks, this.dma.nextEventTime());
-		clocks = this.compareHaltClocks(clocks, this.timer.nextEventTime());
+		var clocks = this.irq.nextEventTime();
+		var dmaClocks = this.dma.nextEventTime();
+		clocks = (clocks > -1) ? ((dmaClocks > -1) ? Math.min(clocks, dmaClocks) : clocks) : dmaClocks;
 		clocks = (clocks == -1 || clocks > this.cyclesToIterate) ? this.cyclesToIterate : clocks;
 		this.updateCore(clocks);
 	}
@@ -2120,15 +2117,4 @@ GameBoyAdvanceIO.prototype.handleStop = function () {
 	//Update sound system to add silence to buffer:
 	this.sound.addClocks(this.cyclesToIterate);
 	//Exits when user presses joypad or from an external irq outside of GBA internal.
-}
-GameBoyAdvanceIO.prototype.compareHaltClocks = (original, clocks) {
-	if (clocks == -1) {
-		return original;
-	}
-	else if (original == -1) {
-		return clocks;
-	}
-	else {
-		return Math.min(original, clocks);
-	}
 }
