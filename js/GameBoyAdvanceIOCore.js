@@ -1144,6 +1144,10 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//400010Fh - TM3CNT_H - Timer 3 Control (R/W)
 	this.writeIO[0x10F] = this.NOP;
+	//4000110h through 400011Fh - NOT USED - GLITCHED
+	this.fillWriteTableNOP(0x110, 0x11F);
+	//400012Ch through 400012Fh - NOT USED - GLITCHED
+	this.fillWriteTableNOP(0x12C, 0x12F);
 	//4000130h - KEYINPUT - Key Status (R)
 	this.writeIO[0x130] = this.NOP;
 	//4000131h - KEYINPUT - Key Status (R)
@@ -1156,10 +1160,38 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x133] = function (parentObj, data) {
 		parentObj.joypad.writeKeyControl1(data);
 	}
+	//4000136h through 400013Fh - NOT USED - GLITCHED
+	this.fillWriteTableNOP(0x136, 0x13F);
+	//4000142h through 400014Fh - NOT USED - GLITCHED
+	this.fillWriteTableNOP(0x142, 0x14F);
+	//400015Ah through 40001FFh - NOT USED - GLITCHED
+	this.fillWriteTableNOP(0x15A, 0x1FF);
+	//4000200h - IE - Interrupt Enable Register (R/W)
+	this.writeIO[0x200] = function (parentObj, data) {
+		parentObj.irq.writeIE0(data);
+	}
+	//4000201h - IE - Interrupt Enable Register (R/W)
+	this.writeIO[0x201] = function (parentObj, data) {
+		parentObj.irq.writeIE1(data);
+	}
+	//4000202h - IF - Interrupt Request Flags / IRQ Acknowledge
+	this.writeIO[0x202] = function (parentObj, data) {
+		parentObj.irq.writeIF0(data);
+	}
+	//4000203h - IF - Interrupt Request Flags / IRQ Acknowledge
+	this.writeIO[0x203] = function (parentObj, data) {
+		parentObj.irq.writeIF1(data);
+	}
+	//4000208h - IME - Interrupt Master Enable Register (R/W)
+	this.writeIO[0x208] = function (parentObj, data) {
+		parentObj.irq.writeIME(data);
+	}
+	//4000209h through 40002FFh - NOT USED - GLITCHED
+	this.fillWriteTableNOP(0x209, 0x2FF);
 }
 GameBoyCoreAdvanceIO.prototype.fillWriteTableNOP = function (from, to) {
 	//Fill in slots of the i/o write table:
-	while (from < to) {
+	while (from <= to) {
 		this.writeIO[from++] = this.NOP;
 	}
 }
@@ -1612,58 +1644,8 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x9F] = function (parentObj) {
 		return parentObj.sound.readWAVE(15);
 	}
-	//40000A0h - FIFO_A_L - FIFO Channel A First Word (W)
-	this.readIO[0xA0] = this.readUnused0;
-	//40000A1h - FIFO_A_L - FIFO Channel A First Word (W)
-	this.readIO[0xA1] = this.readUnused1;
-	//40000A2h - FIFO_A_H - FIFO Channel A Second Word (W)
-	this.readIO[0xA2] = this.readUnused2;
-	//40000A3h - FIFO_A_H - FIFO Channel A Second Word (W)
-	this.readIO[0xA3] = this.readUnused3;
-	//40000A4h - FIFO_B_L - FIFO Channel B First Word (W)
-	this.readIO[0xA4] = this.readUnused0;
-	//40000A5h - FIFO_B_L - FIFO Channel B First Word (W)
-	this.readIO[0xA5] = this.readUnused1;
-	//40000A6h - FIFO_B_H - FIFO Channel B Second Word (W)
-	this.readIO[0xA6] = this.readUnused2;
-	//40000A7h - FIFO_B_H - FIFO Channel B Second Word (W)
-	this.readIO[0xA7] = this.readUnused3;
-	//40000A8h - NOT USED - GLITCHED
-	this.readIO[0xA8] = this.readUnused0;
-	//40000A9h - NOT USED - GLITCHED
-	this.readIO[0xA9] = this.readUnused1;
-	//40000AAh - NOT USED - GLITCHED
-	this.readIO[0xAA] = this.readUnused2;
-	//40000ABh - NOT USED - GLITCHED
-	this.readIO[0xAB] = this.readUnused3;
-	//40000ACh - NOT USED - GLITCHED
-	this.readIO[0xAC] = this.readUnused0;
-	//40000ADh - NOT USED - GLITCHED
-	this.readIO[0xAD] = this.readUnused1;
-	//40000AEh - NOT USED - GLITCHED
-	this.readIO[0xAE] = this.readUnused2;
-	//40000AFh - NOT USED - GLITCHED
-	this.readIO[0xAF] = this.readUnused3;
-	//40000B0h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
-	this.readIO[0xB0] = this.readUnused0;
-	//40000B1h - DMA0SAD - DMA 0 Source Address (W) (internal memory)
-	this.readIO[0xB1] = this.readUnused1;
-	//40000B2h - DMA0SAH - DMA 0 Source Address (W) (internal memory)
-	this.readIO[0xB2] = this.readUnused2;
-	//40000B3h - DMA0SAH - DMA 0 Source Address (W) (internal memory)
-	this.readIO[0xB3] = this.readUnused3;
-	//40000B4h - DMA0DAD - DMA 0 Destination Address (W) (internal memory)
-	this.readIO[0xB4] = this.readUnused0;
-	//40000B5h - DMA0DAD - DMA 0 Destination Address (W) (internal memory)
-	this.readIO[0xB5] = this.readUnused1;
-	//40000B6h - DMA0DAH - DMA 0 Destination Address (W) (internal memory)
-	this.readIO[0xB6] = this.readUnused2;
-	//40000B7h - DMA0DAH - DMA 0 Destination Address (W) (internal memory)
-	this.readIO[0xB7] = this.readUnused3;
-	//40000B8h - DMA0CNT_L - DMA 0 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xB8] = this.readUnused0;
-	//40000B9h - DMA0CNT_L - DMA 0 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xB9] = this.readUnused1;
+	//40000A0h through 40000B9h - READ ONLY
+	this.fillReadTableUnused(0xA0, 0xB9);
 	//40000BAh - DMA0CNT_H - DMA 0 Control (R/W)
 	this.readIO[0xBA] = function (parentObj) {
 		return parentObj.dma.readDMAControl0(0);
@@ -1672,26 +1654,8 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xBB] = function (parentObj) {
 		return parentObj.dma.readDMAControl1(0);
 	}
-	//40000BCh - DMA1SAD - DMA 1 Source Address (W) (internal memory)
-	this.readIO[0xBC] = this.readUnused0;
-	//40000BDh - DMA1SAD - DMA 1 Source Address (W) (internal memory)
-	this.readIO[0xBD] = this.readUnused1;
-	//40000BEh - DMA1SAH - DMA 1 Source Address (W) (internal memory)
-	this.readIO[0xBE] = this.readUnused2;
-	//40000BFh - DMA1SAH - DMA 1 Source Address (W) (internal memory)
-	this.readIO[0xBF] = this.readUnused3;
-	//40000C0h - DMA1DAD - DMA 1 Destination Address (W) (internal memory)
-	this.readIO[0xC0] = this.readUnused0;
-	//40000C1h - DMA1DAD - DMA 1 Destination Address (W) (internal memory)
-	this.readIO[0xC1] = this.readUnused1;
-	//40000C2h - DMA1DAH - DMA 1 Destination Address (W) (internal memory)
-	this.readIO[0xC2] = this.readUnused2;
-	//40000C3h - DMA1DAH - DMA 1 Destination Address (W) (internal memory)
-	this.readIO[0xC3] = this.readUnused3;
-	//40000C4h - DMA1CNT_L - DMA 1 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xC4] = this.readUnused0;
-	//40000C5h - DMA1CNT_L - DMA 1 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xC5] = this.readUnused1;
+	//40000BCh through 40000C5h - READ ONLY
+	this.fillReadTableUnused(0xBC, 0xC5);
 	//40000C6h - DMA1CNT_H - DMA 1 Control (R/W)
 	this.readIO[0xC6] = function (parentObj) {
 		return parentObj.dma.readDMAControl0(1);
@@ -1700,26 +1664,8 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xC7] = function (parentObj) {
 		return parentObj.dma.readDMAControl1(1);
 	}
-	//40000C8h - DMA2SAD - DMA 2 Source Address (W) (internal memory)
-	this.readIO[0xC8] = this.readUnused0;
-	//40000C9h - DMA2SAD - DMA 2 Source Address (W) (internal memory)
-	this.readIO[0xC9] = this.readUnused1;
-	//40000CAh - DMA2SAH - DMA 2 Source Address (W) (internal memory)
-	this.readIO[0xCA] = this.readUnused2;
-	//40000CBh - DMA2SAH - DMA 2 Source Address (W) (internal memory)
-	this.readIO[0xCB] = this.readUnused3;
-	//40000CCh - DMA2DAD - DMA 2 Destination Address (W) (internal memory)
-	this.readIO[0xCC] = this.readUnused0;
-	//40000CDh - DMA2DAD - DMA 2 Destination Address (W) (internal memory)
-	this.readIO[0xCD] = this.readUnused1;
-	//40000CEh - DMA2DAH - DMA 2 Destination Address (W) (internal memory)
-	this.readIO[0xCE] = this.readUnused2;
-	//40000CFh - DMA2DAH - DMA 2 Destination Address (W) (internal memory)
-	this.readIO[0xCF] = this.readUnused3;
-	//40000D0h - DMA2CNT_L - DMA 2 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xD0] = this.readUnused0;
-	//40000D1h - DMA2CNT_L - DMA 2 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xD1] = this.readUnused1;
+	//40000C8h through 40000D1h - READ ONLY
+	this.fillReadTableUnused(0xC8, 0xD1);
 	//40000D2h - DMA2CNT_H - DMA 2 Control (R/W)
 	this.readIO[0xD2] = function (parentObj) {
 		return parentObj.dma.readDMAControl0(2);
@@ -1728,26 +1674,8 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xD3] = function (parentObj) {
 		return parentObj.dma.readDMAControl1(2);
 	}
-	//40000D4h - DMA3SAD - DMA 3 Source Address (W) (internal memory)
-	this.readIO[0xD4] = this.readUnused0;
-	//40000D5h - DMA3SAD - DMA 3 Source Address (W) (internal memory)
-	this.readIO[0xD5] = this.readUnused1;
-	//40000D6h - DMA3SAH - DMA 3 Source Address (W) (internal memory)
-	this.readIO[0xD6] = this.readUnused2;
-	//40000D7h - DMA3SAH - DMA 3 Source Address (W) (internal memory)
-	this.readIO[0xD7] = this.readUnused3;
-	//40000D8h - DMA3DAD - DMA 3 Destination Address (W) (internal memory)
-	this.readIO[0xD8] = this.readUnused0;
-	//40000D9h - DMA3DAD - DMA 3 Destination Address (W) (internal memory)
-	this.readIO[0xD9] = this.readUnused1;
-	//40000DAh - DMA3DAH - DMA 3 Destination Address (W) (internal memory)
-	this.readIO[0xDA] = this.readUnused2;
-	//40000DBh - DMA3DAH - DMA 3 Destination Address (W) (internal memory)
-	this.readIO[0xDB] = this.readUnused3;
-	//40000DCh - DMA3CNT_L - DMA 3 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xDC] = this.readUnused0;
-	//40000DDh - DMA3CNT_L - DMA 3 Word Count (W) (14 bit, 1..4000h)
-	this.readIO[0xDD] = this.readUnused1;
+	//40000D4h through 40000DDh - READ ONLY
+	this.fillReadTableUnused(0xD4, 0xDD);
 	//40000DEh - DMA3CNT_H - DMA 3 Control (R/W)
 	this.readIO[0xDE] = function (parentObj) {
 		return parentObj.dma.readDMAControl0(3);
@@ -1756,70 +1684,8 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xDF] = function (parentObj) {
 		return parentObj.dma.readDMAControl1(3);
 	}
-	//40000E0h - NOT USED - GLITCHED
-	this.readIO[0xE0] = this.readUnused0;
-	//40000E1h - NOT USED - GLITCHED
-	this.readIO[0xE1] = this.readUnused1;
-	//40000E2h - NOT USED - GLITCHED
-	this.readIO[0xE2] = this.readUnused2;
-	//40000E3h - NOT USED - GLITCHED
-	this.readIO[0xE3] = this.readUnused3;
-	//40000E4h - NOT USED - GLITCHED
-	this.readIO[0xE4] = this.readUnused0;
-	//40000E5h - NOT USED - GLITCHED
-	this.readIO[0xE5] = this.readUnused1;
-	//40000E6h - NOT USED - GLITCHED
-	this.readIO[0xE6] = this.readUnused2;
-	//40000E7h - NOT USED - GLITCHED
-	this.readIO[0xE7] = this.readUnused3;
-	//40000E8h - NOT USED - GLITCHED
-	this.readIO[0xE8] = this.readUnused0;
-	//40000E9h - NOT USED - GLITCHED
-	this.readIO[0xE9] = this.readUnused1;
-	//40000EAh - NOT USED - GLITCHED
-	this.readIO[0xEA] = this.readUnused2;
-	//40000EBh - NOT USED - GLITCHED
-	this.readIO[0xEB] = this.readUnused3;
-	//40000ECh - NOT USED - GLITCHED
-	this.readIO[0xEC] = this.readUnused0;
-	//40000EDh - NOT USED - GLITCHED
-	this.readIO[0xED] = this.readUnused1;
-	//40000EEh - NOT USED - GLITCHED
-	this.readIO[0xEE] = this.readUnused2;
-	//40000EFh - NOT USED - GLITCHED
-	this.readIO[0xEF] = this.readUnused3;
-	//40000F0h - NOT USED - GLITCHED
-	this.readIO[0xF0] = this.readUnused0;
-	//40000F1h - NOT USED - GLITCHED
-	this.readIO[0xF1] = this.readUnused1;
-	//40000F2h - NOT USED - GLITCHED
-	this.readIO[0xF2] = this.readUnused2;
-	//40000F3h - NOT USED - GLITCHED
-	this.readIO[0xF3] = this.readUnused3;
-	//40000F4h - NOT USED - GLITCHED
-	this.readIO[0xF4] = this.readUnused0;
-	//40000F5h - NOT USED - GLITCHED
-	this.readIO[0xF5] = this.readUnused1;
-	//40000F6h - NOT USED - GLITCHED
-	this.readIO[0xF6] = this.readUnused2;
-	//40000F7h - NOT USED - GLITCHED
-	this.readIO[0xF7] = this.readUnused3;
-	//40000F8h - NOT USED - GLITCHED
-	this.readIO[0xF8] = this.readUnused0;
-	//40000F9h - NOT USED - GLITCHED
-	this.readIO[0xF9] = this.readUnused1;
-	//40000FAh - NOT USED - GLITCHED
-	this.readIO[0xFA] = this.readUnused2;
-	//40000FBh - NOT USED - GLITCHED
-	this.readIO[0xFB] = this.readUnused3;
-	//40000FCh - NOT USED - GLITCHED
-	this.readIO[0xFC] = this.readUnused0;
-	//40000FDh - NOT USED - GLITCHED
-	this.readIO[0xFD] = this.readUnused1;
-	//40000FEh - NOT USED - GLITCHED
-	this.readIO[0xFE] = this.readUnused2;
-	//40000FFh - NOT USED - GLITCHED
-	this.readIO[0xFF] = this.readUnused3;
+	//40000E0h through 40000FFh - NOT USED - GLITCHED
+	this.fillReadTableUnused(0xE0, 0xFF);
 	//4000100h - TM0CNT_L - Timer 0 Counter/Reload (R/W)
 	this.readIO[0x100] = function (parentObj) {
 		return parentObj.timer.readTM0CNT_L0();
@@ -1876,6 +1742,10 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	}
 	//400010Fh - TM3CNT_H - Timer 3 Control (R/W)
 	this.readIO[0x10F] = this.readWriteOnly;
+	//4000110h through 400011Fh - NOT USED - GLITCHED
+	this.fillReadTableUnused(0x110, 0x11F);
+	//400012Ch through 400012Fh - NOT USED - GLITCHED
+	this.fillReadTableUnused(0x12C, 0x12F);
 	//4000130h - KEYINPUT - Key Status (R)
 	this.readIO[0x130] = function (parentObj) {
 		return parentObj.joypad.readKeyStatus0();
@@ -1891,6 +1761,61 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//4000133h - KEYCNT - Key Interrupt Control (R/W)
 	this.readIO[0x133] = function (parentObj) {
 		return parentObj.joypad.readKeyControl1();
+	}
+	//4000136h - NOT USED - ZERO
+	this.readIO[0x136] = this.readZero;
+	//4000137h - NOT USED - ZERO
+	this.readIO[0x137] = this.readZero;
+	//4000138h through 400013Fh - NOT USED - GLITCHED
+	this.fillReadTableUnused(0x138, 0x13F);
+	//4000142h - NOT USED - ZERO
+	this.readIO[0x142] = this.readZero;
+	//4000143h - NOT USED - ZERO
+	this.readIO[0x143] = this.readZero;
+	//4000144h through 400014Fh - NOT USED - GLITCHED
+	this.fillReadTableUnused(0x144, 0x14F);
+	//400015Ah - NOT USED - ZERO
+	this.readIO[0x15A] = this.readZero;
+	//400015Bh - NOT USED - ZERO
+	this.readIO[0x15B] = this.readZero;
+	//400015Ch through 40001FFh - NOT USED - GLITCHED
+	this.fillReadTableUnused(0x15C, 0x1FF);
+	//4000200h - IE - Interrupt Enable Register (R/W)
+	this.readIO[0x200] = function (parentObj) {
+		return parentObj.irq.readIE0();
+	}
+	//4000201h - IE - Interrupt Enable Register (R/W)
+	this.readIO[0x201] = function (parentObj) {
+		return parentObj.irq.readIE1();
+	}
+	//4000202h - IF - Interrupt Request Flags / IRQ Acknowledge
+	this.readIO[0x202] = function (parentObj) {
+		return parentObj.irq.readIF0();
+	}
+	//4000203h - IF - Interrupt Request Flags / IRQ Acknowledge
+	this.readIO[0x203] = function (parentObj) {
+		return parentObj.irq.readIF1();
+	}
+	//4000208h - IME - Interrupt Master Enable Register (R/W)
+	this.readIO[0x208] = function (parentObj) {
+		return parentObj.irq.readIME();
+	}
+	//4000209h - IME - Interrupt Master Enable Register (R/W)
+	this.readIO[0x209] = this.readWriteOnly;
+	//400020Ah - NOT USED - ZERO
+	this.readIO[0x20A] = this.readZero;
+	//400020Bh - NOT USED - ZERO
+	this.readIO[0x20B] = this.readZero;
+	//400020Ch through 40002FFh - NOT USED - GLITCHED
+	this.fillReadTableUnused(0x20C, 0x2FF);
+}
+GameBoyCoreAdvanceIO.prototype.fillReadTableUnused = function (from, to) {
+	//Fill in slots of the i/o read table:
+	while (from <= to) {
+		this.readIO[from++] = this.readUnused0;
+		this.readIO[from++] = this.readUnused1;
+		this.readIO[from++] = this.readUnused2;
+		this.readIO[from++] = this.readUnused3;
 	}
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
