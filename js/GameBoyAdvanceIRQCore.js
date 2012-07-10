@@ -32,9 +32,6 @@ GameBoyAdvanceIRQ.prototype.checkForIRQFire = function () {
 	//Tell the CPU core when the emulated hardware is triggering an IRQ:
 	this.IOCore.cpu.triggerIRQ((this.interruptsEnabled & this.interruptsRequested) != 0 && this.IME);
 }
-GameBoyAdvanceIRQ.prototype.isIRQEnabled = function (irqLineToCheck) {
-	return ((this.interruptsEnabled & irqLineToCheck) != 0);
-}
 GameBoyAdvanceIRQ.prototype.requestIRQ = function (irqLineToSet) {
 	this.interruptsRequested |= irqLineToSet;
 	this.checkForIRQFire();
@@ -73,4 +70,27 @@ GameBoyAdvanceIRQ.prototype.writeIF1 = function (data) {
 }
 GameBoyAdvanceIRQ.prototype.readIF1 = function () {
 	return this.interruptsRequested >> 8;
+}
+GameBoyAdvanceIRQ.prototype.nextEventTime = function () {
+	var clocks = this.IOCore.gfx.nextVBlankIRQEventTime();
+	clocks = this.findClosestEvent(clocks, this.IOCore.gfx.nextHBlankIRQEventTime());
+	clocks = this.findClosestEvent(clocks, this.IOCore.gfx.nextVCounterIRQEventTime());
+	clocks = this.findClosestEvent(clocks, this.IOCore.timer.nextTimer0IRQEventTime());
+	clocks = this.findClosestEvent(clocks, this.IOCore.timer.nextTimer1IRQEventTime());
+	clocks = this.findClosestEvent(clocks, this.IOCore.timer.nextTimer2IRQEventTime());
+	clocks = this.findClosestEvent(clocks, this.IOCore.timer.nextTimer3IRQEventTime());
+	clocks = this.findClosestEvent(clocks, this.IOCore.serial.nextIRQEventTime());
+	clocks = this.findClosestEvent(clocks, this.IOCore.dma.nextIRQEventTime());
+	clocks = this.findClosestEvent(clocks, this.IOCore.joypad.nextIRQEventTime());
+	clocks = this.findClosestEvent(clocks, this.IOCore.cartridge.nextIRQEventTime());
+	return clocks;
+}
+GameBoyAdvanceIRQ.prototype.findClosestEvent = function (oldClocks, newClocks) {
+	if (oldClocks > -1) {
+		if (newClocks > -1) {
+			return Math.min(oldClocks, newClocks);
+		}
+		return oldClocks;
+	}
+	return newClocks;
 }

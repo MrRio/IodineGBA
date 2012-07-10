@@ -220,6 +220,9 @@ GameBoyAdvanceGraphics.prototype.clockLCDState = function () {
 				this.updateVBlankStart();
 				this.currentScanLine = 160;							//Increment to the next scan line (Start of v-blank).
 				break;
+			case 161:
+				this.IOCore.dma.gfxDisplaySyncKillRequest();		//Display Sync. DMA stop.
+				break;
 			case 226:
 				this.inVBlank = false;								//Un-mark VBlank.
 				this.currentScanLine = 227;							//Increment to the next scan line (Last line of v-blank).
@@ -230,6 +233,7 @@ GameBoyAdvanceGraphics.prototype.clockLCDState = function () {
 			default:
 				++this.currentScanLine;								//Increment to the next scan line.
 		}
+		this.checkDisplaySync();
 		this.checkVCounter();										//We're on a new scan line, so check the VCounter for match.
 		//Recursive clocking of the LCD state:
 		this.clockLCDState();
@@ -240,15 +244,20 @@ GameBoyAdvanceGraphics.prototype.updateHBlank = function () {
 		this.inHBlank = true;										//Mark HBlank.
 		this.HBlankFlagged = true;									//Flag for the state updater so we can handle DMAs later on.
 		if (this.IRQHBlank) {										//Check for HBlank IRQ.
-			this.checkForHBlankIRQ();
+			this.IOCore.irq.requestIRQ(0x2);
 		}
+	}
+}
+GameBoyAdvanceGraphics.prototype.checkDisplaySync = function () {
+	if (this.currentScanLine > 1 && this.currentScanLine < 162) {
+		this.IOCore.dma.gfxDisplaySyncRequest();					//Display Sync. DMA trigger.
 	}
 }
 GameBoyAdvanceGraphics.prototype.checkVCounter = function () {
 	if (this.currentScanLine == this.VCounter) {					//Check for VCounter match.
 		this.VCounterMatch = true;
 		if (this.IRQVCounter) {										//Check for VCounter IRQ.
-			this.checkForVCounterIRQ();
+			this.IOCore.irq.requestIRQ(0x4);
 		}
 	}
 	else {
@@ -259,7 +268,7 @@ GameBoyAdvanceGraphics.prototype.updateVBlankStart = function () {
 	this.inVBlank = true;								//Mark VBlank.
 	this.VBlankFlagged = true;							//Flag for the state updater so we can handle DMAs later on.
 	if (this.IRQVBlank) {								//Check for VBlank IRQ.
-		this.checkForVBlankIRQ();
+		this.IOCore.irq.requestIRQ(0x1);
 	}
 	//Ensure JIT framing alignment:
 	if (this.totalLinesPassed < 160 || (this.totalLinesPassed == 160 && this.midScanLineOffset > 0)) {

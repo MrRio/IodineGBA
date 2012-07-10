@@ -313,3 +313,34 @@ GameBoyAdvanceDMA.prototype.nextEventTime = function () {
 	}
 	return clocks;
 }
+GameBoyAdvanceDMA.prototype.nextIRQEventTime = function () {
+	clocks = -1;
+	workbench = -1;
+	for (var dmaChannel = 0; dmaChannel < 4; ++dmaChannel) {
+		if (this.controlShadow[dmaChannel][0]) {
+			switch (this.enabled[dmaChannel]) {
+				//V_BLANK
+				case 0x2:
+					workbench = this.IOCore.gfx.clocksToNextVBlank();
+					break;
+				//H_BLANK:
+				case 0x4:
+					workbench = this.IOCore.gfx.clocksToNextHBlank();
+					break;
+				//FIFO_A:
+				case 0x8:
+					workbench = this.IOCore.sound.clocksToNextFIFOA();
+					break;
+				//FIFO_B:
+				case 0x10:
+					workbench = this.IOCore.sound.clocksToNextFIFOB();
+					break;
+				//DISPLAY_SYNC:
+				case 0x20:
+					workbench = this.IOCore.gfx.clocksToNextDisplaySync();
+			}
+			clocks = (clocks > -1) ? ((workbench > -1) ? Math.min(clocks, workbench) : clocks) : workbench;
+		}
+	}
+	return clocks;
+}

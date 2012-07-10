@@ -36,6 +36,9 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.timer = new GameBoyAdvanceTimer(this);
 	this.dma = new GameBoyAdvanceDMA(this);
 	this.irq = new GameBoyAdvanceIRQ(this);
+	this.serial = new GameBoyAdvanceSerial(this);
+	this.joypad = new GameBoyAdvanceJoyPad(this);
+	this.cartridge = new GameBoyAdvanceCartridge(this);
 	this.cpu = new GameBoyAdvanceCPU(this);
 	//After all sub-objects initialized, initialize dispatches:
 	this.compileMemoryDispatches();
@@ -1163,7 +1166,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.gfx.readGreenSwap();
 	}
 	//4000003h - Undocumented - Green Swap (R/W)
-	this.readIO[0x3] = this.readZero;
+	this.readIO[0x3] = this.readWriteOnly;
 	//4000004h - DISPSTAT - General LCD Status (Read/Write)
 	this.readIO[0x4] = function (parentObj) {
 		return parentObj.gfx.readDISPSTAT0();
@@ -1177,7 +1180,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.gfx.readVCOUNT();
 	}
 	//4000007h - VCOUNT - Vertical Counter (Read only)
-	this.readIO[0x7] = this.readZero;
+	this.readIO[0x7] = this.readWriteOnly;
 	//4000008h - BG0CNT - BG0 Control (R/W) (BG Modes 0,1 only)
 	this.readIO[0x8] = function (parentObj) {
 		return parentObj.gfx.readBG0CNT0();
@@ -1388,7 +1391,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.sound.readSOUND1CNT_L();
 	}
 	//4000061h - NOT USED - ZERO
-	this.readIO[0x61] = this.readZero;
+	this.readIO[0x61] = this.readWriteOnly;
 	//4000062h - SOUND1CNT_H (NR11, NR12) - Channel 1 Duty/Len/Envelope (R/W)
 	this.readIO[0x62] = function (parentObj) {
 		//NR11:
@@ -1400,7 +1403,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.sound.readSOUND1CNT_H1();
 	}
 	//4000064h - SOUND1CNT_X (NR13, NR14) - Channel 1 Frequency/Control (R/W)
-	this.readIO[0x64] = this.readZero;
+	this.readIO[0x64] = this.readWriteOnly;
 	//4000065h - SOUND1CNT_X (NR13, NR14) - Channel 1 Frequency/Control (R/W)
 	this.readIO[0x65] = function (parentObj) {
 		//NR14:
@@ -1425,7 +1428,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//400006Bh - NOT USED - ZERO
 	this.readIO[0x6B] = this.readZero;
 	//400006Ch - SOUND2CNT_H (NR23, NR24) - Channel 2 Frequency/Control (R/W)
-	this.readIO[0x6C] = this.readZero;
+	this.readIO[0x6C] = this.readWriteOnly;
 	//400006Dh - SOUND2CNT_H (NR23, NR24) - Channel 2 Frequency/Control (R/W)
 	this.readIO[0x6D] = function (parentObj) {
 		//NR24:
@@ -1441,16 +1444,16 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.sound.readSOUND3CNT_L();
 	}
 	//4000071h - SOUND3CNT_L (NR30) - Channel 3 Stop/Wave RAM select (R/W)
-	this.readIO[0x71] = this.readZero;
+	this.readIO[0x71] = this.readWriteOnly;
 	//4000072h - SOUND3CNT_H (NR31, NR32) - Channel 3 Length/Volume (R/W)
-	this.readIO[0x72] = this.readZero;
+	this.readIO[0x72] = this.readWriteOnly;
 	//4000073h - SOUND3CNT_H (NR31, NR32) - Channel 3 Length/Volume (R/W)
 	this.readIO[0x73] = function (parentObj) {
 		//NR32:
 		return parentObj.sound.readSOUND3CNT_H();
 	}
 	//4000074h - SOUND3CNT_X (NR33, NR34) - Channel 3 Frequency/Control (R/W)
-	this.readIO[0x74] = this.readZero;
+	this.readIO[0x74] = this.readWriteOnly;
 	//4000075h - SOUND3CNT_X (NR33, NR34) - Channel 3 Frequency/Control (R/W)
 	this.readIO[0x75] = function (parentObj) {
 		//NR34:
@@ -1461,7 +1464,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//4000077h - NOT USED - ZERO
 	this.readIO[0x77] = this.readZero;
 	//4000078h - SOUND4CNT_L (NR41, NR42) - Channel 4 Length/Envelope (R/W)
-	this.readIO[0x78] = this.readZero;
+	this.readIO[0x78] = this.readWriteOnly;
 	//4000079h - SOUND4CNT_L (NR41, NR42) - Channel 4 Length/Envelope (R/W)
 	this.readIO[0x79] = function (parentObj) {
 		//NR42:
@@ -1508,7 +1511,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.sound.readSOUNDCNT_X();
 	}
 	//4000085h - NOT USED - ZERO
-	this.readIO[0x85] = this.readZero;
+	this.readIO[0x85] = this.readWriteOnly;
 	//4000086h - NOT USED - ZERO
 	this.readIO[0x86] = this.readZero;
 	//4000087h - NOT USED - ZERO
@@ -1802,7 +1805,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.timer.readTM0CNT_H();
 	}
 	//4000103h - TM0CNT_H - Timer 0 Control (R/W)
-	this.readIO[0x103] = this.readZero;
+	this.readIO[0x103] = this.readWriteOnly;
 	//4000104h - TM1CNT_L - Timer 1 Counter/Reload (R/W)
 	this.readIO[0x104] = function (parentObj) {
 		return parentObj.timer.readTM1CNT_L0();
@@ -1816,7 +1819,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.timer.readTM1CNT_H();
 	}
 	//4000107h - TM1CNT_H - Timer 1 Control (R/W)
-	this.readIO[0x107] = this.readZero;
+	this.readIO[0x107] = this.readWriteOnly;
 	//4000108h - TM2CNT_L - Timer 2 Counter/Reload (R/W)
 	this.readIO[0x108] = function (parentObj) {
 		return parentObj.timer.readTM2CNT_L0();
@@ -1830,7 +1833,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.timer.readTM2CNT_H();
 	}
 	//400010Bh - TM2CNT_H - Timer 2 Control (R/W)
-	this.readIO[0x10B] = this.readZero;
+	this.readIO[0x10B] = this.readWriteOnly;
 	//400010Ch - TM3CNT_L - Timer 3 Counter/Reload (R/W)
 	this.readIO[0x10C] = function (parentObj) {
 		return parentObj.timer.readTM3CNT_L0();
@@ -1844,7 +1847,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 		return parentObj.timer.readTM3CNT_H();
 	}
 	//400010Fh - TM3CNT_H - Timer 3 Control (R/W)
-	this.readIO[0x10F] = this.readZero;
+	this.readIO[0x10F] = this.readWriteOnly;
 }
 GameBoyAdvanceIO.prototype.compileMemoryAccessPostProcessDispatch = function () {
 	/*
@@ -2026,6 +2029,9 @@ GameBoyAdvanceIO.prototype.readConfigureWRAM = function (address) {
 }
 GameBoyAdvanceIO.prototype.readZero = function (parentObj) {
 	return 0;
+}
+GameBoyAdvanceIO.prototype.readWriteOnly = function (parentObj) {
+	return 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address) {
 	parentObj.memoryAccessType = 0;
