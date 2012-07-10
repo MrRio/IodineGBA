@@ -36,39 +36,48 @@ GameBoyAdvanceDMA.prototype.DMA_REQUEST_TYPE = {
 	H_BLANK:		0x4,
 	FIFO_A:			0x8,
 	FIFO_B:			0x10,
-	DISPLAY_SYNC:	0x20
+	DISPLAY_SYNC:	0x20,
+	GAME_PAK:		0x40
 }
 GameBoyAdvanceDMA.prototype.initialize = function () {
 	this.enabled = [0, 0, 0, 0];
-	this.pending = this.DMA_REQUEST_TYPE.FIFO_A | this.DMA_REQUEST_TYPE.FIFO_B;
+	this.pending = [0, this.DMA_REQUEST_TYPE.FIFO_A, this.DMA_REQUEST_TYPE.FIFO_B, 0];
 	this.source = [0, 0, 0, 0];
 	this.sourceSource = [0, 0, 0, 0];
 	this.destination = [0, 0, 0, 0];
-	this.destinationSource = [0, 0, 0, 0];
+	this.destinationShadow = [0, 0, 0, 0];
 	this.wordCount = [0, 0, 0, 0];
-	this.wordCountSource = [0, 0, 0, 0];
+	this.wordCountShadow = [0, 0, 0, 0];
 	this.control = [
 		[false, 0, false, false, 0, 0],
 		[false, 0, false, false, 0, 0],
 		[false, 0, false, false, 0, 0],
 		[false, 0, false, false, 0, 0]
 	];
+	this.controlShadow = [
+		[false, 0, false, false, 0, 0],
+		[false, 0, false, false, 0, 0],
+		[false, 0, false, false, 0, 0],
+		[false, 0, false, false, 0, 0]
+	];
+	//Game Pak DMA flag for DMA 3:
+	this.gamePakDMA = false;
 }
 GameBoyAdvanceDMA.prototype.writeDMASource = function (dmaChannel, byteNumber, data) {
-	this.sourceSource[dmaChannel] &= ~(0xFF << (byteNumber << 3));
-	this.sourceSource[dmaChannel] |= data << (byteNumber << 3);
+	this.source[dmaChannel] &= ~(0xFF << (byteNumber << 3));
+	this.source[dmaChannel] |= data << (byteNumber << 3);
 }
 GameBoyAdvanceDMA.prototype.writeDMADestination = function (dmaChannel, byteNumber, data) {
-	this.destinationSource[dmaChannel] &= ~(0xFF << (byteNumber << 3));
-	this.destinationSource[dmaChannel] |= data << (byteNumber << 3);
+	this.destination[dmaChannel] &= ~(0xFF << (byteNumber << 3));
+	this.destination[dmaChannel] |= data << (byteNumber << 3);
 }
 GameBoyAdvanceDMA.prototype.writeDMAWordCount0 = function (dmaChannel, data) {
 	this.wordCountSource[dmaChannel] &= 0x3F00;
-	this.wordCountSource[dmaChannel] |= data;
+	this.wordCount[dmaChannel] |= data;
 }
 GameBoyAdvanceDMA.prototype.writeDMAWordCount1 = function (dmaChannel, data) {
-	this.wordCountSource[dmaChannel] &= 0xFF;
-	this.wordCountSource[dmaChannel] |= data << 8;
+	this.wordCount[dmaChannel] &= 0xFF;
+	this.wordCount[dmaChannel] |= data << 8;
 }
 GameBoyAdvanceDMA.prototype.writeDMAControl0 = function (dmaChannel, data) {
 	var control = this.control[dmaChannel];
@@ -76,12 +85,19 @@ GameBoyAdvanceDMA.prototype.writeDMAControl0 = function (dmaChannel, data) {
 	control[4] &= 0x2;
 	control[4] |= (data >> 7) & 0x1;
 }
+GameBoyAdvanceDMA.prototype.readDMAControl0 = function (dmaChannel) {
+	var control = this.control[dmaChannel];
+	return ((control[4] & 0x01) << 7) | (control[5] << 5);
+}
 GameBoyAdvanceDMA.prototype.writeDMAControl1 = function (dmaChannel, data) {
 	var control = this.control[dmaChannel];
 	control[4] &= 0x1;
 	control[4] |= (data & 0x1) << 1;
 	control[3] = ((data & 0x2) == 0x2);
 	control[2] = ((data & 0x4) == 0x4);
+	if (dmaChannel == 3) {
+		this.gamePakDMA = ((data & 0x8) == 0x8);
+	}
 	control[1] = (data >> 4) & 0x3;
 	control[0] = ((data & 0x40) == 0x40);
 	if (data > 0x7F) {
@@ -92,24 +108,55 @@ GameBoyAdvanceDMA.prototype.writeDMAControl1 = function (dmaChannel, data) {
 		this.enabled[dmaChannel] = 0;
 	}
 }
+GameBoyAdvanceDMA.prototype.readDMAControl1 = function (dmaChannel) {
+	var control = this.control[dmaChannel];
+	return (((this.enabled[dmaChannel] > 0) ? 0x80 : 0) |
+			((control[0]) ? 0x40 : 0) |
+			(control[1] << 4) |
+			((dmaChannel == 3 && this.gamePakDMA) ? 0x8 : 0) |
+			((control[2]) ? 0x4 : 0) |
+			((control[3]) ? 0x2 : 0) |
+			(control[4] >> 1)
+	);
+}
 GameBoyAdvanceDMA.prototype.enableDMAChannel = function (dmaChannel) {
 	//Emulate the DMA preprocessing that occurs on DMA enabling:
-	var control = this.control[dmaChannel];
-	var source = this.sourceSource[dmaChannel];
-	var destination = this.destinationSource[dmaChannel];
-	var wordCount = this.wordCountSource[dmaChannel];
-	switch (dmaChannel) {
-		case 0:
-		case 1:
-			//Direct Sound DMA has some values hardwired:
-			destination = 0x40000A0 | ((dmaChannel - 1) << 2);
-			wordCount = 4;
-			control[2] = true;
-			control[5] = 2;
+	var control = this.control;
+	var controlShadow = this.control[dmaChannel];
+	var sourceShadow = this.source[dmaChannel];
+	var destinationShadow = this.destination[dmaChannel];
+	var wordCountShadow = this.wordCount[dmaChannel];
+	controlShadow[0] = control[0];
+	controlShadow[1] = control[1];
+	controlShadow[4] = control[4];
+	if (this.enabled[dmaChannel] == this.DMA_REQUEST_TYPE.FIFO_A || this.enabled[dmaChannel] == this.DMA_REQUEST_TYPE.FIFO_B) {
+		//Direct Sound DMA has some values hardwired:
+		destinationShadow = 0x40000A0 | ((dmaChannel - 1) << 2);
+		wordCountShadow = 4;
+		controlShadow[2] = true;
+		controlShadow[3] = control[3];
+		controlShadow[5] = 2;
 	}
-	this.source[dmaChannel] = source;
-	this.destination[dmaChannel] = destination;
-	this.wordCount[dmaChannel] = wordCount;
+	else if (this.enabled[dmaChannel] == this.DMA_REQUEST_TYPE.DISPLAY_SYNC) {
+		//Display Sync DMA repeats until stopped by gfx hardware:
+		controlShadow[2] = control[2];
+		controlShadow[3] = true;
+		controlShadow[5] = control[5];
+	}
+	else {
+		//Flag immediate DMA transfers for processing now:
+		if (this.enabled[dmaChannel] == this.DMA_REQUEST_TYPE.IMMEDIATE) {
+			this.pending[dmaChannel] |= this.DMA_REQUEST_TYPE.IMMEDIATE;
+			this.IOCore.systemStatus |= 0x1;
+		}
+		//Copy all of the internal to shadow:
+		controlShadow[2] = control[2];
+		controlShadow[3] = control[3];
+		controlShadow[5] = control[5];
+	}
+	this.sourceShadow[dmaChannel] = sourceShadow;
+	this.destinationShadow[dmaChannel] = destinationShadow;
+	this.wordCountShadow[dmaChannel] = wordCountShadow;
 }
 GameBoyAdvanceDMA.prototype.soundFIFOARequest = function () {
 	this.requestDMA(this.DMA_REQUEST_TYPE.FIFO_A);
@@ -117,14 +164,38 @@ GameBoyAdvanceDMA.prototype.soundFIFOARequest = function () {
 GameBoyAdvanceDMA.prototype.soundFIFOBRequest = function () {
 	this.requestDMA(this.DMA_REQUEST_TYPE.FIFO_B);
 }
+GameBoyAdvanceDMA.prototype.gfxHBlankRequest = function () {
+	this.requestDMA(this.DMA_REQUEST_TYPE.H_BLANK);
+}
+GameBoyAdvanceDMA.prototype.gfxVBlankRequest = function () {
+	this.requestDMA(this.DMA_REQUEST_TYPE.V_BLANK);
+}
+GameBoyAdvanceDMA.prototype.gfxDisplaySyncRequest = function () {
+	this.requestDMA(this.DMA_REQUEST_TYPE.DISPLAY_SYNC);
+}
+GameBoyAdvanceDMA.prototype.gfxDisplaySyncKillRequest = function () {
+	this.enabled[3] &= ~this.DMA_REQUEST_TYPE.DISPLAY_SYNC;
+}
 GameBoyAdvanceDMA.prototype.requestDMA = function (DMAType) {
-	this.pending |= DMAType;
-	this.IOCore.systemStatus |= 0x1;
+	for (var dmaPriority = 0; dmaPriority < 4; ++dmaPriority) {
+		if ((this.enabled[dmaPriority] & DMAType) != 0) {
+			this.pending[dmaPriority] |= DMAType;
+			this.IOCore.systemStatus |= 0x1;
+		}
+	}
+}
+GameBoyAdvanceDMA.prototype.requestGamePakDMA = function () {
+	if (this.gamePakDMA) {
+		//Game Pak transfer causes DMA to trigger:
+		this.pending[3] |= this.DMA_REQUEST_TYPE.GAME_PAK;
+		this.enabled[3] |= this.DMA_REQUEST_TYPE.GAME_PAK;
+		this.IOCore.systemStatus |= 0x1;
+	}
 }
 GameBoyAdvanceDMA.prototype.process = function () {
 	//Solve for the highest priority DMA to process:
 	for (var dmaPriority = 0; dmaPriority < 4; ++dmaPriority) {
-		this.currentMatch = this.enabled[dmaPriority] & this.pending;
+		this.currentMatch = this.enabled[dmaPriority] & this.pending[dmaPriority];
 		if (this.currentMatch != 0) {
 			this.handleDMACopy(dmaPriority);
 			return false;
@@ -135,38 +206,33 @@ GameBoyAdvanceDMA.prototype.process = function () {
 }
 GameBoyAdvanceDMA.prototype.handleDMACopy = function (dmaChannel) {
 	//Get the addesses:
-	var source = this.source[dmaChannel];
-	var destination = this.destination[dmaChannel];
-	//Make sure we have access to the source and destination buses:
-	if (this.addressFree(source) && this.addressFree(destination)) {
-		//Load in the control register:
-		var control = this.control[dmaChannel];
-		//Transfer Data:
-		if (control[2]) {
-			//32-bit Transfer:
-			this.IOCore.memoryWrite32(destination, this.IOCore.memoryRead32(source));
-			this.decrementWordCount(control, dmaChannel, source, destination, 4);
-		}
-		else {
-			//16-bit Transfer:
-			this.IOCore.memoryWrite16(destination, this.IOCore.memoryRead16(source));
-			this.decrementWordCount(control, dmaChannel, source, destination, 2);
-		}
+	var source = this.sourceShadow[dmaChannel];
+	var destination = this.destinationShadow[dmaChannel];
+	//Load in the control register:
+	var control = this.controlShadow[dmaChannel];
+	//Transfer Data:
+	if (control[2]) {
+		//32-bit Transfer:
+		this.IOCore.memoryWrite32(destination, this.IOCore.memoryRead32(source));
+		this.decrementWordCount(control, dmaChannel, source, destination, 4);
+	}
+	else {
+		//16-bit Transfer:
+		this.IOCore.memoryWrite16(destination, this.IOCore.memoryRead16(source));
+		this.decrementWordCount(control, dmaChannel, source, destination, 2);
 	}
 }
 GameBoyAdvanceDMA.prototype.decrementWordCount = function (control, dmaChannel, source, destination, transferred) {
-	var wordCount = (this.wordCount[dmaChannel] - 1) & 0x3FFF;
-	if (wordCount == 0) {
+	var wordCountShadow = (this.wordCountShadow[dmaChannel] - 1) & 0x3FFF;
+	if (wordCountShadow == 0) {
 		if (!control[3]) {
 			//Disable the enable bit:
 			this.enabled[dmaChannel] = 0;
 		}
-		else {
-			//Reload word count for DMA repeat:
-			wordCount = this.wordCountSource[dmaChannel];
-		}
+		//Reload word count for DMA repeat:
+		wordCountShadow = this.wordCount[dmaChannel];
 		//DMA period has ended:
-		this.pending -= this.currentMatch;
+		this.pending[dmaChannel] -= this.currentMatch;
 		//Check to see if we should flag for IRQ:
 		if (control[0]) {
 			this.IOCore.irq.requestIRQ(dmaChannel << 8);
@@ -216,5 +282,5 @@ GameBoyAdvanceDMA.prototype.decrementWordCount = function (control, dmaChannel, 
 		}
 	}
 	//Save the new word count:
-	this.wordCount[dmaChannel] = wordCount;
+	this.wordCountShadow[dmaChannel] = wordCountShadow;
 }
