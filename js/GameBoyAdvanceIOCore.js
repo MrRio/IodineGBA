@@ -1146,6 +1146,30 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x10F] = this.NOP;
 	//4000110h through 400011Fh - NOT USED - GLITCHED
 	this.fillWriteTableNOP(0x110, 0x11F);
+	//4000120h - SIODATA32_L - SIO Normal Communication lower 16bit data (R/W)
+	this.writeIO[0x120] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA32_L0(data);
+	}
+	//4000121h - SIODATA32_L - SIO Normal Communication lower 16bit data (R/W)
+	this.writeIO[0x121] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA32_L1(data);
+	}
+	//4000122h - SIODATA32_H - SIO Normal Communication upper 16bit data (R/W)
+	this.writeIO[0x122] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA32_H0(data);
+	}
+	//4000123h - SIODATA32_H - SIO Normal Communication upper 16bit data (R/W)
+	this.writeIO[0x123] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA32_H1(data);
+	}
+	//400012Ah - SIOMLT_SEND - Data Send Register (R/W)
+	this.writeIO[0x12A] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA8_0(data);
+	}
+	//400012Bh - SIOMLT_SEND - Data Send Register (R/W)
+	this.writeIO[0x12B] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA8_1(data);
+	}
 	//400012Ch through 400012Fh - NOT USED - GLITCHED
 	this.fillWriteTableNOP(0x12C, 0x12F);
 	//4000130h - KEYINPUT - Key Status (R)
@@ -1744,6 +1768,30 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x10F] = this.readWriteOnly;
 	//4000110h through 400011Fh - NOT USED - GLITCHED
 	this.fillReadTableUnused(0x110, 0x11F);
+	//4000120h - SIODATA32_L - SIO Normal Communication lower 16bit data (R/W)
+	this.readIO[0x120] = function (parentObj) {
+		return parentObj.serial.readSIODATA32_L0();
+	}
+	//4000121h - SIODATA32_L - SIO Normal Communication lower 16bit data (R/W)
+	this.readIO[0x121] = function (parentObj) {
+		return parentObj.serial.readSIODATA32_L1();
+	}
+	//4000122h - SIODATA32_H - SIO Normal Communication upper 16bit data (R/W)
+	this.readIO[0x122] = function (parentObj) {
+		return parentObj.serial.readSIODATA32_H0();
+	}
+	//4000123h - SIODATA32_H - SIO Normal Communication upper 16bit data (R/W)
+	this.readIO[0x123] = function (parentObj) {
+		return parentObj.serial.readSIODATA32_H1();
+	}
+	//400012Ah - SIOMLT_SEND - Data Send Register (R/W)
+	this.readIO[0x12A] = function (parentObj) {
+		return parentObj.serial.readSIODATA8_0();
+	}
+	//400012Bh - SIOMLT_SEND - Data Send Register (R/W)
+	this.readIO[0x12B] = function (parentObj) {
+		return parentObj.serial.readSIODATA8_1();
+	}
 	//400012Ch through 400012Fh - NOT USED - GLITCHED
 	this.fillReadTableUnused(0x12C, 0x12F);
 	//4000130h - KEYINPUT - Key Status (R)
