@@ -1210,6 +1210,12 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//4000136h through 400013Fh - NOT USED - GLITCHED
 	this.fillWriteTableNOP(0x136, 0x13F);
+	//4000140h - JOYCNT - JOY BUS Control Register (R/W)
+	this.writeIO[0x140] = function (parentObj, data) {
+		parentObj.serial.writeJOYCNT(data);
+	}
+	//4000141h - JOYCNT - JOY BUS Control Register (R/W)
+	this.writeIO[0x141] = this.NOP;
 	//4000142h through 400014Fh - NOT USED - GLITCHED
 	this.fillWriteTableNOP(0x142, 0x14F);
 	//4000150h - JoyBus Receive (R/W)
@@ -1896,6 +1902,12 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x137] = this.readZero;
 	//4000138h through 400013Fh - NOT USED - GLITCHED
 	this.fillReadTableUnused(0x138, 0x13F);
+	//4000140h - JOYCNT - JOY BUS Control Register (R/W)
+	this.readIO[0x140] = function (parentObj) {
+		return parentObj.serial.readJOYCNT();
+	}
+	//4000141h - JOYCNT - JOY BUS Control Register (R/W)
+	this.readIO[0x141] = this.readWriteOnly;
 	//4000142h - NOT USED - ZERO
 	this.readIO[0x142] = this.readZero;
 	//4000143h - NOT USED - ZERO
