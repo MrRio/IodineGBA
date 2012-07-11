@@ -1343,118 +1343,8 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xF] = function (parentObj) {
 		return parentObj.gfx.readBG3CNT1();
 	}
-	//4000010h - BG0HOFS - BG0 X-Offset (W)
-	this.readIO[0x10] = this.readUnused0;
-	//4000011h - BG0HOFS - BG0 X-Offset (W)
-	this.readIO[0x11] = this.readUnused1;
-	//4000012h - BG0VOFS - BG0 Y-Offset (W)
-	this.readIO[0x12] = this.readUnused2;
-	//4000013h - BG0VOFS - BG0 Y-Offset (W)
-	this.readIO[0x13] = this.readUnused3;
-	//4000014h - BG1HOFS - BG1 X-Offset (W)
-	this.readIO[0x14] = this.readUnused0;
-	//4000015h - BG1HOFS - BG1 X-Offset (W)
-	this.readIO[0x15] = this.readUnused1;
-	//4000016h - BG1VOFS - BG1 Y-Offset (W)
-	this.readIO[0x16] = this.readUnused2;
-	//4000017h - BG1VOFS - BG1 Y-Offset (W)
-	this.readIO[0x17] = this.readUnused3;
-	//4000018h - BG2HOFS - BG2 X-Offset (W)
-	this.readIO[0x18] = this.readUnused0;
-	//4000019h - BG2HOFS - BG2 X-Offset (W)
-	this.readIO[0x19] = this.readUnused1;
-	//400001Ah - BG2VOFS - BG2 Y-Offset (W)
-	this.readIO[0x1A] = this.readUnused2;
-	//400001Bh - BG2VOFS - BG2 Y-Offset (W)
-	this.readIO[0x1B] = this.readUnused3;
-	//400001Ch - BG3HOFS - BG3 X-Offset (W)
-	this.readIO[0x1C] = this.readUnused0;
-	//400001Dh - BG3HOFS - BG3 X-Offset (W)
-	this.readIO[0x1D] = this.readUnused1;
-	//400001Eh - BG3VOFS - BG3 Y-Offset (W)
-	this.readIO[0x1E] = this.readUnused2;
-	//400001Fh - BG3VOFS - BG3 Y-Offset (W)
-	this.readIO[0x1F] = this.readUnused3;
-	//4000020h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
-	this.readIO[0x20] = this.readUnused0;
-	//4000021h - BG2PA - BG2 Rotation/Scaling Parameter A (alias dx) (W)
-	this.readIO[0x21] = this.readUnused1;
-	//4000022h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
-	this.readIO[0x22] = this.readUnused2;
-	//4000023h - BG2PB - BG2 Rotation/Scaling Parameter B (alias dmx) (W)
-	this.readIO[0x23] = this.readUnused3;
-	//4000024h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
-	this.readIO[0x24] = this.readUnused0;
-	//4000025h - BG2PC - BG2 Rotation/Scaling Parameter C (alias dy) (W)
-	this.readIO[0x25] = this.readUnused1;
-	//4000026h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
-	this.readIO[0x26] = this.readUnused2;
-	//4000027h - BG2PD - BG2 Rotation/Scaling Parameter D (alias dmy) (W)
-	this.readIO[0x27] = this.readUnused3;
-	//4000028h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
-	this.readIO[0x28] = this.readUnused0;
-	//4000029h - BG2X_L - BG2 Reference Point X-Coordinate, lower 16 bit (W)
-	this.readIO[0x29] = this.readUnused1;
-	//400002Ah - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
-	this.readIO[0x2A] = this.readUnused2;
-	//400002Bh - BG2X_H - BG2 Reference Point X-Coordinate, upper 12 bit (W)
-	this.readIO[0x2B] = this.readUnused3;
-	//400002Ch - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
-	this.readIO[0x2C] = this.readUnused0;
-	//400002Dh - BG2Y_L - BG2 Reference Point Y-Coordinate, lower 16 bit (W)
-	this.readIO[0x2D] = this.readUnused1;
-	//400002Eh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
-	this.readIO[0x2E] = this.readUnused2;
-	//400002Fh - BG2Y_H - BG2 Reference Point Y-Coordinate, upper 12 bit (W)
-	this.readIO[0x2F] = this.readUnused3;
-	//4000030h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
-	this.readIO[0x30] = this.readUnused0;
-	//4000031h - BG3PA - BG3 Rotation/Scaling Parameter A (alias dx) (W)
-	this.readIO[0x31] = this.readUnused1;
-	//4000032h - BG3PB - BG3 Rotation/Scaling Parameter B (alias dmx) (W)
-	this.readIO[0x32] = this.readUnused2;
-	//4000033h - BG3PB - BG3 Rotation/Scaling Parameter B (alias dmx) (W)
-	this.readIO[0x33] = this.readUnused3;
-	//4000034h - BG3PC - BG3 Rotation/Scaling Parameter C (alias dy) (W)
-	this.readIO[0x34] = this.readUnused0;
-	//4000035h - BG3PC - BG3 Rotation/Scaling Parameter C (alias dy) (W)
-	this.readIO[0x35] = this.readUnused1;
-	//4000036h - BG3PD - BG3 Rotation/Scaling Parameter D (alias dmy) (W)
-	this.readIO[0x36] = this.readUnused2;
-	//4000037h - BG3PD - BG3 Rotation/Scaling Parameter D (alias dmy) (W)
-	this.readIO[0x37] = this.readUnused3;
-	//4000038h - BG3X_L - BG3 Reference Point X-Coordinate, lower 16 bit (W)
-	this.readIO[0x38] = this.readUnused0;
-	//4000039h - BG3X_L - BG3 Reference Point X-Coordinate, lower 16 bit (W)
-	this.readIO[0x39] = this.readUnused1;
-	//400003Ah - BG3X_H - BG3 Reference Point X-Coordinate, upper 12 bit (W)
-	this.readIO[0x3A] = this.readUnused2;
-	//400003Bh - BG3X_H - BG3 Reference Point X-Coordinate, upper 12 bit (W)
-	this.readIO[0x3B] = this.readUnused3;
-	//400003Ch - BG3Y_L - BG3 Reference Point Y-Coordinate, lower 16 bit (W)
-	this.readIO[0x3C] = this.readUnused0;
-	//400003Dh - BGY_L - BG3 Reference Point Y-Coordinate, lower 16 bit (W)
-	this.readIO[0x3D] = this.readUnused1;
-	//400003Eh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
-	this.readIO[0x3E] = this.readUnused2;
-	//400003Fh - BG3Y_H - BG3 Reference Point Y-Coordinate, upper 12 bit (W)
-	this.readIO[0x3F] = this.readUnused3;
-	//4000040h - WIN0H - Window 0 Horizontal Dimensions (W)
-	this.readIO[0x40] = this.readUnused0;
-	//4000041h - WIN0H - Window 0 Horizontal Dimensions (W)
-	this.readIO[0x41] = this.readUnused1;
-	//4000042h - WIN1H - Window 1 Horizontal Dimensions (W)
-	this.readIO[0x42] = this.readUnused2;
-	//4000043h - WIN1H - Window 1 Horizontal Dimensions (W)
-	this.readIO[0x43] = this.readUnused3;
-	//4000044h - WIN0V - Window 0 Vertical Dimensions (W)
-	this.readIO[0x44] = this.readUnused0;
-	//4000045h - WIN0V - Window 0 Vertical Dimensions (W)
-	this.readIO[0x45] = this.readUnused1;
-	//4000046h - WIN1V - Window 1 Vertical Dimensions (W)
-	this.readIO[0x46] = this.readUnused2;
-	//4000047h - WIN1V - Window 1 Vertical Dimensions (W)
-	this.readIO[0x47] = this.readUnused3;
+	//4000010h through 4000047h - WRITE ONLY
+	this.fillReadTableUnused(0x10, 0x47);
 	//4000048h - WININ - Control of Inside of Window(s) (R/W)
 	this.readIO[0x48] = function (parentObj) {
 		return parentObj.gfx.readWININ0();
@@ -1491,30 +1381,8 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x52] = this.readZero;
 	//4000053h - BLDALPHA - Alpha Blending Coefficients (W)
 	this.readIO[0x53] = this.readZero;
-	//4000054h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
-	this.readIO[0x54] = this.readUnused0;
-	//4000055h - BLDY - Brightness (Fade-In/Out) Coefficient (W)
-	this.readIO[0x55] = this.readUnused1;
-	//4000056h - NOT USED - ZERO
-	this.readIO[0x56] = this.readUnused2;
-	//4000057h - NOT USED - ZERO
-	this.readIO[0x57] = this.readUnused3;
-	//4000058h - NOT USED - GLITCHED
-	this.readIO[0x58] = this.readUnused0;
-	//4000059h - NOT USED - GLITCHED
-	this.readIO[0x59] = this.readUnused1;
-	//400005Ah - NOT USED - GLITCHED
-	this.readIO[0x5A] = this.readUnused2;
-	//400005Bh - NOT USED - GLITCHED
-	this.readIO[0x5B] = this.readUnused3;
-	//400005Ch - NOT USED - GLITCHED
-	this.readIO[0x5C] = this.readUnused0;
-	//400005Dh - NOT USED - GLITCHED
-	this.readIO[0x5D] = this.readUnused1;
-	//400005Eh - NOT USED - GLITCHED
-	this.readIO[0x5E] = this.readUnused2;
-	//400005Fh - NOT USED - GLITCHED
-	this.readIO[0x5F] = this.readUnused3;
+	//4000054h through 400005Fh - NOT USED - GLITCHED
+	this.fillReadTableUnused(0x54, 0x5F);
 	//4000060h - SOUND1CNT_L (NR10) - Channel 1 Sweep register (R/W)
 	this.readIO[0x60] = function (parentObj) {
 		//NR10:
@@ -1730,7 +1598,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x9F] = function (parentObj) {
 		return parentObj.sound.readWAVE(15);
 	}
-	//40000A0h through 40000B9h - READ ONLY
+	//40000A0h through 40000B9h - WRITE ONLY
 	this.fillReadTableUnused(0xA0, 0xB9);
 	//40000BAh - DMA0CNT_H - DMA 0 Control (R/W)
 	this.readIO[0xBA] = function (parentObj) {
@@ -1740,7 +1608,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xBB] = function (parentObj) {
 		return parentObj.dma.readDMAControl1(0);
 	}
-	//40000BCh through 40000C5h - READ ONLY
+	//40000BCh through 40000C5h - WRITE ONLY
 	this.fillReadTableUnused(0xBC, 0xC5);
 	//40000C6h - DMA1CNT_H - DMA 1 Control (R/W)
 	this.readIO[0xC6] = function (parentObj) {
@@ -1750,7 +1618,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xC7] = function (parentObj) {
 		return parentObj.dma.readDMAControl1(1);
 	}
-	//40000C8h through 40000D1h - READ ONLY
+	//40000C8h through 40000D1h - WRITE ONLY
 	this.fillReadTableUnused(0xC8, 0xD1);
 	//40000D2h - DMA2CNT_H - DMA 2 Control (R/W)
 	this.readIO[0xD2] = function (parentObj) {
@@ -1760,7 +1628,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0xD3] = function (parentObj) {
 		return parentObj.dma.readDMAControl1(2);
 	}
-	//40000D4h through 40000DDh - READ ONLY
+	//40000D4h through 40000DDh - WRITE ONLY
 	this.fillReadTableUnused(0xD4, 0xDD);
 	//40000DEh - DMA3CNT_H - DMA 3 Control (R/W)
 	this.readIO[0xDE] = function (parentObj) {
