@@ -24,6 +24,12 @@ GameBoyAdvanceSerial.prototype.initialize = function () {
 	this.SIODATA_C = 0xFFFF;
 	this.SIODATA_D = 0xFFFF;
 	this.SIODATA8 = 0xFFFF;
+	this.RCNTMode = 0;
+	this.RCNTIRQ = false;
+	this.RCNTDataBits = 0;
+	this.RCNTDataBitFlow = 0;
+	this.JOYBUS_IRQ = false;
+	this.JOYBUS_CNTL_FLAGS = 0;
 	this.JOYBUS_RECV0 = 0xFF;
 	this.JOYBUS_RECV1 = 0xFF;
 	this.JOYBUS_RECV2 = 0xFF;
@@ -102,6 +108,44 @@ GameBoyAdvanceSerial.prototype.writeSIODATA8_1 = function (data) {
 }
 GameBoyAdvanceSerial.prototype.readSIODATA8_1 = function () {
 	return this.SIODATA8 >> 8;
+}
+GameBoyAdvanceSerial.prototype.writeRCNT0 = function (data) {
+	if (this.RCNTMode == 0x2) {
+		//General Comm:
+		var oldDataBits = this.RCNTDataBits;
+		this.RCNTDataBits = data & 0xF;	//Device manually controls SI/SO/SC/SD here.
+		this.RCNTDataBitFlow = data >> 4;
+		if (this.RCNTIRQ && ((oldDataBits ^ this.RCNTDataBits) & oldDataBits & 0x4) == 0x4) {
+			//SI fell low, trigger IRQ:
+			this.IOCore.irq.requestIRQ(0x80);
+		}
+	}
+}
+GameBoyAdvanceSerial.prototype.readRCNT0 = function () {
+	return (this.RCNTDataBitFlow << 4) | this.RCNTDataBits;
+}
+GameBoyAdvanceSerial.prototype.writeRCNT1 = function (data) {
+	this.RCNTMode = data >> 6;
+	this.RCNTIRQ = ((data & 0x1) == 0x1);
+	if (this.RCNTMode != 0x2) {
+		//Force SI/SO/SC/SD to low as we're never "hooked" up:
+		this.RCNTDataBits = 0;
+		this.RCNTDataBitFlow = 0;
+	}
+}
+GameBoyAdvanceSerial.prototype.readRCNT1 = function () {
+	return (this.RCNTMode << 6) | 0x3E | ((this.RCNTIRQ) ? 0x1 : 0);
+}
+GameBoyAdvanceSerial.prototype.writeJOYCNT = function (data) {
+	this.JOYBUS_IRQ = ((data & 0x40) == 0x40);
+	this.JOYBUS_CNTL_FLAGS = data & 0x7;
+	if (this.JOYBUS_IRQ && this.JOYBUS_CNTL_FLAGS > 0) {
+		//We forced a reset, so trigger IRQ:
+		this.IOCore.irq.requestIRQ(0x80);
+	}
+}
+GameBoyAdvanceSerial.prototype.readJOYCNT = function () {
+	return 0xB8 | ((this.JOYBUS_IRQ) ? 0x40 : 0) | this.JOYBUS_CNTL_FLAGS;
 }
 GameBoyAdvanceSerial.prototype.writeJOYBUS_RECV0 = function (data) {
 	this.JOYBUS_RECV0 = data;

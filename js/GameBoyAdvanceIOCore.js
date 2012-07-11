@@ -1200,6 +1200,14 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x133] = function (parentObj, data) {
 		parentObj.joypad.writeKeyControl1(data);
 	}
+	//4000134h - RCNT (R/W) - Mode Selection
+	this.writeIO[0x134] = function (parentObj, data) {
+		parentObj.serial.writeRCNT0(data);
+	}
+	//4000135h - RCNT (R/W) - Mode Selection
+	this.writeIO[0x135] = function (parentObj, data) {
+		parentObj.serial.writeRCNT1(data);
+	}
 	//4000136h through 400013Fh - NOT USED - GLITCHED
 	this.fillWriteTableNOP(0x136, 0x13F);
 	//4000142h through 400014Fh - NOT USED - GLITCHED
@@ -1873,6 +1881,14 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//4000133h - KEYCNT - Key Interrupt Control (R/W)
 	this.readIO[0x133] = function (parentObj) {
 		return parentObj.joypad.readKeyControl1();
+	}
+	//4000134h - RCNT (R/W) - Mode Selection
+	this.readIO[0x134] = function (parentObj) {
+		return parentObj.serial.readRCNT0();
+	}
+	//4000135h - RCNT (R/W) - Mode Selection
+	this.readIO[0x135] = function (parentObj) {
+		return parentObj.serial.readRCNT1();
 	}
 	//4000136h - NOT USED - ZERO
 	this.readIO[0x136] = this.readZero;
