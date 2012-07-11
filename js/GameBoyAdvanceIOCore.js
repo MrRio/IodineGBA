@@ -1146,21 +1146,37 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x10F] = this.NOP;
 	//4000110h through 400011Fh - NOT USED - GLITCHED
 	this.fillWriteTableNOP(0x110, 0x11F);
-	//4000120h - SIODATA32_L - SIO Normal Communication lower 16bit data (R/W)
+	//4000120h - Serial Data A (R/W)
 	this.writeIO[0x120] = function (parentObj, data) {
-		parentObj.serial.writeSIODATA32_L0(data);
+		parentObj.serial.writeSIODATA_A0(data);
 	}
-	//4000121h - SIODATA32_L - SIO Normal Communication lower 16bit data (R/W)
+	//4000121h - Serial Data A (R/W)
 	this.writeIO[0x121] = function (parentObj, data) {
-		parentObj.serial.writeSIODATA32_L1(data);
+		parentObj.serial.writeSIODATA_A1(data);
 	}
-	//4000122h - SIODATA32_H - SIO Normal Communication upper 16bit data (R/W)
+	//4000122h - Serial Data B (R/W)
 	this.writeIO[0x122] = function (parentObj, data) {
-		parentObj.serial.writeSIODATA32_H0(data);
+		parentObj.serial.writeSIODATA_B0(data);
 	}
-	//4000123h - SIODATA32_H - SIO Normal Communication upper 16bit data (R/W)
+	//4000123h - Serial Data B (R/W)
 	this.writeIO[0x123] = function (parentObj, data) {
-		parentObj.serial.writeSIODATA32_H1(data);
+		parentObj.serial.writeSIODATA_B1(data);
+	}
+	//4000124h - Serial Data C (R/W)
+	this.writeIO[0x124] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA_C0(data);
+	}
+	//4000125h - Serial Data C (R/W)
+	this.writeIO[0x125] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA_C1(data);
+	}
+	//4000126h - Serial Data D (R/W)
+	this.writeIO[0x126] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA_D0(data);
+	}
+	//4000127h - Serial Data D (R/W)
+	this.writeIO[0x127] = function (parentObj, data) {
+		parentObj.serial.writeSIODATA_D1(data);
 	}
 	//400012Ah - SIOMLT_SEND - Data Send Register (R/W)
 	this.writeIO[0x12A] = function (parentObj, data) {
@@ -1768,21 +1784,37 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x10F] = this.readWriteOnly;
 	//4000110h through 400011Fh - NOT USED - GLITCHED
 	this.fillReadTableUnused(0x110, 0x11F);
-	//4000120h - SIODATA32_L - SIO Normal Communication lower 16bit data (R/W)
+	//4000120h - Serial Data A
 	this.readIO[0x120] = function (parentObj) {
-		return parentObj.serial.readSIODATA32_L0();
+		return parentObj.serial.readSIODATA_A0();
 	}
-	//4000121h - SIODATA32_L - SIO Normal Communication lower 16bit data (R/W)
+	//4000121h - Serial Data A
 	this.readIO[0x121] = function (parentObj) {
-		return parentObj.serial.readSIODATA32_L1();
+		return parentObj.serial.readSIODATA_A1();
 	}
-	//4000122h - SIODATA32_H - SIO Normal Communication upper 16bit data (R/W)
+	//4000122h - Serial Data B
 	this.readIO[0x122] = function (parentObj) {
-		return parentObj.serial.readSIODATA32_H0();
+		return parentObj.serial.readSIODATA_B0();
 	}
-	//4000123h - SIODATA32_H - SIO Normal Communication upper 16bit data (R/W)
+	//4000123h - Serial Data B
 	this.readIO[0x123] = function (parentObj) {
-		return parentObj.serial.readSIODATA32_H1();
+		return parentObj.serial.readSIODATA_B1();
+	}
+	//4000124h - Serial Data C
+	this.readIO[0x124] = function (parentObj) {
+		return parentObj.serial.readSIODATA_C0();
+	}
+	//4000125h - Serial Data C
+	this.readIO[0x125] = function (parentObj) {
+		return parentObj.serial.readSIODATA_C1();
+	}
+	//4000126h - Serial Data D
+	this.readIO[0x126] = function (parentObj) {
+		return parentObj.serial.readSIODATA_D0();
+	}
+	//4000127h - Serial Data D
+	this.readIO[0x127] = function (parentObj) {
+		return parentObj.serial.readSIODATA_D1();
 	}
 	//400012Ah - SIOMLT_SEND - Data Send Register (R/W)
 	this.readIO[0x12A] = function (parentObj) {
