@@ -1204,6 +1204,38 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.fillWriteTableNOP(0x136, 0x13F);
 	//4000142h through 400014Fh - NOT USED - GLITCHED
 	this.fillWriteTableNOP(0x142, 0x14F);
+	//4000150h - JoyBus Receive (R/W)
+	this.writeIO[0x150] = function (parentObj, data) {
+		parentObj.serial.writeJOYBUS_RECV0(data);
+	}
+	//4000151h - JoyBus Receive (R/W)
+	this.writeIO[0x151] = function (parentObj, data) {
+		parentObj.serial.writeJOYBUS_RECV1(data);
+	}
+	//4000152h - JoyBus Receive (R/W)
+	this.writeIO[0x152] = function (parentObj, data) {
+		parentObj.serial.writeJOYBUS_RECV2(data);
+	}
+	//4000153h - JoyBus Receive (R/W)
+	this.writeIO[0x153] = function (parentObj, data) {
+		parentObj.serial.writeJOYBUS_RECV3(data);
+	}
+	//4000154h - JoyBus Send (R/W)
+	this.writeIO[0x154] = function (parentObj, data) {
+		parentObj.serial.writeJOYBUS_SEND0(data);
+	}
+	//4000155h - JoyBus Send (R/W)
+	this.writeIO[0x155] = function (parentObj, data) {
+		parentObj.serial.writeJOYBUS_SEND1(data);
+	}
+	//4000156h - JoyBus Send (R/W)
+	this.writeIO[0x156] = function (parentObj, data) {
+		parentObj.serial.writeJOYBUS_SEND2(data);
+	}
+	//4000157h - JoyBus Send (R/W)
+	this.writeIO[0x157] = function (parentObj, data) {
+		parentObj.serial.writeJOYBUS_SEND3(data);
+	}
 	//400015Ah through 40001FFh - NOT USED - GLITCHED
 	this.fillWriteTableNOP(0x15A, 0x1FF);
 	//4000200h - IE - Interrupt Enable Register (R/W)
@@ -1784,35 +1816,35 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x10F] = this.readWriteOnly;
 	//4000110h through 400011Fh - NOT USED - GLITCHED
 	this.fillReadTableUnused(0x110, 0x11F);
-	//4000120h - Serial Data A
+	//4000120h - Serial Data A (R/W)
 	this.readIO[0x120] = function (parentObj) {
 		return parentObj.serial.readSIODATA_A0();
 	}
-	//4000121h - Serial Data A
+	//4000121h - Serial Data A (R/W)
 	this.readIO[0x121] = function (parentObj) {
 		return parentObj.serial.readSIODATA_A1();
 	}
-	//4000122h - Serial Data B
+	//4000122h - Serial Data B (R/W)
 	this.readIO[0x122] = function (parentObj) {
 		return parentObj.serial.readSIODATA_B0();
 	}
-	//4000123h - Serial Data B
+	//4000123h - Serial Data B (R/W)
 	this.readIO[0x123] = function (parentObj) {
 		return parentObj.serial.readSIODATA_B1();
 	}
-	//4000124h - Serial Data C
+	//4000124h - Serial Data C (R/W)
 	this.readIO[0x124] = function (parentObj) {
 		return parentObj.serial.readSIODATA_C0();
 	}
-	//4000125h - Serial Data C
+	//4000125h - Serial Data C (R/W)
 	this.readIO[0x125] = function (parentObj) {
 		return parentObj.serial.readSIODATA_C1();
 	}
-	//4000126h - Serial Data D
+	//4000126h - Serial Data D (R/W)
 	this.readIO[0x126] = function (parentObj) {
 		return parentObj.serial.readSIODATA_D0();
 	}
-	//4000127h - Serial Data D
+	//4000127h - Serial Data D (R/W)
 	this.readIO[0x127] = function (parentObj) {
 		return parentObj.serial.readSIODATA_D1();
 	}
@@ -1854,6 +1886,38 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x143] = this.readZero;
 	//4000144h through 400014Fh - NOT USED - GLITCHED
 	this.fillReadTableUnused(0x144, 0x14F);
+	//4000150h - JoyBus Receive (R/W)
+	this.readIO[0x150] = function (parentObj) {
+		return parentObj.serial.readJOYBUS_RECV0();
+	}
+	//4000151h - JoyBus Receive (R/W)
+	this.readIO[0x151] = function (parentObj) {
+		return parentObj.serial.readJOYBUS_RECV1();
+	}
+	//4000152h - JoyBus Receive (R/W)
+	this.readIO[0x152] = function (parentObj) {
+		return parentObj.serial.readJOYBUS_RECV2();
+	}
+	//4000153h - JoyBus Receive (R/W)
+	this.readIO[0x153] = function (parentObj) {
+		return parentObj.serial.readJOYBUS_RECV3();
+	}
+	//4000154h - JoyBus Send (R/W)
+	this.readIO[0x154] = function (parentObj) {
+		return parentObj.serial.readJOYBUS_SEND0();
+	}
+	//4000155h - JoyBus Send (R/W)
+	this.readIO[0x155] = function (parentObj) {
+		return parentObj.serial.readJOYBUS_SEND1();
+	}
+	//4000156h - JoyBus Send (R/W)
+	this.readIO[0x156] = function (parentObj) {
+		return parentObj.serial.readJOYBUS_SEND2();
+	}
+	//4000157h - JoyBus Send (R/W)
+	this.readIO[0x157] = function (parentObj) {
+		return parentObj.serial.readJOYBUS_SEND3();
+	}
 	//400015Ah - NOT USED - ZERO
 	this.readIO[0x15A] = this.readZero;
 	//400015Bh - NOT USED - ZERO

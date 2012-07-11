@@ -19,11 +19,19 @@ function GameBoyAdvanceSerial(IOCore) {
 	this.initialize();
 }
 GameBoyAdvanceSerial.prototype.initialize = function () {
-	this.SIODATA_A = 0;
-	this.SIODATA_B = 0;
-	this.SIODATA_C = 0;
-	this.SIODATA_D = 0;
-	this.SIODATA8 = 0;
+	this.SIODATA_A = 0xFFFF;
+	this.SIODATA_B = 0xFFFF;
+	this.SIODATA_C = 0xFFFF;
+	this.SIODATA_D = 0xFFFF;
+	this.SIODATA8 = 0xFFFF;
+	this.JOYBUS_RECV0 = 0xFF;
+	this.JOYBUS_RECV1 = 0xFF;
+	this.JOYBUS_RECV2 = 0xFF;
+	this.JOYBUS_RECV3 = 0xFF;
+	this.JOYBUS_SEND0 = 0xFF;
+	this.JOYBUS_SEND1 = 0xFF;
+	this.JOYBUS_SEND2 = 0xFF;
+	this.JOYBUS_SEND3 = 0xFF;
 }
 GameBoyAdvanceSerial.prototype.writeSIODATA_A0 = function (data) {
 	this.SIODATA_A &= 0xFF00;
@@ -94,4 +102,52 @@ GameBoyAdvanceSerial.prototype.writeSIODATA8_1 = function (data) {
 }
 GameBoyAdvanceSerial.prototype.readSIODATA8_1 = function () {
 	return this.SIODATA8 >> 8;
+}
+GameBoyAdvanceSerial.prototype.writeJOYBUS_RECV0 = function (data) {
+	this.JOYBUS_RECV0 = data;
+}
+GameBoyAdvanceSerial.prototype.readJOYBUS_RECV0 = function () {
+	return this.JOYBUS_RECV0;
+}
+GameBoyAdvanceSerial.prototype.writeJOYBUS_RECV1 = function (data) {
+	this.JOYBUS_RECV1 = data;
+}
+GameBoyAdvanceSerial.prototype.readJOYBUS_RECV1 = function () {
+	return this.JOYBUS_RECV1;
+}
+GameBoyAdvanceSerial.prototype.writeJOYBUS_RECV2 = function (data) {
+	this.JOYBUS_RECV2 = data;
+}
+GameBoyAdvanceSerial.prototype.readJOYBUS_RECV2 = function () {
+	return this.JOYBUS_RECV2;
+}
+GameBoyAdvanceSerial.prototype.writeJOYBUS_RECV3 = function (data) {
+	this.JOYBUS_RECV3 = data;
+}
+GameBoyAdvanceSerial.prototype.readJOYBUS_RECV3 = function () {
+	return this.JOYBUS_RECV3;
+}
+GameBoyAdvanceSerial.prototype.writeJOYBUS_SEND0 = function (data) {
+	this.JOYBUS_SEND0 = data;
+}
+GameBoyAdvanceSerial.prototype.readJOYBUS_SEND0 = function () {
+	return this.JOYBUS_SEND0;
+}
+GameBoyAdvanceSerial.prototype.writeJOYBUS_SEND1 = function (data) {
+	this.JOYBUS_SEND1 = data;
+}
+GameBoyAdvanceSerial.prototype.readJOYBUS_SEND1 = function () {
+	return this.JOYBUS_SEND1;
+}
+GameBoyAdvanceSerial.prototype.writeJOYBUS_SEND2 = function (data) {
+	this.JOYBUS_SEND2 = data;
+}
+GameBoyAdvanceSerial.prototype.readJOYBUS_SEND2 = function () {
+	return this.JOYBUS_SEND2;
+}
+GameBoyAdvanceSerial.prototype.writeJOYBUS_SEND3 = function (data) {
+	this.JOYBUS_SEND3 = data;
+}
+GameBoyAdvanceSerial.prototype.readJOYBUS_SEND0 = function () {
+	return this.JOYBUS_SEND3;
 }
