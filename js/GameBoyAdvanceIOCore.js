@@ -1250,8 +1250,12 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x157] = function (parentObj, data) {
 		parentObj.serial.writeJOYBUS_SEND3(data);
 	}
-	//400015Ah through 40001FFh - NOT USED - GLITCHED
-	this.fillWriteTableNOP(0x15A, 0x1FF);
+	//4000158h - JoyBus Stat (R/W)
+	this.writeIO[0x158] = function (parentObj, data) {
+		parentObj.serial.writeJOYBUS_STAT(data);
+	}
+	//4000159h through 40001FFh - NOT USED - GLITCHED
+	this.fillWriteTableNOP(0x159, 0x1FF);
 	//4000200h - IE - Interrupt Enable Register (R/W)
 	this.writeIO[0x200] = function (parentObj, data) {
 		parentObj.irq.writeIE0(data);
@@ -1814,6 +1818,12 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	this.readIO[0x157] = function (parentObj) {
 		return parentObj.serial.readJOYBUS_SEND3();
 	}
+	//4000158h - JoyBus Stat (R/W)
+	this.readIO[0x158] = function (parentObj) {
+		return parentObj.serial.readJOYBUS_STAT();
+	}
+	//4000159h - JoyBus Stat (R/W)
+	this.readIO[0x159] = this.readWriteOnly;
 	//400015Ah - NOT USED - ZERO
 	this.readIO[0x15A] = this.readZero;
 	//400015Bh - NOT USED - ZERO
