@@ -1178,6 +1178,14 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0x127] = function (parentObj, data) {
 		parentObj.serial.writeSIODATA_D1(data);
 	}
+	//4000128h - SIOCNT - SIO Sub Mode Control (R/W)
+	this.writeIO[0x128] = function (parentObj, data) {
+		parentObj.serial.writeSIOCNT0(data);
+	}
+	//4000129h - SIOCNT - SIO Sub Mode Control (R/W)
+	this.writeIO[0x129] = function (parentObj, data) {
+		parentObj.serial.writeSIOCNT1(data);
+	}
 	//400012Ah - SIOMLT_SEND - Data Send Register (R/W)
 	this.writeIO[0x12A] = function (parentObj, data) {
 		parentObj.serial.writeSIODATA8_0(data);
@@ -1733,6 +1741,14 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//4000127h - Serial Data D (R/W)
 	this.readIO[0x127] = function (parentObj) {
 		return parentObj.serial.readSIODATA_D1();
+	}
+	//4000128h - SIOCNT - SIO Sub Mode Control (R/W)
+	this.readIO[0x128] = function (parentObj) {
+		return parentObj.serial.readSIOCNT0();
+	}
+	//4000129h - SIOCNT - SIO Sub Mode Control (R/W)
+	this.readIO[0x129] = function (parentObj) {
+		return parentObj.serial.readSIOCNT1();
 	}
 	//400012Ah - SIOMLT_SEND - Data Send Register (R/W)
 	this.readIO[0x12A] = function (parentObj) {
