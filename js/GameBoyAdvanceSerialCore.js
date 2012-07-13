@@ -434,7 +434,7 @@ GameBoyAdvanceSerial.prototype.nextIRQEventTime = function (clocks) {
 				}
 			case 3:
 				if (this.SIOCNT_UART_SEND_ENABLE && !this.SIOCNT_UART_CTS) {
-					return ((((this.SIOCNT_UART_FIFO_ENABLE) ? (this.SIOCNT_UART_FIFO * 8) : 8) - 1) * this.SIOShiftClockDivider) + (this.SIOShiftClockDivider - this.shiftClocks);
+					return (Math.max(((this.SIOCNT_UART_FIFO_ENABLE) ? (this.SIOCNT_UART_FIFO * 8) : 8) - 1, 0) * this.SIOShiftClockDivider) + (this.SIOShiftClockDivider - this.shiftClocks);
 				}
 				else {
 					return -1;
