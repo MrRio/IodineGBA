@@ -62,6 +62,8 @@ GameBoyAdvanceDMA.prototype.initialize = function () {
 	];
 	//Game Pak DMA flag for DMA 3:
 	this.gamePakDMA = false;
+	this.currentMatch = -1;
+	this.lastCurrentMatch = -1;
 }
 GameBoyAdvanceDMA.prototype.writeDMASource = function (dmaChannel, byteNumber, data) {
 	this.source[dmaChannel] &= ~(0xFF << (byteNumber << 3));
@@ -197,11 +199,16 @@ GameBoyAdvanceDMA.prototype.process = function () {
 	for (var dmaPriority = 0; dmaPriority < 4; ++dmaPriority) {
 		this.currentMatch = this.enabled[dmaPriority] & this.pending[dmaPriority];
 		if (this.currentMatch != 0) {
+			if (this.currentMatch != this.lastCurrentMatch) {
+				//Re-broadcasting on address bus, so non-seq:
+				this.IOCore.wait.NonSequentialBroadcast();
+			}
 			this.handleDMACopy(dmaPriority);
 			return false;
 		}
 	}
 	//If no DMA was processed, then the DMA period has ended:
+	this.lastCurrentMatch = -1;
 	return true;
 }
 GameBoyAdvanceDMA.prototype.handleDMACopy = function (dmaChannel) {
