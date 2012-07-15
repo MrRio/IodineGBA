@@ -1963,6 +1963,34 @@ GameBoyAdvanceIO.prototype.writePalette = function (parentObj, address, data, bu
 	parentObj.wait.VRAMAccess(busReqNumber);
 	parentObj.gfx.writePalette(address & 0x3FF, data);
 }
+GameBoyAdvanceIO.prototype.writeROM0Low = function (parentObj, address, data, busReqNumber) {
+	parentObj.wait.ROM0Access(busReqNumber);
+	parentObj.cartridge.writeROMLow(address & 0x1FFFFFF, data);
+}
+GameBoyAdvanceIO.prototype.writeROM0High = function (parentObj, address, data, busReqNumber) {
+	parentObj.wait.ROM0Access(busReqNumber);
+	parentObj.cartridge.writeROMHigh(address & 0x1FFFFFF, data);
+}
+GameBoyAdvanceIO.prototype.writeROM1Low = function (parentObj, address, data, busReqNumber) {
+	parentObj.wait.ROM1Access(busReqNumber);
+	parentObj.cartridge.writeROMLow(address & 0x1FFFFFF, data);
+}
+GameBoyAdvanceIO.prototype.writeROM1High = function (parentObj, address, data, busReqNumber) {
+	parentObj.wait.ROM1Access(busReqNumber);
+	parentObj.cartridge.writeROMHigh(address & 0x1FFFFFF, data);
+}
+GameBoyAdvanceIO.prototype.writeROM2Low = function (parentObj, address, data, busReqNumber) {
+	parentObj.wait.ROM2Access(busReqNumber);
+	parentObj.cartridge.writeROMLow(address & 0x1FFFFFF, data);
+}
+GameBoyAdvanceIO.prototype.writeROM2High = function (parentObj, address, data, busReqNumber) {
+	parentObj.wait.ROM2Access(busReqNumber);
+	parentObj.cartridge.writeROMHigh(address & 0x1FFFFFF, data);
+}
+GameBoyAdvanceIO.prototype.writeSRAM = function (parentObj, address, data, busReqNumber) {
+	parentObj.wait.SRAMAccess(busReqNumber);
+	parentObj.cartridge.writeSRAM(address & 0xFFFF, data);
+}
 GameBoyAdvanceIO.prototype.NOP = function (parentObj, data) {
 	//Ignore the data write...
 }
@@ -2067,6 +2095,10 @@ GameBoyAdvanceIO.prototype.readROM2Low = function (parentObj, address, busReqNum
 GameBoyAdvanceIO.prototype.readROM2High = function (parentObj, address, busReqNumber) {
 	parentObj.wait.ROM2Access(busReqNumber);
 	return parentObj.cartridge.readROMHigh(address & 0x1FFFFFF);
+}
+GameBoyAdvanceIO.prototype.readSRAM = function (parentObj, address, busReqNumber) {
+	parentObj.wait.SRAMAccess(busReqNumber);
+	return parentObj.cartridge.readSRAM(address & 0xFFFF);
 }
 GameBoyAdvanceIO.prototype.readZero = function (parentObj) {
 	return 0;

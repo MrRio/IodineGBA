@@ -18,19 +18,19 @@ function GameBoyAdvanceWait(IOCore) {
 	this.IOCore = IOCore;
 	this.initialize();
 }
-GameBoyAdvanceWait.prototype.GAMEPAKWaitState0 = [
-	4, 3, 2, 8
+GameBoyAdvanceWait.prototype.GAMEPAKWaitStateTable = [
+	5, 4, 3, 9
 ];
 GameBoyAdvanceWait.prototype.initialize = function () {
 	this.WRAMConfiguration = [0xD, 0x20];	//WRAM configuration control register current data.
-	this.WRAMWaitState = 2;					//External WRAM wait state.
-	this.SRAMWaitState = 4;
-	this.CARTWaitState0First = 4;
-	this.CARTWaitState0Second = 2;
-	this.CARTWaitState1First = 4;
-	this.CARTWaitState1Second = 4;
-	this.CARTWaitState2First = 4;
-	this.CARTWaitState2Second = 8;
+	this.WRAMWaitState = 3;					//External WRAM wait state.
+	this.SRAMWaitState = 5;
+	this.CARTWaitState0First = 5;
+	this.CARTWaitState0Second = 3;
+	this.CARTWaitState1First = 5;
+	this.CARTWaitState1Second = 5;
+	this.CARTWaitState2First = 5;
+	this.CARTWaitState2Second = 9;
 	this.POSTBOOT = 0;
 	this.width = 8;
 	this.nonSequential = true;
@@ -40,19 +40,19 @@ GameBoyAdvanceWait.prototype.initialize = function () {
 	this.WAITCNT1 = 0;
 }
 GameBoyAdvanceWait.prototype.writeWAITCNT0 = function (data) {
-	this.SRAMWaitState = this.SRAMWaitStates[data & 0x3];
-	this.CARTWaitState0First = this.GAMEPAKWaitState0[(data >> 2) & 0x3];
-	this.CARTWaitState0Second = ((data & 0x10) == 0x10) ? 0x1 : 0x2;
-	this.CARTWaitState1First = this.GAMEPAKWaitState0[(data >> 5) & 0x3];
-	this.CARTWaitState0Second = (data > 0x7F) ? 0x1 : 0x4;
+	this.SRAMWaitState = this.GAMEPAKWaitStateTable[data & 0x3];
+	this.CARTWaitState0First = this.GAMEPAKWaitStateTable[(data >> 2) & 0x3];
+	this.CARTWaitState0Second = ((data & 0x10) == 0x10) ? 0x2 : 0x3;
+	this.CARTWaitState1First = this.GAMEPAKWaitStateTable[(data >> 5) & 0x3];
+	this.CARTWaitState1Second = (data > 0x7F) ? 0x2 : 0x5;
 	this.WAITCNT0 = data;
 }
 GameBoyAdvanceWait.prototype.readWAITCNT0 = function () {
 	return this.WAITCNT0;
 }
 GameBoyAdvanceWait.prototype.writeWAITCNT1 = function (data) {
-	this.CARTWaitState2First = this.GAMEPAKWaitState0[data & 0x3];
-	this.CARTWaitState0Second = ((data & 0x8) == 0x8) ? 0x1 : 0x8;
+	this.CARTWaitState2First = this.GAMEPAKWaitStateTable[data & 0x3];
+	this.CARTWaitState2Second = ((data & 0x8) == 0x8) ? 0x2 : 0x9;
 	this.prefetchEnabled = ((data & 0x40) == 0x40);
 	if (!this.prefetchEnabled) {
 		this.ROMPrebuffer = 0;
@@ -79,7 +79,7 @@ GameBoyAdvanceIO.prototype.writeConfigureWRAM = function (address, data) {
 			this.IOCore.remapWRAM(data);
 			break;
 		case 0:
-			this.WRAMWaitState = 0xF - (data & 0xF);
+			this.WRAMWaitState = 0x10 - (data & 0xF);
 			this.WRAMConfiguration[0] = data;
 	}
 }
@@ -183,6 +183,11 @@ GameBoyAdvanceWait.prototype.ROM2Access = function (reqByteNumber) {
 		}
 		this.IOCore.updateCore();
 	}
+}
+GameBoyAdvanceWait.prototype.SRAMAccess = function (reqByteNumber) {
+	this.IOCore.clocks = this.SRAMWaitState;
+	this.IOCore.updateCore();
+	this.nonSequential = false;
 }
 GameBoyAdvanceWait.prototype.VRAMAccess = function (reqByteNumber) {
 	if ((reqByteNumber & 0x1) == 0x1 || this.width == 8) {
