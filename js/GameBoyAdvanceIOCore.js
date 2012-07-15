@@ -2044,6 +2044,30 @@ GameBoyAdvanceIO.prototype.readPalette = function (parentObj, address, busReqNum
 	parentObj.wait.VRAMAccess(busReqNumber);
 	return parentObj.gfx.readPalette(address & 0x3FF);
 }
+GameBoyAdvanceIO.prototype.readROM0Low = function (parentObj, address, busReqNumber) {
+	parentObj.wait.ROM0Access(busReqNumber);
+	return parentObj.cartridge.readROMLow(address & 0x1FFFFFF);
+}
+GameBoyAdvanceIO.prototype.readROM0High = function (parentObj, address, busReqNumber) {
+	parentObj.wait.ROM0Access(busReqNumber);
+	return parentObj.cartridge.readROMHigh(address & 0x1FFFFFF);
+}
+GameBoyAdvanceIO.prototype.readROM1Low = function (parentObj, address, busReqNumber) {
+	parentObj.wait.ROM1Access(busReqNumber);
+	return parentObj.cartridge.readROMLow(address & 0x1FFFFFF);
+}
+GameBoyAdvanceIO.prototype.readROM1High = function (parentObj, address, busReqNumber) {
+	parentObj.wait.ROM1Access(busReqNumber);
+	return parentObj.cartridge.readROMHigh(address & 0x1FFFFFF);
+}
+GameBoyAdvanceIO.prototype.readROM2Low = function (parentObj, address, busReqNumber) {
+	parentObj.wait.ROM2Access(busReqNumber);
+	return parentObj.cartridge.readROMLow(address & 0x1FFFFFF);
+}
+GameBoyAdvanceIO.prototype.readROM2High = function (parentObj, address, busReqNumber) {
+	parentObj.wait.ROM2Access(busReqNumber);
+	return parentObj.cartridge.readROMHigh(address & 0x1FFFFFF);
+}
 GameBoyAdvanceIO.prototype.readZero = function (parentObj) {
 	return 0;
 }

@@ -25,8 +25,8 @@ GameBoyAdvanceWait.prototype.initialize = function () {
 	this.WRAMConfiguration = [0xD, 0x20];	//WRAM configuration control register current data.
 	this.WRAMWaitState = 2;					//External WRAM wait state.
 	this.SRAMWaitState = 4;
-	this.CARTWaitState0First = 2;
-	this.CARTWaitState0Second = 4;
+	this.CARTWaitState0First = 4;
+	this.CARTWaitState0Second = 2;
 	this.CARTWaitState1First = 4;
 	this.CARTWaitState1Second = 4;
 	this.CARTWaitState2First = 4;
@@ -147,6 +147,42 @@ GameBoyAdvanceWait.prototype.WRAMAccess = function (reqByteNumber) {
 		this.IOCore.updateCore();
 	}
 	this.nonSequential = false;
+}
+GameBoyAdvanceWait.prototype.ROM0Access = function (reqByteNumber) {
+	if ((reqByteNumber & 0x1) == 0x1 || this.width == 8) {
+		if (this.nonSequential) {
+			this.IOCore.clocks = this.CARTWaitState0First;
+			this.nonSequential = false;
+		}
+		else {
+			this.IOCore.clocks = this.CARTWaitState0Second;
+		}
+		this.IOCore.updateCore();
+	}
+}
+GameBoyAdvanceWait.prototype.ROM1Access = function (reqByteNumber) {
+	if ((reqByteNumber & 0x1) == 0x1 || this.width == 8) {
+		if (this.nonSequential) {
+			this.IOCore.clocks = this.CARTWaitState1First;
+			this.nonSequential = false;
+		}
+		else {
+			this.IOCore.clocks = this.CARTWaitState1Second;
+		}
+		this.IOCore.updateCore();
+	}
+}
+GameBoyAdvanceWait.prototype.ROM2Access = function (reqByteNumber) {
+	if ((reqByteNumber & 0x1) == 0x1 || this.width == 8) {
+		if (this.nonSequential) {
+			this.IOCore.clocks = this.CARTWaitState2First;
+			this.nonSequential = false;
+		}
+		else {
+			this.IOCore.clocks = this.CARTWaitState2Second;
+		}
+		this.IOCore.updateCore();
+	}
 }
 GameBoyAdvanceWait.prototype.VRAMAccess = function (reqByteNumber) {
 	if ((reqByteNumber & 0x1) == 0x1 || this.width == 8) {
