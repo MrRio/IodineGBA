@@ -115,6 +115,14 @@ GameBoyAdvanceCartridge.prototype.IDLookup = function () {
 	var length = this.ROM.length - 6;
 	for (var index = 0; index < length; ++index) {
 		switch (this.ROM[index]) {
+			case 0x45:	//E
+				if (this.isEEPROMCart(index)) {
+					found |= 2;
+					if (found == 3) {
+						return;
+					}
+				}
+				break;
 			case 0x46:	//F
 				if (this.isFLASHCart(index)) {
 					found |= 2;
@@ -126,6 +134,14 @@ GameBoyAdvanceCartridge.prototype.IDLookup = function () {
 			case 0x52:	//R
 				if (this.isRTCCart(index)) {
 					found |= 1;
+					if (found == 3) {
+						return;
+					}
+				}
+				break;
+			case 0x53:	//S
+				if (this.isSRAMCart(index)) {
+					found |= 2;
 					if (found == 3) {
 						return;
 					}
@@ -142,11 +158,11 @@ GameBoyAdvanceCartridge.prototype.isFLASHCart = function (index) {
 						case "_":
 						case "5":
 							this.saveType = 1;
-							this.saveSize = 65536;
+							this.saveSize = 0x10000;
 							return true;
 						case "1":
 							this.saveType = 1;
-							this.saveSize = 131072;
+							this.saveSize = 0x20000;
 							return true;
 					}
 				}
@@ -162,6 +178,22 @@ GameBoyAdvanceCartridge.prototype.isRTCCart = function (index) {
 				if (String.fromCharCode(this.ROM[index]) == "V") {
 					this.saveRTC = true;
 					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+GameBoyAdvanceCartridge.prototype.isSRAMCart = function (index) {
+	if (String.fromCharCode(this.ROM[++index]) == "R") {
+		if (String.fromCharCode(this.ROM[++index]) == "A") {
+			if (String.fromCharCode(this.ROM[++index]) == "M") {
+				if (String.fromCharCode(this.ROM[++index]) == "_") {
+					if (String.fromCharCode(this.ROM[index]) == "V") {
+						this.saveType = 2;
+						this.saveSize = 0x8000;
+						return true;
+					}
 				}
 			}
 		}
