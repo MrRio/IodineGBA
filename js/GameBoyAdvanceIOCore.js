@@ -131,27 +131,27 @@ GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 		/*
 			Game Pak ROM (max 16MB) - Wait State 0 (08000000-08FFFFFF)
 		*/
-		this.writeROM0Low,
+		this.writeROM0,
 		/*
 			Game Pak ROM/FlashROM (max 16MB) - Wait State 0 (09000000-09FFFFFF)
 		*/
-		this.writeROM0High,
+		this.writeROM0,
 		/*
 			Game Pak ROM (max 16MB) - Wait State 1 (0A000000-0AFFFFFF)
 		*/
-		this.writeROM1Low,
+		this.writeROM1,
 		/*
 			Game Pak ROM/FlashROM (max 16MB) - Wait State 1 (0B000000-0BFFFFFF)
 		*/
-		this.writeROM1High,
+		this.writeROM1,
 		/*
 			Game Pak ROM (max 16MB) - Wait State 2 (0C000000-0CFFFFFF)
 		*/
-		this.writeROM2Low,
+		this.writeROM2,
 		/*
 			Game Pak ROM/FlashROM (max 16MB) - Wait State 2 (0D000000-0DFFFFFF)
 		*/
-		this.writeROM2High,
+		this.writeROM2,
 		/*
 			Game Pak SRAM  (max 64 KBytes) - 8bit Bus width (0E000000-0E00FFFF)
 		*/
@@ -234,27 +234,27 @@ GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 		/*
 			Game Pak ROM (max 16MB) - Wait State 0 (08000000-08FFFFFF)
 		*/
-		this.readROM0Low,
+		this.readROM0,
 		/*
 			Game Pak ROM/FlashROM (max 16MB) - Wait State 0 (09000000-09FFFFFF)
 		*/
-		this.readROM0High,
+		this.readROM0,
 		/*
 			Game Pak ROM (max 16MB) - Wait State 1 (0A000000-0AFFFFFF)
 		*/
-		this.readROM1Low,
+		this.readROM1,
 		/*
 			Game Pak ROM/FlashROM (max 16MB) - Wait State 1 (0B000000-0BFFFFFF)
 		*/
-		this.readROM1High,
+		this.readROM1,
 		/*
 			Game Pak ROM (max 16MB) - Wait State 2 (0C000000-0CFFFFFF)
 		*/
-		this.readROM2Low,
+		this.readROM2,
 		/*
 			Game Pak ROM/FlashROM (max 16MB) - Wait State 2 (0D000000-0DFFFFFF)
 		*/
-		this.readROM2High,
+		this.readROM2,
 		/*
 			Game Pak SRAM  (max 64 KBytes) - 8bit Bus width (0E000000-0E00FFFF)
 		*/
@@ -1963,29 +1963,17 @@ GameBoyAdvanceIO.prototype.writePalette = function (parentObj, address, data, bu
 	parentObj.wait.VRAMAccess(busReqNumber);
 	parentObj.gfx.writePalette(address & 0x3FF, data);
 }
-GameBoyAdvanceIO.prototype.writeROM0Low = function (parentObj, address, data, busReqNumber) {
+GameBoyAdvanceIO.prototype.writeROM0 = function (parentObj, address, data, busReqNumber) {
 	parentObj.wait.ROM0Access(busReqNumber);
-	parentObj.cartridge.writeROMLow(address & 0x1FFFFFF, data);
+	parentObj.cartridge.writeROM(address & 0x1FFFFFF, data);
 }
-GameBoyAdvanceIO.prototype.writeROM0High = function (parentObj, address, data, busReqNumber) {
-	parentObj.wait.ROM0Access(busReqNumber);
-	parentObj.cartridge.writeROMHigh(address & 0x1FFFFFF, data);
-}
-GameBoyAdvanceIO.prototype.writeROM1Low = function (parentObj, address, data, busReqNumber) {
+GameBoyAdvanceIO.prototype.writeROM1 = function (parentObj, address, data, busReqNumber) {
 	parentObj.wait.ROM1Access(busReqNumber);
-	parentObj.cartridge.writeROMLow(address & 0x1FFFFFF, data);
+	parentObj.cartridge.writeROM(address & 0x1FFFFFF, data);
 }
-GameBoyAdvanceIO.prototype.writeROM1High = function (parentObj, address, data, busReqNumber) {
-	parentObj.wait.ROM1Access(busReqNumber);
-	parentObj.cartridge.writeROMHigh(address & 0x1FFFFFF, data);
-}
-GameBoyAdvanceIO.prototype.writeROM2Low = function (parentObj, address, data, busReqNumber) {
+GameBoyAdvanceIO.prototype.writeROM2 = function (parentObj, address, data, busReqNumber) {
 	parentObj.wait.ROM2Access(busReqNumber);
-	parentObj.cartridge.writeROMLow(address & 0x1FFFFFF, data);
-}
-GameBoyAdvanceIO.prototype.writeROM2High = function (parentObj, address, data, busReqNumber) {
-	parentObj.wait.ROM2Access(busReqNumber);
-	parentObj.cartridge.writeROMHigh(address & 0x1FFFFFF, data);
+	parentObj.cartridge.writeROM(address & 0x1FFFFFF, data);
 }
 GameBoyAdvanceIO.prototype.writeSRAM = function (parentObj, address, data, busReqNumber) {
 	parentObj.wait.SRAMAccess(busReqNumber);
@@ -2072,29 +2060,17 @@ GameBoyAdvanceIO.prototype.readPalette = function (parentObj, address, busReqNum
 	parentObj.wait.VRAMAccess(busReqNumber);
 	return parentObj.gfx.readPalette(address & 0x3FF);
 }
-GameBoyAdvanceIO.prototype.readROM0Low = function (parentObj, address, busReqNumber) {
+GameBoyAdvanceIO.prototype.readROM0 = function (parentObj, address, busReqNumber) {
 	parentObj.wait.ROM0Access(busReqNumber);
-	return parentObj.cartridge.readROMLow(address & 0x1FFFFFF);
+	return parentObj.cartridge.readROM(address & 0x1FFFFFF);
 }
-GameBoyAdvanceIO.prototype.readROM0High = function (parentObj, address, busReqNumber) {
-	parentObj.wait.ROM0Access(busReqNumber);
-	return parentObj.cartridge.readROMHigh(address & 0x1FFFFFF);
-}
-GameBoyAdvanceIO.prototype.readROM1Low = function (parentObj, address, busReqNumber) {
+GameBoyAdvanceIO.prototype.readROM1 = function (parentObj, address, busReqNumber) {
 	parentObj.wait.ROM1Access(busReqNumber);
-	return parentObj.cartridge.readROMLow(address & 0x1FFFFFF);
+	return parentObj.cartridge.readROM(address & 0x1FFFFFF);
 }
-GameBoyAdvanceIO.prototype.readROM1High = function (parentObj, address, busReqNumber) {
-	parentObj.wait.ROM1Access(busReqNumber);
-	return parentObj.cartridge.readROMHigh(address & 0x1FFFFFF);
-}
-GameBoyAdvanceIO.prototype.readROM2Low = function (parentObj, address, busReqNumber) {
+GameBoyAdvanceIO.prototype.readROM2 = function (parentObj, address, busReqNumber) {
 	parentObj.wait.ROM2Access(busReqNumber);
-	return parentObj.cartridge.readROMLow(address & 0x1FFFFFF);
-}
-GameBoyAdvanceIO.prototype.readROM2High = function (parentObj, address, busReqNumber) {
-	parentObj.wait.ROM2Access(busReqNumber);
-	return parentObj.cartridge.readROMHigh(address & 0x1FFFFFF);
+	return parentObj.cartridge.readROM(address & 0x1FFFFFF);
 }
 GameBoyAdvanceIO.prototype.readSRAM = function (parentObj, address, busReqNumber) {
 	parentObj.wait.SRAMAccess(busReqNumber);
