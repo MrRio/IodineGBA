@@ -159,6 +159,7 @@ GameBoyAdvanceGraphics.prototype.initializeIO = function () {
 	this.paletteRAM = getUint8Array(0x400);
 	this.VRAM = getUint8Array(0x18000);
 	this.OAMRAM = getUint8Array(0x400);
+	this.lineBuffer = getInt32Array(160);
 	this.frameBuffer = getInt32Array(38400);
 	this.LCDTicks = 0;
 	this.HBlankFlagged = false;
@@ -166,17 +167,26 @@ GameBoyAdvanceGraphics.prototype.initializeIO = function () {
 	this.totalLinesPassed = 0;
 	this.queuedScanLines = 0;
 	this.lastUnrenderedLine = 0;
-	this.midScanLineOffset = 0;
 }
 GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.initializeMatrixStorage();
 	this.initializePaletteStorage();
-	this.mode0Renderer = new mode0Renderer(this);
-	this.mode1Renderer = new mode1Renderer(this);
-	this.mode2Renderer = new mode2Renderer(this);
-	this.mode3Renderer = new mode3Renderer(this);
-	this.mode4Renderer = new mode4Renderer(this);
-	this.mode5Renderer = new mode5Renderer(this);
+	this.bg0Renderer = new GameBoyAdvanceBG0Renderer(this);
+	this.bg1Renderer = new GameBoyAdvanceBG1Renderer(this);
+	this.bg2TextRenderer = new GameBoyAdvanceBG2TEXTRenderer(this);
+	this.bg3TextRenderer = new GameBoyAdvanceBG3TEXTRenderer(this);
+	this.bg2MatrixRenderer = new GameBoyAdvanceBG2MatrixRenderer(this);
+	this.bg3MatrixRenderer = new GameBoyAdvanceBG3MatrixRenderer(this);
+	this.objRenderer = new GameBoyAdvanceObjRenderer(this);
+	this.window0Renderer = new GameBoyAdvanceWindow0Renderer(this);
+	this.window1Renderer = new GameBoyAdvanceWindow1Renderer(this);
+	this.objWindowRenderer = new GameBoyAdvanceOBJWindowRenderer(this);
+	this.mode0Renderer = new GameBoyAdvanceMode0Renderer(this);
+	this.mode1Renderer = new GameBoyAdvanceMode1Renderer(this);
+	this.mode2Renderer = new GameBoyAdvanceMode2Renderer(this);
+	this.mode3Renderer = new GameBoyAdvanceMode3Renderer(this);
+	this.mode4Renderer = new GameBoyAdvanceMode4Renderer(this);
+	this.mode5Renderer = new GameBoyAdvanceMode5Renderer(this);
 	this.renderer = this.mode0Renderer();
 }
 GameBoyAdvanceGraphics.prototype.initializeMatrixStorage = function () {
@@ -219,6 +229,7 @@ GameBoyAdvanceGraphics.prototype.clockLCDState = function () {
 			case 159:
 				this.updateVBlankStart();
 				this.currentScanLine = 160;							//Increment to the next scan line (Start of v-blank).
+				this.incrementScanLineQueue();
 				break;
 			case 161:
 				this.IOCore.dma.gfxDisplaySyncKillRequest();		//Display Sync. DMA stop.
@@ -232,6 +243,9 @@ GameBoyAdvanceGraphics.prototype.clockLCDState = function () {
 				break;
 			default:
 				++this.currentScanLine;								//Increment to the next scan line.
+				if (!this.inVBlank) {
+					this.incrementScanLineQueue();
+				}
 		}
 		this.checkDisplaySync();
 		this.checkVCounter();										//We're on a new scan line, so check the VCounter for match.
@@ -300,7 +314,7 @@ GameBoyAdvanceGraphics.prototype.updateVBlankStart = function () {
 		this.IOCore.irq.requestIRQ(0x1);
 	}
 	//Ensure JIT framing alignment:
-	if (this.totalLinesPassed < 160 || (this.totalLinesPassed == 160 && this.midScanLineOffset > 0)) {
+	if (this.totalLinesPassed < 160) {
 		//Make sure our gfx are up-to-date:
 		this.graphicsJITVBlank();
 		//Draw the frame:
@@ -332,7 +346,7 @@ GameBoyAdvanceGraphics.prototype.graphicsJITVBlank = function () {
 GameBoyAdvanceGraphics.prototype.graphicsJITScanlineGroup = function () {
 	//Normal rendering JIT, where we try to do groups of scanlines at once:
 	while (this.queuedScanLines > 0) {
-		this.renderScanLine(this.lastUnrenderedLine);
+		this.renderer.renderScanLine(this.lastUnrenderedLine);
 		if (this.lastUnrenderedLine < 159) {
 			++this.lastUnrenderedLine;
 		}
@@ -347,7 +361,6 @@ GameBoyAdvanceGraphics.prototype.incrementScanLineQueue = function () {
 		++this.queuedScanLines;
 	}
 	else {
-		this.midScanLineOffset = 0;
 		if (this.lastUnrenderedLine < 159) {
 			++this.lastUnrenderedLine;
 		}
@@ -357,8 +370,54 @@ GameBoyAdvanceGraphics.prototype.incrementScanLineQueue = function () {
 	}
 }
 GameBoyAdvanceGraphics.prototype.midScanLineJIT = function () {
+	//No mid-scanline JIT for now, instead just do per-scanline:
 	this.graphicsJIT();
-	this.renderer.renderMidScanLine();
+}
+GameBoyAdvanceGraphics.prototype.compositeLayers = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
+	var pixelPosition = -1;
+	var currentPixel = 0;
+	var workingPixel = 0;
+	var backdropColor = this.palette256[0] | 0x58000;
+	var layerStack = this.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
+	var stackDepth = layerStack.length;
+	var stackIndex = 0;
+	while (++pixelPosition < 160) {
+		currentPixel = backdropColor;
+		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
+			workingPixel = layerStack[stackIndex][pixelPosition];
+			if (workingPixel <= currentPixel && (workingPixel & 0x8000) == 0) {
+				//If higher priority AND non-transparent:
+				currentPixel = workingPixel;
+			}
+		}
+		this.lineBuffer[pixelPosition] = currentPixel;
+	}
+}
+GameBoyAdvanceGraphics.prototype.cleanLayerStack = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
+	//Clear out disabled layers from our stack:
+	var layerStack = [];
+	if (BG3Buffer) {
+		layerStack.push(BG3Buffer);
+	}
+	if (BG2Buffer) {
+		layerStack.push(BG2Buffer);
+	}
+	if (BG1Buffer) {
+		layerStack.push(BG1Buffer);
+	}
+	if (BG0Buffer) {
+		layerStack.push(BG0Buffer);
+	}
+	if (OBJBuffer) {
+		layerStack.push(OBJBuffer);
+	}
+	return layerStack;
+}
+GameBoyAdvanceGraphics.prototype.copyLineToFrameBuffer = function (line) {
+	var offsetStart = line * 160;
+	for (var offsetEnd = offsetStart + 160; offsetStart < offsetEnd; ++offsetStart) {
+		this.frameBuffer[offsetStart] = this.lineBuffer[offsetStart];
+	}
 }
 GameBoyAdvanceGraphics.prototype.writeDISPCNT0 = function (data) {
 	this.midScanLineJIT();
