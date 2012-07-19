@@ -14,24 +14,23 @@
  * GNU General Public License for more details.
  *
  */
-function GameBoyAdvanceMode0Renderer(gfx) {
+function GameBoyAdvanceMode1Renderer(gfx) {
 	this.gfx = gfx;
 }
-GameBoyAdvanceMode0Renderer.prototype.renderScanLine = function (line) {
+GameBoyAdvanceMode1Renderer.prototype.renderScanLine = function (line) {
 	var BG0Buffer = (this.gfx.displayBG0) ? this.gfx.bg0Renderer.renderScanLine(line) : null;
 	var BG1Buffer = (this.gfx.displayBG1) ? this.gfx.bg1Renderer.renderScanLine(line) : null;
-	var BG2Buffer = (this.gfx.displayBG2) ? this.gfx.bg2TextRenderer.renderScanLine(line) : null;
-	var BG3Buffer = (this.gfx.displayBG3) ? this.gfx.bg3TextRenderer.renderScanLine(line) : null;
+	var BG2Buffer = (this.gfx.displayBG2) ? this.gfx.bg2MatrixRenderer.renderScanLine(line) : null;
 	var OBJBuffer = (this.gfx.displayOBJ) ? this.gfx.objRenderer.renderScanLine(line) : null;
-	this.gfx.compositeLayers(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
+	this.gfx.compositeLayers(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, null);
 	if (this.gfx.displayObjectWindowFlag) {
-		this.gfx.objWindowRenderer.renderScanLine(line, this.gfx.lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
+		this.gfx.objWindowRenderer.renderScanLine(line, this.gfx.lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, null);
 	}
 	if (this.gfx.displayWindow1Flag) {
-		this.gfx.window1Renderer.renderScanLine(line, this.gfx.lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
+		this.gfx.window1Renderer.renderScanLine(line, this.gfx.lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, null);
 	}
 	if (this.gfx.displayWindow0Flag) {
-		this.gfx.window0Renderer.renderScanLine(line, this.gfx.lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
+		this.gfx.window0Renderer.renderScanLine(line, this.gfx.lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, null);
 	}
 	this.gfx.copyLineToFrameBuffer(line);
 }
