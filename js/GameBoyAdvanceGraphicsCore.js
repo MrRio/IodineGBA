@@ -386,7 +386,7 @@ GameBoyAdvanceGraphics.prototype.compositeLayers = function (OBJBuffer, BG0Buffe
 		currentPixel = backdropColor;
 		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 			workingPixel = layerStack[stackIndex][pixelPosition];
-			if ((workingPixel >> 21) <= (currentPixel >> 21)) {
+			if ((workingPixel & 0xF00000) <= (currentPixel & 0xF00000)) {
 				//If higher priority AND non-transparent:
 				currentPixel = workingPixel;
 			}
@@ -1073,11 +1073,11 @@ GameBoyAdvanceGraphics.prototype.writePalette = function (address, data) {
 	var palette = ((this.paletteRAM[address | 1] << 8) | this.paletteRAM[address & 0x3FE]) & 0x7FFF;
 	address >>= 1;
 	if (address == 0) {
-		palette |= 0x800000;
+		palette |= 0x900000;
 	}
 	this.palette256[address] = palette;
 	if ((address & 0xF) == 0) {
-		palette |= 0x800000;
+		palette |= 0x900000;
 	}
 	this.palette16[address >> 4][address] = palette;
 }
