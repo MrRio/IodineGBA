@@ -25,7 +25,7 @@ GameBoyAdvanceBG0TEXTRenderer.prototype.tileMapMask = [
 	0x820
 ];
 GameBoyAdvanceBG0TEXTRenderer.prototype.initialize = function (line) {
-	this.scratchBuffer = getInt32Array(168);
+	this.scratchBuffer = getInt32Array(248);
 	this.tileMask = 0;
 	this.priorityFlag = 0;
 	this.baseBlockOffset = 0;
@@ -36,7 +36,7 @@ GameBoyAdvanceBG0TEXTRenderer.prototype.renderScanLine = function (line) {
 	var pixelPipelinePosition = this.gfx.BG0XCoord & 0x7;
 	var tileNumber = (((line + this.BG0YCoord) >> 3) << 6) | (this.gfx.BG0XCoord >> 3);
 	var chrData = this.fetchTile(tileNumber++);
-	for (var position = 0; position < 160;) {
+	for (var position = 0; position < 248;) {
 		while (pixelPipelinePosition < 0x8) {
 			this.scratchBuffer[position++] = this.priorityFlag | this.fetchVRAM(chrData, pixelPipelinePosition++, yTileOffset);
 		}
@@ -90,6 +90,6 @@ GameBoyAdvanceBG0TEXTRenderer.prototype.preprocess = function () {
 		this.fetchVRAM = this.fetch4BitVRAM;
 	}
 	this.tileMask = this.tileMapMask[this.gfx.BG0ScreenSize];
-	this.priorityFlag = this.BG0Priority << 16;
+	this.priorityFlag = this.BG0Priority << 15;
 	this.baseBlockOffset = this.gfx.BG0CharacterBaseBlock << 14;
 }
