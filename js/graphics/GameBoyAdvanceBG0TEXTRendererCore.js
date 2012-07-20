@@ -64,12 +64,10 @@ GameBoyAdvanceBG0TEXTRenderer.prototype.fetch4BitVRAM = function (chrData, xOffs
 	address += this.baseBlockOffset;
 	address += (((chrData & 0x800) == 0x800) ? (0x7 - yOffset) : yOffset) << 2;
 	address += (((chrData & 0x400) == 0x400) ? (0x7 - xOffset) : xOffset) >> 1;
-	if ((xOffset & 0x1) == 0x1) {
+	if ((xOffset & 0x1) != ((chrData & 0x400) >> 10)) {
 		return this.palette[chrData >> 12][this.gfx.VRAM[address] & 0xF];
 	}
-	else {
-		return this.palette[chrData >> 12][this.gfx.VRAM[address] >> 4];
-	}
+	return this.palette[chrData >> 12][this.gfx.VRAM[address] >> 4];
 }
 GameBoyAdvanceBG0TEXTRenderer.prototype.fetch8BitVRAM = function (chrData, xOffset, yOffset) {
 	//Parse flip attributes and output pixel:
