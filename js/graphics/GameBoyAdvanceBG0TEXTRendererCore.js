@@ -56,7 +56,7 @@ GameBoyAdvanceBG0TEXTRenderer.prototype.computeTileNumber = function (tileNumber
 	return actualTile;
 }
 GameBoyAdvanceBG0TEXTRenderer.prototype.computeScreenMapAddress = function (tileNumber) {
-	return 0x6000000 | (((tileNumber << 1) | (this.BG0ScreenBaseBlock << 11)) & 0xFFFF);
+	return ((tileNumber << 1) | (this.BG0ScreenBaseBlock << 11)) & 0xFFFF;
 }
 GameBoyAdvanceBG0TEXTRenderer.prototype.fetch4BitVRAM = function (chrData, xOffset, yOffset) {
 	//Parse flip attributes, grab palette, and then output pixel:
