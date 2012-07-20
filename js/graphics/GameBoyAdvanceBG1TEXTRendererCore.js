@@ -26,12 +26,9 @@ GameBoyAdvanceBG1TEXTRenderer.prototype.tileMapMask = [
 ];
 GameBoyAdvanceBG1TEXTRenderer.prototype.initialize = function (line) {
 	this.scratchBuffer = getInt32Array(248);
-	this.tileMask = 0;
-	this.priorityFlag = 0;
-	this.baseBlockOffset = 0;
+	this.preprocess();
 }
 GameBoyAdvanceBG1TEXTRenderer.prototype.renderScanLine = function (line) {
-	this.preprocess();
 	var yTileOffset = (line + this.BG1YCoord) & 0x7;
 	var pixelPipelinePosition = this.gfx.BG1XCoord & 0x7;
 	var tileNumber = (((line + this.BG1YCoord) >> 3) << 6) | (this.gfx.BG1XCoord >> 3);
