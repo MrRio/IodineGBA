@@ -382,7 +382,7 @@ GameBoyAdvanceGraphics.prototype.compositeLayers = function (OBJBuffer, BG0Buffe
 	var layerStack = this.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
-	while (++pixelPosition < 160) {
+	while (++pixelPosition < 240) {
 		currentPixel = backdropColor;
 		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 			workingPixel = layerStack[stackIndex][pixelPosition];
@@ -415,8 +415,8 @@ GameBoyAdvanceGraphics.prototype.cleanLayerStack = function (OBJBuffer, BG0Buffe
 	return layerStack;
 }
 GameBoyAdvanceGraphics.prototype.copyLineToFrameBuffer = function (line) {
-	var offsetStart = line * 160;
-	for (var offsetEnd = offsetStart + 160; offsetStart < offsetEnd; ++offsetStart) {
+	var offsetStart = line * 240;
+	for (var offsetEnd = offsetStart + 240; offsetStart < offsetEnd; ++offsetStart) {
 		this.frameBuffer[offsetStart] = this.lineBuffer[offsetStart];
 	}
 }
