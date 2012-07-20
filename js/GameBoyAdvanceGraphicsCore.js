@@ -387,7 +387,11 @@ GameBoyAdvanceGraphics.prototype.compositeLayers = function (OBJBuffer, BG0Buffe
 		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 			workingPixel = layerStack[stackIndex][pixelPosition];
 			if ((workingPixel & 0xF00000) <= (currentPixel & 0xF00000)) {
-				//If higher priority AND non-transparent:
+				/*
+					If higher priority than last pixel and not transparent.
+					Also clear any plane layer bits other than backplane for
+					transparency.
+				*/
 				currentPixel = workingPixel;
 			}
 		}
