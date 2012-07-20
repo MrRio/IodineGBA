@@ -177,6 +177,7 @@ GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.bg3TextRenderer = new GameBoyAdvanceBG3TEXTRenderer(this);
 	this.bg2MatrixRenderer = new GameBoyAdvanceBG2MatrixRenderer(this);
 	this.bg3MatrixRenderer = new GameBoyAdvanceBG3MatrixRenderer(this);
+	this.bg2FrameBufferRenderer = new GameBoyAdvanceBG2FrameBufferRenderer(this);
 	this.objRenderer = new GameBoyAdvanceObjRenderer(this);
 	this.window0Renderer = new GameBoyAdvanceWindow0Renderer(this);
 	this.window1Renderer = new GameBoyAdvanceWindow1Renderer(this);
