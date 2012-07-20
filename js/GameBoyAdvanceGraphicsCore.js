@@ -162,8 +162,6 @@ GameBoyAdvanceGraphics.prototype.initializeIO = function () {
 	this.lineBuffer = getInt32Array(160);
 	this.frameBuffer = getInt32Array(38400);
 	this.LCDTicks = 0;
-	this.HBlankFlagged = false;
-	this.VBlankFlagged = false;
 	this.totalLinesPassed = 0;
 	this.queuedScanLines = 0;
 	this.lastUnrenderedLine = 0;
@@ -257,7 +255,6 @@ GameBoyAdvanceGraphics.prototype.clockLCDState = function () {
 GameBoyAdvanceGraphics.prototype.updateHBlank = function () {
 	if (!this.inHBlank) {											//If we were last in HBlank, don't run this again.
 		this.inHBlank = true;										//Mark HBlank.
-		this.HBlankFlagged = true;									//Flag for the state updater so we can handle DMAs later on.
 		if (this.IRQHBlank) {										//Check for HBlank IRQ.
 			this.IOCore.irq.requestIRQ(0x2);
 		}
@@ -310,7 +307,6 @@ GameBoyAdvanceGraphics.prototype.nextDisplaySyncEventTime = function () {
 }
 GameBoyAdvanceGraphics.prototype.updateVBlankStart = function () {
 	this.inVBlank = true;								//Mark VBlank.
-	this.VBlankFlagged = true;							//Flag for the state updater so we can handle DMAs later on.
 	if (this.IRQVBlank) {								//Check for VBlank IRQ.
 		this.IOCore.irq.requestIRQ(0x1);
 	}
@@ -369,6 +365,22 @@ GameBoyAdvanceGraphics.prototype.incrementScanLineQueue = function () {
 			this.lastUnrenderedLine = 0;
 		}
 	}
+}
+GameBoyAdvanceGraphics.prototype.isRendering = function () {
+	return (this.currentScanLine < 160 && !this.inHBlank);
+}
+GameBoyAdvanceGraphics.prototype.OAMLockedCycles = function () {
+	if (!this.forcedBlank && this.currentScanLine < 160) {
+		if (this.HBlankIntervalFree) {
+			//Delay OAM access until horizontal blank:
+			return this.nextHBlankEventTime();
+		}
+		else {
+			//Delay OAM access until vertical blank:
+			return this.nextVBlankEventTime();
+		}
+	}
+	return 0;
 }
 GameBoyAdvanceGraphics.prototype.midScanLineJIT = function () {
 	//No mid-scanline JIT for now, instead just do per-scanline:

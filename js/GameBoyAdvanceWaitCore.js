@@ -207,7 +207,7 @@ GameBoyAdvanceWait.prototype.OAMAccess = function (reqByteNumber) {
 				return;
 			}
 		case 3:
-			this.IOCore.clocks = (this.IOCore.gfx.isRendering()) ? 2 : 1;
+			this.IOCore.clocks = this.IOCore.gfx.OAMLockedCycles() + 1;
 			this.IOCore.updateCore();
 	}
 	this.nonSequential = false;
