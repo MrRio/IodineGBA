@@ -367,7 +367,7 @@ GameBoyAdvanceGraphics.prototype.incrementScanLineQueue = function () {
 	}
 }
 GameBoyAdvanceGraphics.prototype.isRendering = function () {
-	return (this.currentScanLine < 160 && !this.inHBlank);
+	return (!this.forcedBlank && this.currentScanLine < 160 && !this.inHBlank);
 }
 GameBoyAdvanceGraphics.prototype.OAMLockedCycles = function () {
 	if (!this.forcedBlank && this.currentScanLine < 160) {
