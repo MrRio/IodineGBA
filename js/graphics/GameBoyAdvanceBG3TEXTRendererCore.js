@@ -87,6 +87,6 @@ GameBoyAdvanceBG3TEXTRenderer.prototype.preprocess = function () {
 		this.fetchVRAM = this.fetch4BitVRAM;
 	}
 	this.tileMask = this.tileMapMask[this.gfx.BG3ScreenSize];
-	this.priorityFlag = this.BG3Priority << 15;
+	this.priorityFlag = (this.gfx.BG3Priority << 21) | 0x40000;
 	this.baseBlockOffset = this.gfx.BG3CharacterBaseBlock << 14;
 }
