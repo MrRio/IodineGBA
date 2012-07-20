@@ -35,12 +35,11 @@ GameBoyAdvanceBG0TEXTRenderer.prototype.renderScanLine = function (line) {
 	var yTileOffset = (line + this.BG0YCoord) & 0x7;
 	var pixelPipelinePosition = this.gfx.BG0XCoord & 0x7;
 	var tileNumber = (((line + this.BG0YCoord) >> 3) << 6) | (this.gfx.BG0XCoord >> 3);
-	var chrData = this.fetchTile(tileNumber++);
-	for (var position = 0; position < 248;) {
+	for (var position = 0; position < 240;) {
+		var chrData = this.fetchTile(tileNumber++);
 		while (pixelPipelinePosition < 0x8) {
 			this.scratchBuffer[position++] = this.priorityFlag | this.fetchVRAM(chrData, pixelPipelinePosition++, yTileOffset);
 		}
-		chrData = this.fetchTile(tileNumber++);
 		pixelPipelinePosition &= 0x7;
 	}
 }
