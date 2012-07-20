@@ -375,15 +375,15 @@ GameBoyAdvanceGraphics.prototype.midScanLineJIT = function () {
 	this.graphicsJIT();
 }
 GameBoyAdvanceGraphics.prototype.compositeLayers = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
-	var pixelPosition = -1;
-	var currentPixel = 0;
-	var workingPixel = 0;
-	var backdropColor = this.palette256[0];
+	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
 	var layerStack = this.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
-	while (++pixelPosition < 240) {
-		currentPixel = backdropColor;
+	//Loop through each pixel on the line:
+	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0; pixelPosition < 240; ++pixelPosition) {
+		//Start with backdrop color:
+		currentPixel = this.palette256[0];
+		//Loop through all layers each pixel to resolve priority:
 		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 			workingPixel = layerStack[stackIndex][pixelPosition];
 			if ((workingPixel & 0xF00000) <= (currentPixel & 0xF00000)) {
