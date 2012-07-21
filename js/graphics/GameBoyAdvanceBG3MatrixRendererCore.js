@@ -28,9 +28,18 @@ GameBoyAdvanceBG3MatrixRenderer.prototype.initialize = function () {
 	this.scratchBuffer = getInt32Array(240);
 	this.referenceYDMXCounter = 0;
 	this.referenceYDMYCounter = 0;
+	this.shadowReferenceYDMXCounter = 0;
+	this.shadowReferenceYDMYCounter = 0;
 	this.preprocess();
 }
 GameBoyAdvanceBG3MatrixRenderer.prototype.renderScanLine = function (line) {
+	if (this.gfx.BG3Mosaic) {
+		//Correct line number for mosaic:
+		this.shadowReferenceYDMXCounter = this.referenceYDMXCounter;
+		this.shadowReferenceYDMYCounter = this.referenceYDMYCounter;
+		this.referenceYDMXCounter -= this.gfx.actualBG3dmx * this.gfx.mosaicRenderer.getMosaicYOffset(line);
+		this.referenceYDMYCounter -= this.gfx.actualBG3dmy * this.gfx.mosaicRenderer.getMosaicYOffset(line);
+	}
 	var x = 0;
 	var y = 0;
 	var referenceXDMXCounter = (this.gfx.actualBG3dx * -this.gfx.actualBG3ReferenceX) + this.gfx.actualBG3ReferenceX;
@@ -42,7 +51,14 @@ GameBoyAdvanceBG3MatrixRenderer.prototype.renderScanLine = function (line) {
 		referenceXDMYCounter += this.gfx.actualBG3dy;
 		this.scratchBuffer[position] = this.priorityFlag | this.fetchPixel(x, y);
 	}
+	if (this.gfx.BG3Mosaic) {
+		//Pixelize the line horizontally:
+		this.referenceYDMXCounter = this.shadowReferenceYDMXCounter;
+		this.referenceYDMYCounter = this.shadowReferenceYDMYCounter;
+		this.gfx.mosaicRenderer.renderMosaicHorizontal(this.scratchBuffer);
+	}
 	this.incrementReferenceCounters();
+	return this.scratchBuffer;
 }
 GameBoyAdvanceBG3MatrixRenderer.prototype.incrementReferenceCounters = function () {
 	this.referenceYDMXCounter += this.gfx.actualBG3dmx;

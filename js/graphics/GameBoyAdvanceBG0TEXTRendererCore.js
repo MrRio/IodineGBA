@@ -29,6 +29,10 @@ GameBoyAdvanceBG0TEXTRenderer.prototype.initialize = function (line) {
 	this.preprocess();
 }
 GameBoyAdvanceBG0TEXTRenderer.prototype.renderScanLine = function (line) {
+	if (this.gfx.BG0Mosaic) {
+		//Correct line number for mosaic:
+		line -= this.gfx.mosaicRenderer.getMosaicYOffset(line);
+	}
 	var yTileOffset = (line + this.BG0YCoord) & 0x7;
 	var pixelPipelinePosition = this.gfx.BG0XCoord & 0x7;
 	var tileNumber = (((line + this.BG0YCoord) >> 3) << 6) | (this.gfx.BG0XCoord >> 3);
@@ -39,6 +43,11 @@ GameBoyAdvanceBG0TEXTRenderer.prototype.renderScanLine = function (line) {
 		}
 		pixelPipelinePosition &= 0x7;
 	}
+	if (this.gfx.BG0Mosaic) {
+		//Pixelize the line horizontally:
+		this.gfx.mosaicRenderer.renderMosaicHorizontal(this.scratchBuffer);
+	}
+	return this.scratchBuffer;
 }
 GameBoyAdvanceBG0TEXTRenderer.prototype.fetchTile = function (tileNumber) {
 	//Find the tile code to locate the tile block:

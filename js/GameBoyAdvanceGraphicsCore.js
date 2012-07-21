@@ -180,6 +180,7 @@ GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.window0Renderer = new GameBoyAdvanceWindow0Renderer(this);
 	this.window1Renderer = new GameBoyAdvanceWindow1Renderer(this);
 	this.objWindowRenderer = new GameBoyAdvanceOBJWindowRenderer(this);
+	this.mosaicRenderer = new GameBoyAdvanceMosaicRenderer(this);
 	this.mode0Renderer = new GameBoyAdvanceMode0Renderer(this);
 	this.mode1Renderer = new GameBoyAdvanceMode1Renderer(this);
 	this.mode2Renderer = new GameBoyAdvanceMode2Renderer(this);
