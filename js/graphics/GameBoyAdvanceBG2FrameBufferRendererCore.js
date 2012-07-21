@@ -110,7 +110,4 @@ GameBoyAdvanceBG2FrameBufferRenderer.prototype.fetchMode5Pixel = function (x, y)
 }
 GameBoyAdvanceBG2FrameBufferRenderer.prototype.preprocess = function () {
 	this.priorityFlag = (this.gfx.BG2Priority << 21) | 0x20000;
-	this.mapSize = this.tileMapSize[this.gfx.BG2ScreenSize];
-	this.mapSizeComparer = this.mapSize - 1;
-	this.baseBlockOffset = this.gfx.BG2CharacterBaseBlock << 14;
 }

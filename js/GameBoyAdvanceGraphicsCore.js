@@ -597,6 +597,7 @@ GameBoyAdvanceGraphics.prototype.writeBG2CNT0 = function (data) {
 	this.BG2Palette256 = ((data & 0x80) == 0x80);
 	this.bg2TextRenderer.preprocess();
 	this.bg2MatrixRenderer.preprocess();
+	this.bg2FrameBufferRenderer.preprocess();
 }
 GameBoyAdvanceGraphics.prototype.readBG2CNT0 = function () {
 	return (this.BG2Priority |
