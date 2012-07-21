@@ -442,7 +442,7 @@ GameBoyAdvanceGraphics.prototype.copyLineToFrameBuffer = function (line) {
 GameBoyAdvanceGraphics.prototype.writeDISPCNT0 = function (data) {
 	this.midScanLineJIT();
 	this.BGMode = data & 0x07;
-	this.frameSelect = (data & 0x10) >> 4;
+	this.frameSelect = ((data & 0x10) >> 4) * 0xA000;
 	this.HBlankIntervalFree = ((data & 0x20) == 0x20);
 	this.VRAMOneDimensional = ((data & 0x40) == 0x40);
 	this.forcedBlank = ((data & 0x80) == 0x80);
@@ -458,19 +458,22 @@ GameBoyAdvanceGraphics.prototype.writeDISPCNT0 = function (data) {
 			break;
 		case 3:
 			this.renderer = this.mode3Renderer;
+			this.renderer.preprocess();
 			break;
 		case 4:
 			this.renderer = this.mode4Renderer;
+			this.renderer.preprocess();
 			break;
 		//case 5:
 		//Make the prohibited codes select mode 5?
 		default:
 			this.renderer = this.mode5Renderer;
+			this.renderer.preprocess();
 	}
 }
 GameBoyAdvanceGraphics.prototype.readDISPCNT0 = function () {
 	return (this.BGMode |
-	(this.frameSelect << 4) |
+	((this.frameSelect > 0) ? 0x10 : 0) |
 	(this.HBlankIntervalFree ? 0x20 : 0) | 
 	(this.VRAMOneDimensional ? 0x40 : 0) |
 	(this.forcedBlank ? 0x80 : 0));

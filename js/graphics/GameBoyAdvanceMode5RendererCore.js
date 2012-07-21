@@ -18,7 +18,7 @@ function GameBoyAdvanceMode5Renderer(gfx) {
 	this.gfx = gfx;
 }
 GameBoyAdvanceMode4Renderer.prototype.renderScanLine = function (line) {
-	var BG2Buffer = (this.gfx.displayBG2) ? this.gfx.bg2FrameBufferRenderer.renderMode5ScanLine(line) : null;
+	var BG2Buffer = (this.gfx.displayBG2) ? this.gfx.bg2FrameBufferRenderer.renderScanLine(line) : null;
 	var OBJBuffer = (this.gfx.displayOBJ) ? this.gfx.objRenderer.renderScanLine(line) : null;
 	this.gfx.compositeLayers(OBJBuffer, null, null, BG2Buffer, null);
 	if (this.gfx.displayObjectWindowFlag) {
@@ -31,4 +31,8 @@ GameBoyAdvanceMode4Renderer.prototype.renderScanLine = function (line) {
 		this.gfx.window0Renderer.renderScanLine(line, this.gfx.lineBuffer, OBJBuffer, null, null, BG2Buffer, null);
 	}
 	this.gfx.copyLineToFrameBuffer(line);
+}
+GameBoyAdvanceMode5Renderer.prototype.preprocess = function () {
+	//Set up pixel fetcher ahead of time:
+	this.gfx.bg2FrameBufferRenderer.selectMode(5);
 }
