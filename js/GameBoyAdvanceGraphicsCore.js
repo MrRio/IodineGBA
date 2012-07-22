@@ -400,7 +400,7 @@ GameBoyAdvanceGraphics.prototype.compositeLayersNormal = function (OBJBuffer, BG
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
 	//Loop through each pixel on the line:
-	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0; pixelPosition < 240; ++pixelPosition) {
+	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0, lowerPixel = 0; pixelPosition < 240; ++pixelPosition) {
 		//Start with backdrop color:
 		currentPixel = this.palette256[0];
 		//Loop through all layers each pixel to resolve priority:
@@ -412,10 +412,19 @@ GameBoyAdvanceGraphics.prototype.compositeLayersNormal = function (OBJBuffer, BG
 					Also clear any plane layer bits other than backplane for
 					transparency.
 				*/
+				lowerPixel = currentPixel;
 				currentPixel = workingPixel;
 			}
 		}
-		this.lineBuffer[pixelPosition] = currentPixel;
+		if ((currentPixel & 0x200000) == 0) {
+			//Normal Pixel:
+			this.lineBuffer[pixelPosition] = currentPixel;
+		}
+		else {
+			//OAM Pixel Processing:
+			//Pass the highest two pixels to be arbitrated in the color effects processing:
+			this.lineBuffer[pixelPosition] = this.colorEffectsRenderer.processOAMSemiTransparent(lowerPixel, currentPixel);
+		}
 	}
 }
 GameBoyAdvanceGraphics.prototype.compositeLayersWithEffects = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
@@ -443,8 +452,17 @@ GameBoyAdvanceGraphics.prototype.compositeLayersWithEffects = function (OBJBuffe
 				currentPixel = workingPixel;
 			}
 		}
-		//Pass the highest two pixels to be arbitrated in the color effects processing:
-		this.lineBuffer[pixelPosition] = this.colorEffectsRenderer.process(lowerPixel, currentPixel);
+		this.lineBuffer[pixelPosition] = ;
+		if ((currentPixel & 0x200000) == 0) {
+			//Normal Pixel:
+			//Pass the highest two pixels to be arbitrated in the color effects processing:
+			this.lineBuffer[pixelPosition] = this.colorEffectsRenderer.process(lowerPixel, currentPixel);
+		}
+		else {
+			//OAM Pixel Processing:
+			//Pass the highest two pixels to be arbitrated in the color effects processing:
+			this.lineBuffer[pixelPosition] = this.colorEffectsRenderer.processOAMSemiTransparent(lowerPixel, currentPixel);
+		}
 	}
 }
 GameBoyAdvanceGraphics.prototype.cleanLayerStack = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {

@@ -14,18 +14,18 @@
  * GNU General Public License for more details.
  *
  */
-function GameBoyAdvanceWindow0Renderer(gfx) {
+function GameBoyAdvanceWindow1Renderer(gfx) {
 	this.gfx = gfx;
 	this.preprocess();
 }
-GameBoyAdvanceWindow0Renderer.prototype.renderNormalScanLine = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
+GameBoyAdvanceWindow1Renderer.prototype.renderNormalScanLine = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
 	var layerStack = this.gfx.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
-	if (this.WIN0YCoordTop <= line && line <= this.WIN0YCoordBottom) {
+	if (this.WIN1YCoordTop <= line && line <= this.WIN1YCoordBottom) {
 		//Loop through each pixel on the line:
-		for (var pixelPosition = this.gfx.WIN0XCoordLeft, currentPixel = 0, workingPixel = 0, endPosition = Math.min(this.gfx.WIN0XCoordRight, 240); pixelPosition <= endPosition; ++pixelPosition) {
+		for (var pixelPosition = this.gfx.WIN1XCoordLeft, currentPixel = 0, workingPixel = 0, endPosition = Math.min(this.gfx.WIN1XCoordRight, 240); pixelPosition <= endPosition; ++pixelPosition) {
 			//Start with backdrop color:
 			currentPixel = this.palette256[0];
 			//Loop through all layers each pixel to resolve priority:
@@ -52,14 +52,14 @@ GameBoyAdvanceWindow0Renderer.prototype.renderNormalScanLine = function (line, l
 		}
 	}
 }
-GameBoyAdvanceWindow0Renderer.prototype.renderScanLineWithEffects = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
+GameBoyAdvanceWindow1Renderer.prototype.renderScanLineWithEffects = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
 	var layerStack = this.gfx.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
-	if (this.WIN0YCoordTop <= line && line <= this.WIN0YCoordBottom) {
+	if (this.WIN1YCoordTop <= line && line <= this.WIN1YCoordBottom) {
 		//Loop through each pixel on the line:
-		for (var pixelPosition = this.gfx.WIN0XCoordLeft, currentPixel = 0, workingPixel = 0, lowerPixel = 0, endPosition = Math.min(this.gfx.WIN0XCoordRight, 240); pixelPosition <= endPosition; ++pixelPosition) {
+		for (var pixelPosition = this.gfx.WIN1XCoordLeft, currentPixel = 0, workingPixel = 0, lowerPixel = 0, endPosition = Math.min(this.gfx.WIN1XCoordRight, 240); pixelPosition <= endPosition; ++pixelPosition) {
 			//Start with backdrop color:
 			lowerPixel = this.palette256[0];
 			currentPixel = this.palette256[0];
@@ -91,6 +91,6 @@ GameBoyAdvanceWindow0Renderer.prototype.renderScanLineWithEffects = function (li
 		}
 	}
 }
-GameBoyAdvanceWindow0Renderer.prototype.preprocess = function () {
-	this.renderScanLine = (this.gfx.WIN0Effects) ? this.renderScanLineWithEffects : this.renderNormalScanLine;
+GameBoyAdvanceWindow1Renderer.prototype.preprocess = function () {
+	this.renderScanLine = (this.gfx.WIN1Effects) ? this.renderScanLineWithEffects : this.renderNormalScanLine;
 }
