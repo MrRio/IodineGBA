@@ -181,6 +181,7 @@ GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.window1Renderer = new GameBoyAdvanceWindow1Renderer(this);
 	this.objWindowRenderer = new GameBoyAdvanceOBJWindowRenderer(this);
 	this.mosaicRenderer = new GameBoyAdvanceMosaicRenderer(this);
+	this.colorEffectsRenderer = new GameBoyAdvanceColorEffectsRenderer(this);
 	this.mode0Renderer = new GameBoyAdvanceMode0Renderer(this);
 	this.mode1Renderer = new GameBoyAdvanceMode1Renderer(this);
 	this.mode2Renderer = new GameBoyAdvanceMode2Renderer(this);
@@ -188,6 +189,7 @@ GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.mode4Renderer = new GameBoyAdvanceMode4Renderer(this);
 	this.mode5Renderer = new GameBoyAdvanceMode5Renderer(this);
 	this.renderer = this.mode0Renderer();
+	this.compositorPreprocess();
 }
 GameBoyAdvanceGraphics.prototype.initializeMatrixStorage = function () {
 	this.OBJMatrixParametersRaw = [];
@@ -389,7 +391,10 @@ GameBoyAdvanceGraphics.prototype.midScanLineJIT = function () {
 	//No mid-scanline JIT for now, instead just do per-scanline:
 	this.graphicsJIT();
 }
-GameBoyAdvanceGraphics.prototype.compositeLayers = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
+GameBoyAdvanceGraphics.prototype.compositorPreprocess = function () { 
+	this.compositeLayers = (this.WINEffectsOutside) ? this.compositeLayersWithEffects : this.compositeLayersNormal;
+}
+GameBoyAdvanceGraphics.prototype.compositeLayersNormal = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
 	var layerStack = this.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
@@ -401,7 +406,7 @@ GameBoyAdvanceGraphics.prototype.compositeLayers = function (OBJBuffer, BG0Buffe
 		//Loop through all layers each pixel to resolve priority:
 		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 			workingPixel = layerStack[stackIndex][pixelPosition];
-			if ((workingPixel & 0xF00000) <= (currentPixel & 0xF00000)) {
+			if ((workingPixel & 0x1D00000) <= (currentPixel & 0x1D00000)) {
 				/*
 					If higher priority than last pixel and not transparent.
 					Also clear any plane layer bits other than backplane for
@@ -411,6 +416,35 @@ GameBoyAdvanceGraphics.prototype.compositeLayers = function (OBJBuffer, BG0Buffe
 			}
 		}
 		this.lineBuffer[pixelPosition] = currentPixel;
+	}
+}
+GameBoyAdvanceGraphics.prototype.compositeLayersWithEffects = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
+	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
+	var layerStack = this.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
+	var stackDepth = layerStack.length;
+	var stackIndex = 0;
+	//Loop through each pixel on the line:
+	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0, lowerPixel = 0; pixelPosition < 240; ++pixelPosition) {
+		//Start with backdrop color:
+		lowerPixel = this.palette256[0];
+		currentPixel = this.palette256[0];
+		//Loop through all layers each pixel to resolve priority:
+		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
+			workingPixel = layerStack[stackIndex][pixelPosition];
+			if ((workingPixel & 0x1D00000) <= (currentPixel & 0x1D00000)) {
+				/*
+					If higher priority than last pixel and not transparent.
+					Also clear any plane layer bits other than backplane for
+					transparency.
+					
+					Keep a copy of the previous pixel (backdrop or non-transparent) for the color effects:
+				*/
+				lowerPixel = currentPixel;
+				currentPixel = workingPixel;
+			}
+		}
+		//Pass the highest two pixels to be arbitrated in the color effects processing:
+		this.lineBuffer[pixelPosition] = this.colorEffectsRenderer.process(lowerPixel, currentPixel);
 	}
 }
 GameBoyAdvanceGraphics.prototype.cleanLayerStack = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
@@ -920,6 +954,7 @@ GameBoyAdvanceGraphics.prototype.writeWININ0 = function (data) {
 	this.WIN0BG3 = ((data & 0x08) == 0x08);
 	this.WIN0OBJ = ((data & 0x10) == 0x10);
 	this.WIN0Effects = ((data & 0x20) == 0x20);
+	this.window0Renderer.preprocess();
 }
 GameBoyAdvanceGraphics.prototype.readWININ0 = function () {
 	//Window 0:
@@ -939,6 +974,7 @@ GameBoyAdvanceGraphics.prototype.writeWININ1 = function (data) {
 	this.WIN1BG3 = ((data & 0x08) == 0x08);
 	this.WIN1OBJ = ((data & 0x10) == 0x10);
 	this.WIN1Effects = ((data & 0x20) == 0x20);
+	this.window1Renderer.preprocess();
 }
 GameBoyAdvanceGraphics.prototype.readWININ1 = function () {
 	//Window 1:
@@ -957,6 +993,7 @@ GameBoyAdvanceGraphics.prototype.writeWINOUT0 = function (data) {
 	this.WINBG3Outside = ((data & 0x08) == 0x08);
 	this.WINOBJOutside = ((data & 0x10) == 0x10);
 	this.WINEffectsOutside = ((data & 0x20) == 0x20);
+	this.compositorPreprocess();
 }
 GameBoyAdvanceGraphics.prototype.readWINOUT0 = function () {
 	return ((this.WINBG0Outside ? 0x1 : 0) |
@@ -974,6 +1011,7 @@ GameBoyAdvanceGraphics.prototype.writeWINOUT1 = function (data) {
 	this.WINOBJBG3Outside = ((data & 0x08) == 0x08);
 	this.WINOBJOBJOutside = ((data & 0x10) == 0x10);
 	this.WINOBJEffectsOutside = ((data & 0x20) == 0x20);
+	this.objWindowRenderer.preprocess();
 }
 GameBoyAdvanceGraphics.prototype.readWINOUT1 = function () {
 	return ((this.WINOBJBG0Outside ? 0x1 : 0) |

@@ -91,7 +91,7 @@ GameBoyAdvanceBG3MatrixRenderer.prototype.fetchPixel = function (x, y) {
 	return this.gfx.palette256[this.gfx.VRAM[address]];
 }
 GameBoyAdvanceBG3MatrixRenderer.prototype.preprocess = function () {
-	this.priorityFlag = (this.gfx.BG3Priority << 21) | 0x40000;
+	this.priorityFlag = (this.gfx.BG3Priority << 22) | 0x40000;
 	this.mapSize = this.tileMapSize[this.gfx.BG3ScreenSize];
 	this.mapSizeComparer = this.mapSize - 1;
 	this.baseBlockOffset = this.gfx.BG3CharacterBaseBlock << 14;

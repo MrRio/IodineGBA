@@ -109,5 +109,5 @@ GameBoyAdvanceBG2FrameBufferRenderer.prototype.fetchMode5Pixel = function (x, y)
 	return this.gfx.VRAM[address | 1] | this.gfx.VRAM[address];
 }
 GameBoyAdvanceBG2FrameBufferRenderer.prototype.preprocess = function () {
-	this.priorityFlag = (this.gfx.BG2Priority << 21) | 0x20000;
+	this.priorityFlag = (this.gfx.BG2Priority << 22) | 0x20000;
 }
