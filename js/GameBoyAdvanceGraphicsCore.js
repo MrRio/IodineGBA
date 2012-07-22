@@ -402,7 +402,7 @@ GameBoyAdvanceGraphics.prototype.compositeLayersNormal = function (OBJBuffer, BG
 	//Loop through each pixel on the line:
 	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0, lowerPixel = 0; pixelPosition < 240; ++pixelPosition) {
 		//Start with backdrop color:
-		currentPixel = this.palette256[0];
+		lowerPixel = currentPixel = this.palette256[0];
 		//Loop through all layers each pixel to resolve priority:
 		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 			workingPixel = layerStack[stackIndex][pixelPosition];
@@ -435,8 +435,7 @@ GameBoyAdvanceGraphics.prototype.compositeLayersWithEffects = function (OBJBuffe
 	//Loop through each pixel on the line:
 	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0, lowerPixel = 0; pixelPosition < 240; ++pixelPosition) {
 		//Start with backdrop color:
-		lowerPixel = this.palette256[0];
-		currentPixel = this.palette256[0];
+		lowerPixel = currentPixel = this.palette256[0];
 		//Loop through all layers each pixel to resolve priority:
 		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 			workingPixel = layerStack[stackIndex][pixelPosition];

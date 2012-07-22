@@ -25,9 +25,9 @@ GameBoyAdvanceWindow1Renderer.prototype.renderNormalScanLine = function (line, l
 	var stackIndex = 0;
 	if (this.WIN1YCoordTop <= line && line <= this.WIN1YCoordBottom) {
 		//Loop through each pixel on the line:
-		for (var pixelPosition = this.gfx.WIN1XCoordLeft, currentPixel = 0, workingPixel = 0, endPosition = Math.min(this.gfx.WIN1XCoordRight, 240); pixelPosition <= endPosition; ++pixelPosition) {
+		for (var pixelPosition = this.gfx.WIN1XCoordLeft, currentPixel = 0, workingPixel = 0, lowerPixel = 0, endPosition = Math.min(this.gfx.WIN1XCoordRight, 240); pixelPosition <= endPosition; ++pixelPosition) {
 			//Start with backdrop color:
-			currentPixel = this.palette256[0];
+			lowerPixel = currentPixel = this.palette256[0];
 			//Loop through all layers each pixel to resolve priority:
 			for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 				workingPixel = layerStack[stackIndex][pixelPosition];
@@ -36,7 +36,10 @@ GameBoyAdvanceWindow1Renderer.prototype.renderNormalScanLine = function (line, l
 						If higher priority than last pixel and not transparent.
 						Also clear any plane layer bits other than backplane for
 						transparency.
+						
+						Keep a copy of the previous pixel (backdrop or non-transparent) for the color effects:
 					*/
+					lowerPixel = currentPixel;
 					currentPixel = workingPixel;
 				}
 			}
@@ -61,8 +64,7 @@ GameBoyAdvanceWindow1Renderer.prototype.renderScanLineWithEffects = function (li
 		//Loop through each pixel on the line:
 		for (var pixelPosition = this.gfx.WIN1XCoordLeft, currentPixel = 0, workingPixel = 0, lowerPixel = 0, endPosition = Math.min(this.gfx.WIN1XCoordRight, 240); pixelPosition <= endPosition; ++pixelPosition) {
 			//Start with backdrop color:
-			lowerPixel = this.palette256[0];
-			currentPixel = this.palette256[0];
+			lowerPixel = currentPixel = this.palette256[0];
 			//Loop through all layers each pixel to resolve priority:
 			for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 				workingPixel = layerStack[stackIndex][pixelPosition];
