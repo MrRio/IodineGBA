@@ -170,6 +170,7 @@ GameBoyAdvanceGraphics.prototype.initializeIO = function () {
 GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.initializeMatrixStorage();
 	this.initializePaletteStorage();
+	this.initializeOAMTable();
 	this.bg0Renderer = new GameBoyAdvanceBG0Renderer(this);
 	this.bg1Renderer = new GameBoyAdvanceBG1Renderer(this);
 	this.bg2TextRenderer = new GameBoyAdvanceBG2TEXTRenderer(this);
@@ -209,6 +210,27 @@ GameBoyAdvanceGraphics.prototype.initializePaletteStorage = function () {
 	for (var index = 0; index < 0x10; ++index) {
 		this.palette16[index] = getInt16Array(0x10);
 		this.paletteOBJ16[index] = getInt16Array(0x10);
+	}
+}
+GameBoyAdvanceGraphics.prototype.initializeOAMTable = function () {
+	for (var spriteNumber = 0; spriteNumber < 128; ++spriteNumber) {
+		OAMTable = {};
+		OAMTable.ycoord = 0;
+		OAMTable.matrix2D = false;
+		OAMTable.doubleSizeOrDisabled = false;
+		OAMTable.mode = 0;
+		OAMTable.mosaic = false;
+		OAMTable.monolithicPalette = false;
+		OAMTable.shape = 0;
+		OAMTable.xcoord = 0;
+		OAMTable.matrixParameters = 0;
+		OAMTable.horizontalFlip = false;
+		OAMTable.verticalFlip = false;
+		OAMTable.size = 0;
+		OAMTable.tileNumber = 0;
+		OAMTable.priority = 0;
+		OAMTable.paletteNumber = 0;
+		this.OAMTable[spriteNumber] = OAMTable;
 	}
 }
 GameBoyAdvanceGraphics.prototype.updateCore = function (clocks) {
