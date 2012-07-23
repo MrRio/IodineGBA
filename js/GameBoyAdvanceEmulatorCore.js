@@ -266,7 +266,7 @@ GameBoyAdvanceEmulator.prototype.initializeAudioBuffering = function () {
 	this.audioDestinationPosition = 0;
 	this.audioBufferContainAmount = Math.max(this.CPUCyclesPerIteration * audioBufferUnderrunLimit / this.audioResamplerFirstPassFactor, 4096) << 1;
 	this.audioNumSamplesTotal = (this.CPUCyclesPerIteration / this.audioResamplerFirstPassFactor) << 1;
-	this.audioBuffer = this.getTypedArray(this.audioNumSamplesTotal, 0, "float32");
+	this.audioBuffer = getFloat32Array(this.audioNumSamplesTotal);
 }
 GameBoyAdvanceEmulator.prototype.changeVolume = function (newVolume) {
 	this.audioVolume = Math.min(Math.max(parseFloat(newVolume), 0), 1);

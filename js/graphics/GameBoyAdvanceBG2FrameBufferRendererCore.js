@@ -88,7 +88,7 @@ GameBoyAdvanceBG2FrameBufferRenderer.prototype.fetchTile = function (tileNumber)
 GameBoyAdvanceBG2FrameBufferRenderer.prototype.fetchMode3Pixel = function (x, y) {
 	//Output pixel:
 	if (x > 239 || y > 159) {
-		return this.gfx.palette256[0];
+		return this.gfx.transparency;
 	}
 	address = this.gfx.frameSelect | (y * 480) | (x << 1);
 	return this.gfx.VRAM[address | 1] | this.gfx.VRAM[address];
@@ -96,14 +96,14 @@ GameBoyAdvanceBG2FrameBufferRenderer.prototype.fetchMode3Pixel = function (x, y)
 GameBoyAdvanceBG2FrameBufferRenderer.prototype.fetchMode4Pixel = function (x, y) {
 	//Output pixel:
 	if (x > 239 || y > 159) {
-		return this.gfx.palette256[0];
+		return this.gfx.transparency;
 	}
 	return this.gfx.palette256[this.gfx.VRAM[(y * 240) | x]];
 }
 GameBoyAdvanceBG2FrameBufferRenderer.prototype.fetchMode5Pixel = function (x, y) {
 	//Output pixel:
 	if (x > 159 || y > 127) {
-		return this.gfx.palette256[0];
+		return this.gfx.transparency;
 	}
 	address = this.gfx.frameSelect | (y * 480) | (x << 1);
 	return this.gfx.VRAM[address | 1] | this.gfx.VRAM[address];

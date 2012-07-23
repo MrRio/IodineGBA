@@ -18,6 +18,7 @@ function GameBoyAdvanceMosaicRenderer(gfx) {
 	this.gfx = gfx;
 }
 GameBoyAdvanceMosaicRenderer.prototype.renderMosaicHorizontal = function (layer) {
+	var currentPixel = 0;
 	var mosaicBlur = this.gfx.BGMosaicHSize + 1;
 	if (mosaicBlur > 1) {	//Don't perform a useless loop.
 		for (var position = 0; position < 240; ++position) {
@@ -30,6 +31,23 @@ GameBoyAdvanceMosaicRenderer.prototype.renderMosaicHorizontal = function (layer)
 		}
 	}
 }
+GameBoyAdvanceMosaicRenderer.prototype.renderOBJMosaicHorizontal = function (layer, position, to) {
+	var currentPixel = this.gfx.transparency;
+	var mosaicBlur = this.gfx.OBJMosaicHSize + 1;
+	if (mosaicBlur > 1) {	//Don't perform a useless loop.
+		for (; position < to; ++position) {
+			if ((position % mosaicBlur) == 0) {
+				currentPixel = layer[position];
+			}
+			else {
+				layer[position] = currentPixel;
+			}
+		}
+	}
+}
 GameBoyAdvanceMosaicRenderer.prototype.getMosaicYOffset = function (line) {
 	return line % (this.gfx.BGMosaicVSize + 1);
+}
+GameBoyAdvanceMosaicRenderer.prototype.getOBJMosaicYOffset = function (line) {
+	return line % (this.gfx.OBJMosaicVSize + 1);
 }

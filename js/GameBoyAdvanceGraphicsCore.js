@@ -165,6 +165,7 @@ GameBoyAdvanceGraphics.prototype.initializeIO = function () {
 	this.totalLinesPassed = 0;
 	this.queuedScanLines = 0;
 	this.lastUnrenderedLine = 0;
+	this.transparency = 0x1100000;
 }
 GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.initializeMatrixStorage();
@@ -176,7 +177,7 @@ GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.bg2MatrixRenderer = new GameBoyAdvanceBG2MatrixRenderer(this);
 	this.bg3MatrixRenderer = new GameBoyAdvanceBG3MatrixRenderer(this);
 	this.bg2FrameBufferRenderer = new GameBoyAdvanceBG2FrameBufferRenderer(this);
-	this.objRenderer = new GameBoyAdvanceObjRenderer(this);
+	this.objRenderer = new GameBoyAdvanceOBJRenderer(this);
 	this.window0Renderer = new GameBoyAdvanceWindow0Renderer(this);
 	this.window1Renderer = new GameBoyAdvanceWindow1Renderer(this);
 	this.objWindowRenderer = new GameBoyAdvanceOBJWindowRenderer(this);
@@ -201,10 +202,13 @@ GameBoyAdvanceGraphics.prototype.initializeMatrixStorage = function () {
 }
 GameBoyAdvanceGraphics.prototype.initializePaletteStorage = function () {
 	//Both BG and OAM in unified storage:
-	this.palette256 = getInt16Array(0x1FF);
+	this.palette256 = getInt16Array(0x100);
+	this.paletteOBJ256 = getInt16Array(0x100);
 	this.palette16 = [];
-	for (var index = 0; index < 0x20;) {
-		this.palette16[index++] = getInt16Array(0x10);
+	this.paletteOBJ16 = [];
+	for (var index = 0; index < 0x10; ++index) {
+		this.palette16[index] = getInt16Array(0x10);
+		this.paletteOBJ16[index] = getInt16Array(0x10);
 	}
 }
 GameBoyAdvanceGraphics.prototype.updateCore = function (clocks) {
@@ -402,7 +406,7 @@ GameBoyAdvanceGraphics.prototype.compositeLayersNormal = function (OBJBuffer, BG
 	//Loop through each pixel on the line:
 	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0, lowerPixel = 0; pixelPosition < 240; ++pixelPosition) {
 		//Start with backdrop color:
-		lowerPixel = currentPixel = this.palette256[0];
+		lowerPixel = currentPixel = this.transparency;
 		//Loop through all layers each pixel to resolve priority:
 		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 			workingPixel = layerStack[stackIndex][pixelPosition];
@@ -435,7 +439,7 @@ GameBoyAdvanceGraphics.prototype.compositeLayersWithEffects = function (OBJBuffe
 	//Loop through each pixel on the line:
 	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0, lowerPixel = 0; pixelPosition < 240; ++pixelPosition) {
 		//Start with backdrop color:
-		lowerPixel = currentPixel = this.palette256[0];
+		lowerPixel = currentPixel = this.transparency;
 		//Loop through all layers each pixel to resolve priority:
 		for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 			workingPixel = layerStack[stackIndex][pixelPosition];
@@ -1163,13 +1167,23 @@ GameBoyAdvanceGraphics.prototype.writePalette = function (address, data) {
 	var palette = ((this.paletteRAM[address | 1] << 8) | this.paletteRAM[address & 0x3FE]) & 0x7FFF;
 	address >>= 1;
 	if (address == 0) {
-		palette |= 0x900000;
+		palette |= this.transparency;
 	}
-	this.palette256[address] = palette;
+	if (address < 0x100) {
+		this.palette256[address] = palette;
+	}
+	else {
+		this.paletteOBJ256[address] = palette;
+	}
 	if ((address & 0xF) == 0) {
-		palette |= 0x900000;
+		palette |= this.transparency;
 	}
-	this.palette16[address >> 4][address] = palette;
+	if (address < 0x100) {
+		this.palette16[address >> 4][address] = palette;
+	}
+	else {
+		this.paletteOBJ16[address >> 4][address] = palette;
+	}
 }
 GameBoyAdvanceGraphics.prototype.readPalette = function (address) {
 	return this.paletteRAM[address];

@@ -81,7 +81,7 @@ GameBoyAdvanceBG2MatrixRenderer.prototype.fetchPixel = function (x, y) {
 			y &= this.mapSizeComparer;
 		}
 		else {
-			return this.gfx.palette256[0];
+			return this.gfx.transparency;
 		}
 	}
 	var address = this.fetchTile((x >> 3) + ((y >> 3) * this.mapSize)) << 6;

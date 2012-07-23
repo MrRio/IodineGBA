@@ -292,8 +292,8 @@ GameBoyAdvanceDMA.prototype.decrementWordCount = function (control, dmaChannel, 
 	this.wordCountShadow[dmaChannel] = wordCountShadow;
 }
 GameBoyAdvanceDMA.prototype.nextEventTime = function () {
-	clocks = -1;
-	workbench = -1;
+	var clocks = -1;
+	var workbench = -1;
 	for (var dmaChannel = 0; dmaChannel < 4; ++dmaChannel) {
 		switch (this.enabled[dmaChannel]) {
 			//V_BLANK
@@ -321,8 +321,8 @@ GameBoyAdvanceDMA.prototype.nextEventTime = function () {
 	return clocks;
 }
 GameBoyAdvanceDMA.prototype.nextIRQEventTime = function () {
-	clocks = -1;
-	workbench = -1;
+	var clocks = -1;
+	var workbench = -1;
 	for (var dmaChannel = 0; dmaChannel < 4; ++dmaChannel) {
 		if (this.controlShadow[dmaChannel][0]) {
 			switch (this.enabled[dmaChannel]) {

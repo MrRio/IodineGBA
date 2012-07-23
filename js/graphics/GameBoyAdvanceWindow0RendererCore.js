@@ -27,7 +27,7 @@ GameBoyAdvanceWindow0Renderer.prototype.renderNormalScanLine = function (line, l
 		//Loop through each pixel on the line:
 		for (var pixelPosition = this.gfx.WIN0XCoordLeft, currentPixel = 0, workingPixel = 0, lowerPixel = 0, endPosition = Math.min(this.gfx.WIN0XCoordRight, 240); pixelPosition <= endPosition; ++pixelPosition) {
 			//Start with backdrop color:
-			lowerPixel = currentPixel = this.palette256[0];
+			lowerPixel = currentPixel = this.gfx.transparency;
 			//Loop through all layers each pixel to resolve priority:
 			for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 				workingPixel = layerStack[stackIndex][pixelPosition];
@@ -64,7 +64,7 @@ GameBoyAdvanceWindow0Renderer.prototype.renderScanLineWithEffects = function (li
 		//Loop through each pixel on the line:
 		for (var pixelPosition = this.gfx.WIN0XCoordLeft, currentPixel = 0, workingPixel = 0, lowerPixel = 0, endPosition = Math.min(this.gfx.WIN0XCoordRight, 240); pixelPosition <= endPosition; ++pixelPosition) {
 			//Start with backdrop color:
-			lowerPixel = currentPixel = this.palette256[0];
+			lowerPixel = currentPixel = this.gfx.transparency;
 			//Loop through all layers each pixel to resolve priority:
 			for (stackIndex = 0; stackIndex < stackDepth; ++stackIndex) {
 				workingPixel = layerStack[stackIndex][pixelPosition];
