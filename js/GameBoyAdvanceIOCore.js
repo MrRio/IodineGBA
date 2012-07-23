@@ -1303,7 +1303,7 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	//4000303h - NOT USED - ZERO
 	this.writeIO[0x303] = this.NOP;
 }
-GameBoyCoreAdvanceIO.prototype.fillWriteTableNOP = function (from, to) {
+GameBoyAdvanceIO.prototype.fillWriteTableNOP = function (from, to) {
 	//Fill in slots of the i/o write table:
 	while (from <= to) {
 		this.writeIO[from++] = this.NOP;
@@ -1913,7 +1913,7 @@ GameBoyAdvanceIO.prototype.compileIOReadDispatch = function () {
 	//4000303h - NOT USED - ZERO
 	this.readIO[0x303] = this.readZero;
 }
-GameBoyCoreAdvanceIO.prototype.fillReadTableUnused = function (from, to) {
+GameBoyAdvanceIO.prototype.fillReadTableUnused = function (from, to) {
 	//Fill in slots of the i/o read table:
 	while (from <= to) {
 		this.readIO[from++] = this.readUnused0;
