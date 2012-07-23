@@ -27,34 +27,34 @@ GameBoyAdvanceJoyPad.prototype.initialize = function () {
 GameBoyAdvanceJoyPad.prototype.keyPress = function (keyPressed) {
 	switch (keyPressed) {
 		case "A":
-			this.keyInput ~= 0x1;
+			this.keyInput &= ~0x1;
 			break;
 		case "B":
-			this.keyInput ~= 0x2;
+			this.keyInput &= ~0x2;
 			break;
 		case "SELECT":
-			this.keyInput ~= 0x4;
+			this.keyInput &= ~0x4;
 			break;
 		case "START":
-			this.keyInput ~= 0x8;
+			this.keyInput &= ~0x8;
 			break;
 		case "RIGHT":
-			this.keyInput ~= 0x10;
+			this.keyInput &= ~0x10;
 			break;
 		case "LEFT":
-			this.keyInput ~= 0x20;
+			this.keyInput &= ~0x20;
 			break;
 		case "UP":
-			this.keyInput ~= 0x40;
+			this.keyInput &= ~0x40;
 			break;
 		case "DOWN":
-			this.keyInput ~= 0x80;
+			this.keyInput &= ~0x80;
 			break;
 		case "R":
-			this.keyInput ~= 0x100;
+			this.keyInput &= ~0x100;
 			break;
 		case "L":
-			this.keyInput ~= 0x200;
+			this.keyInput &= ~0x200;
 			break;
 		default:
 			return;
