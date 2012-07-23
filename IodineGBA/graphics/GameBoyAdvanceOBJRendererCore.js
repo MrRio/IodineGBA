@@ -146,12 +146,13 @@ GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xc
 	if (sprite.mosaic) {
 		renderOBJMosaicHorizontal(this.scratchBuffer, xcoord, xcoordEnd);
 	}
+	var bitFlags = (sprite.priority << 22) | 0x80000;
 	if (!sprite.horizontalFlip || sprite.matrix2D) {
 		//Normal:
 		for (var xSource = 0; xcoord < xcoordEnd; ++xcoord) {
 			//Only overwrite transparency:
 			if ((this.scratchBuffer[xcoord] & 0x1000000) == 0x1000000) {
-				this.scratchBuffer[xcoord] = this.scratchOBJBuffer[xSource++] | 0x80000;
+				this.scratchBuffer[xcoord] = bitFlags | this.scratchOBJBuffer[xSource++];
 			}
 		}
 	}
@@ -160,7 +161,7 @@ GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xc
 		for (var xSource = xSize; xcoord < xcoordEnd; ++xcoord) {
 			//Only overwrite transparency:
 			if ((this.scratchBuffer[xcoord] & 0x1000000) == 0x1000000) {
-				this.scratchBuffer[xcoordEnd] = this.scratchOBJBuffer[--xSource] | 0x80000;
+				this.scratchBuffer[xcoordEnd] = bitFlags | this.scratchOBJBuffer[--xSource];
 			}
 		}
 	}
