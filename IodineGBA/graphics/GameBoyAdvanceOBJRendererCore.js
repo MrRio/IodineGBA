@@ -58,7 +58,7 @@ GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite) {
 		}
 		//Obtain vertical size info:
 		var ySize = this.lookupYSize[(sprite.shape << 2) | sprite.size] << ((sprite.doubleSizeOrDisabled) ? 1 : 0);
-		var yOffset = line + ySize - sprite.ycoord;
+		var yOffset = line + ySize - sprite.ycoord - ((ySize < 128) ? 0 : 0x100);
 		//Make a sprite line:
 		if ((yOffset & --ySize) == yOffset) {
 			//Obtain horizontal size info::
@@ -92,18 +92,19 @@ GameBoyAdvanceOBJRenderer.prototype.renderNormalSprite = function (sprite, xSize
 			//Hardware ignores the LSB in this case:
 			tileNumber &= -2;
 		}
-		tileNumber += yOffset * 0x20;
+		tileNumber += (yOffset >> 3) * 0x20;
 	}
 	else {
 		//1D Mapping:
-		tileNumber += yOffset * xSize;
+		tileNumber += (yOffset >> 3) * xSize;
 	}
 	//Starting address of currently drawing sprite line:
 	var address = tileNumber << 5;
 	var vram = this.gfx.VRAM;
 	var objBufferPosition = 0;
 	if (sprite.monolithicPalette) {
-		//2D Mapping (32 8x8 tiles by 32 8x8 tiles):
+		//256 Colors / 1 Palette:
+		address += (yOffset & 7) << 3;
 		var palette = this.gfx.paletteOBJ256;
 		while (--xSize > -1) {
 			this.scratchOBJBuffer[objBufferPosition++] = palette[vram[address++]];
@@ -113,11 +114,13 @@ GameBoyAdvanceOBJRenderer.prototype.renderNormalSprite = function (sprite, xSize
 			this.scratchOBJBuffer[objBufferPosition++] = palette[vram[address++]];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[vram[address++]];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[vram[address++]];
-			this.scratchOBJBuffer[objBufferPosition++] = palette[vram[address++]];
+			this.scratchOBJBuffer[objBufferPosition++] = palette[vram[address]];
+			address += 0x39;
 		}
 	}
 	else {
-		//1D Mapping:
+		//16 Colors / 16 palettes:
+		address += (yOffset & 7) << 2;
 		var palette = this.gfx.paletteOBJ16[sprite.paletteNumber];
 		while (--xSize > -1) {
 			data = vram[address++];
@@ -129,9 +132,10 @@ GameBoyAdvanceOBJRenderer.prototype.renderNormalSprite = function (sprite, xSize
 			data = vram[address++];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[data >> 4];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[data & 0xF];
-			data = vram[address++];
+			data = vram[address];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[data >> 4];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[data & 0xF];
+			address += 0x1D;
 		}
 	}
 }
