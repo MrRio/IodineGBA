@@ -144,7 +144,7 @@ GameBoyAdvanceOBJRenderer.prototype.markSemiTransparent = function (xSize) {
 GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xcoord, xSize) {
 	var xcoordEnd = Math.min(xcoord + xSize, 240);
 	if (sprite.mosaic) {
-		renderOBJMosaicHorizontal(this.scratchOBJBuffer, xcoord, xcoordEnd);
+		renderOBJMosaicHorizontal(this.scratchBuffer, xcoord, xcoordEnd);
 	}
 	if (!sprite.horizontalFlip || sprite.matrix2D) {
 		//Normal:

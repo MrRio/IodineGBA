@@ -32,7 +32,7 @@ GameBoyAdvanceMosaicRenderer.prototype.renderMosaicHorizontal = function (layer)
 	}
 }
 GameBoyAdvanceMosaicRenderer.prototype.renderOBJMosaicHorizontal = function (layer, position, to) {
-	var currentPixel = this.gfx.transparency;
+	var currentPixel = (position > 0) ? layer[position - 1] : this.gfx.transparency;
 	var mosaicBlur = this.gfx.OBJMosaicHSize + 1;
 	if (mosaicBlur > 1) {	//Don't perform a useless loop.
 		for (; position < to; ++position) {
