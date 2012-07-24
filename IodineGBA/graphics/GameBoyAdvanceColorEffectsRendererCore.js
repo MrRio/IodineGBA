@@ -69,7 +69,7 @@ GameBoyAdvanceColorEffectsRenderer.prototype.brightnessIncrease = function (topP
 	b1 += (0x1F - b1) * this.gfx.brightnessEffectAmount;
 	g1 += (0x1F - g1) * this.gfx.brightnessEffectAmount;
 	r1 += (0x1F - r1) * this.gfx.brightnessEffectAmount;
-	return (Math.min(b1, 0x1F) << 10) | (Math.min(g1, 0x1F) << 5) | Math.min(r1, 0x1F);
+	return (b1 << 10) | (g1 << 5) | r1;
 }
 GameBoyAdvanceColorEffectsRenderer.prototype.brightnessDecrease = function (topPixel) {
 	var b1 = topPixel >> 10;
