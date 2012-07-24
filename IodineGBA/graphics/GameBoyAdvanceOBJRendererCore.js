@@ -58,7 +58,7 @@ GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite) {
 		}
 		//Obtain vertical size info:
 		var ySize = this.lookupYSize[(sprite.shape << 2) | sprite.size] << ((sprite.doubleSizeOrDisabled) ? 1 : 0);
-		var yOffset = line + ySize - sprite.ycoord - ((ySize < 128) ? 0 : 0x100);
+		var yOffset = line + ySize - sprite.ycoord - ((ySize < 129) ? 0 : 0x100);
 		//Make a sprite line:
 		if ((yOffset & --ySize) == yOffset) {
 			//Obtain horizontal size info::
