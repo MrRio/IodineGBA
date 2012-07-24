@@ -96,7 +96,7 @@ GameBoyAdvanceOBJRenderer.prototype.renderNormalSprite = function (sprite, xSize
 	}
 	else {
 		//1D Mapping:
-		tileNumber += (yOffset >> 3) * xSize;
+		tileNumber += (yOffset >> 3) * (xSize >> 3);
 	}
 	//Starting address of currently drawing sprite line:
 	var address = tileNumber << 5;
@@ -106,7 +106,7 @@ GameBoyAdvanceOBJRenderer.prototype.renderNormalSprite = function (sprite, xSize
 		//256 Colors / 1 Palette:
 		address += (yOffset & 7) << 3;
 		var palette = this.gfx.paletteOBJ256;
-		while (--xSize > -1) {
+		while (objBufferPosition < xSize) {
 			this.scratchOBJBuffer[objBufferPosition++] = palette[vram[address++]];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[vram[address++]];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[vram[address++]];
@@ -122,7 +122,7 @@ GameBoyAdvanceOBJRenderer.prototype.renderNormalSprite = function (sprite, xSize
 		//16 Colors / 16 palettes:
 		address += (yOffset & 7) << 2;
 		var palette = this.gfx.paletteOBJ16[sprite.paletteNumber];
-		while (--xSize > -1) {
+		while (objBufferPosition < xSize) {
 			data = vram[address++];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[data >> 4];
 			this.scratchOBJBuffer[objBufferPosition++] = palette[data & 0xF];
