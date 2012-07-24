@@ -65,7 +65,8 @@ GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite) {
 			var xSize = this.lookupXSize[(sprite.shape << 2) | sprite.size] << ((sprite.doubleSizeOrDisabled) ? 1 : 0);
 			if (sprite.matrix2D) {
 				//Scale & Rotation:
-				this.renderMatrixSprite(sprite, xSize, ySize, yOffset);
+				//this.renderMatrixSprite(sprite, xSize, ySize, yOffset);
+				return;
 			}
 			else {
 				//Regular Scrolling:
@@ -86,7 +87,7 @@ GameBoyAdvanceOBJRenderer.prototype.renderNormalSprite = function (sprite, xSize
 		yOffset = ySize - yOffset;
 	}
 	var tileNumber = sprite.tileNumber;
-	if (!this.VRAMOneDimensional) {
+	if (!this.gfx.VRAMOneDimensional) {
 		//2D Mapping (32 8x8 tiles by 32 8x8 tiles):
 		if (sprite.monolithicPalette) {
 			//Hardware ignores the LSB in this case:
