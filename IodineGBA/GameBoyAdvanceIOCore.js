@@ -17,6 +17,8 @@
 function GameBoyAdvanceIO(emulatorCore) {
 	//Reference to the emulator core:
 	this.emulatorCore = emulatorCore;
+	//Load the BIOS:
+	this.loadBIOS();
 	//State Machine Tracking:
 	this.systemStatus = 0;
 	this.cyclesToIterate = 0;
@@ -30,7 +32,7 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.irq = new GameBoyAdvanceIRQ(this);
 	this.serial = new GameBoyAdvanceSerial(this);
 	this.joypad = new GameBoyAdvanceJoyPad(this);
-	this.cartridge = new GameBoyAdvanceCartridge(this);
+	this.cartridge = new GameBoyAdvanceCartridge(this, ROM);
 	this.wait = new GameBoyAdvanceWait(this);
 	this.cpu = new GameBoyAdvanceCPU(this);
 	//After all sub-objects initialized, initialize dispatches:
@@ -2170,4 +2172,13 @@ GameBoyAdvanceIO.prototype.handleStop = function () {
 	//Update sound system to add silence to buffer:
 	this.sound.addClocks(this.cyclesToIterate);
 	//Exits when user presses joypad or from an external irq outside of GBA internal.
+}
+GameBoyAdvanceIO.prototype.loadBIOS = function () {
+	//Ensure BIOS is of correct length:
+	if (this.emulatorCore.BIOS.length != 0x4000) {
+		throw(new Error("Invalid BIOS length."));
+	}
+	else {
+		this.BIOS = this.emulatorCore.BIOS;
+	}
 }

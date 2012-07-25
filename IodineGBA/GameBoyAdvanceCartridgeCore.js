@@ -19,7 +19,7 @@ function GameBoyAdvanceCartridge(IOCore) {
 	this.initialize();
 }
 GameBoyAdvanceCartridge.prototype.initialize = function () {
-	this.ROM = this.IOCore.ROM;
+	this.ROM = this.IOCore.emulatorCore.ROM;
 	this.saveType = 0;
 	this.saveSize = 0;
 	this.saveRTC = false;

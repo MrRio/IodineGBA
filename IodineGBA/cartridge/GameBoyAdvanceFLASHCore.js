@@ -32,7 +32,7 @@ GameBoyAdvanceFlash.prototype.load = function (existingData) {
 	}
 }
 GameBoyAdvanceFlash.prototype.read = function (address) {
-	//return this.FLASH[this.bankOffset | (address & 0xFFFF)];
+	return this.FLASH[this.bankOffset | (address & 0xFFFF)];
 }
 GameBoyAdvanceFlash.prototype.write = function (address, data) {
 	//this.FLASH[this.bankOffset | (address & 0xFFFF)] = data;

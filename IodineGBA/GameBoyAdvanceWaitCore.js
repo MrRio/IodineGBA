@@ -95,21 +95,23 @@ GameBoyAdvanceWait.prototype.readConfigureWRAM = function (address) {
 			return 0;
 	}
 }
-GameBoyAdvanceWait.prototype.CPUInternalCyclePrefetch = function (address) {
-	if (address >= 0x8000000 && address < 0xF000000) {
+GameBoyAdvanceWait.prototype.CPUInternalCyclePrefetch = function (address, clocks) {
+	if (address >= 0x8000000 && address < 0xE000000) {
 		if (this.prefetchEnabled) {
-			if (this.ROMPrebuffer < 8) {
-				this.ROMPrebuffer++;
+			this.ROMPrebuffer += clocks;
+			if (this.ROMPrebuffer > 8) {
+				this.ROMPrebuffer = 8;
 			}
+			this.IOCore.clocks = clocks;
+			this.IOCore.updateCore();
 		}
 	}	
 }
 GameBoyAdvanceWait.prototype.CPUGetOpcode16 = function (address) {
-	if (address >= 0x8000000 && address < 0xF000000) {
+	if (address >= 0x8000000 && address < 0xE000000) {
 		if (this.prefetchEnabled) {
 			if (this.ROMPrebuffer > 0) {
 				--this.ROMPrebuffer;
-				return this.IOCore.cartridge.prebufferRead16(address);
 			}
 		}
 		else {
@@ -119,11 +121,10 @@ GameBoyAdvanceWait.prototype.CPUGetOpcode16 = function (address) {
 	return this.IOCore.memoryRead16(address);
 }
 GameBoyAdvanceWait.prototype.CPUGetOpcode32 = function (address) {
-	if (address >= 0x8000000 && address < 0xF000000) {
+	if (address >= 0x8000000 && address < 0xE000000) {
 		if (this.prefetchEnabled) {
 			if (this.ROMPrebuffer > 0) {
 				this.ROMPrebuffer -= 2;
-				return this.IOCore.cartridge.prebufferRead32(address);
 			}
 		}
 		else {
