@@ -58,15 +58,19 @@ GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite) {
 		}
 		//Obtain vertical size info:
 		var ySize = this.lookupYSize[(sprite.shape << 2) | sprite.size] << ((sprite.doubleSizeOrDisabled) ? 1 : 0);
-		var yOffset = line + ySize - sprite.ycoord - ((ySize < 129) ? 0 : 0x100);
+		var ycoord = sprite.ycoord - ((sprite.matrix2D) ? (ySize >> 1) : 0);
+		var yOffset = line + ySize - ycoord;
+		//Simulate y-coord wrap around logic:
+		if (ycoord > (0x100 - ySize)) {
+			yOffset += 0x100;
+		}
 		//Make a sprite line:
 		if ((yOffset & --ySize) == yOffset) {
-			//Obtain horizontal size info::
+			//Obtain horizontal size info:
 			var xSize = this.lookupXSize[(sprite.shape << 2) | sprite.size] << ((sprite.doubleSizeOrDisabled) ? 1 : 0);
 			if (sprite.matrix2D) {
 				//Scale & Rotation:
-				//this.renderMatrixSprite(sprite, xSize, ySize, yOffset);
-				return;
+				this.renderMatrixSprite(sprite, xSize, ySize + 1, yOffset);
 			}
 			else {
 				//Regular Scrolling:
@@ -77,7 +81,65 @@ GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite) {
 				this.markSemiTransparent(xSize);
 			}
 			//Copy OBJ scratch buffer to scratch line buffer:
-			this.outputSpriteToScratch(sprite, sprite.xcoord, xSize);
+			this.outputSpriteToScratch(sprite, xSize);
+		}
+	}
+}
+GameBoyAdvanceOBJRenderer.prototype.renderMatrixSprite = function (sprite, xSize, ySize, yOffset) {
+	var yDiffFromCenter = yOffset - (ySize >> 1);
+	var params = this.OBJMatrixParameters[sprite.matrixParameters];
+	var pa = -params[0] * (xSize >> 1);
+	var pb = params[1] * yDiffFromCenter;
+	var pc = -params[2] * (xSize >> 1);
+	var pd = params[3] * yDiffFromCenter;
+	var x = 0;
+	var y = 0;
+	var tileNumber = sprite.tileNumber;
+	for (var position = 0; position < xSize; ++position) {
+		//Find (X, Y):
+		x = pa + pb;
+		y = pc + pd;
+		if (x < xSize && y < ySize) {
+			//Coordinates in range, fetch pixel:
+			this.scratchOBJBuffer[position] = this.fetchMatrixPixel(tileNumber, x, y, xSize);
+		}
+		else {
+			//Coordinates outside of range, transparency defaulted:
+			this.scratchOBJBuffer[position] = this.gfx.transparency;
+		}
+		//Increment PA & PC for each X:
+		pa += params;
+		pc += params;
+	}
+}
+GameBoyAdvanceOBJRenderer.prototype.fetchMatrixPixel = function (tileNumber, x, y, xSize) {
+	if (!this.gfx.VRAMOneDimensional) {
+		//2D Mapping (32 8x8 tiles by 32 8x8 tiles):
+		if (sprite.monolithicPalette) {
+			//Hardware ignores the LSB in this case:
+			tileNumber &= -2;
+		}
+		tileNumber += (y >> 3) * 0x20;
+	}
+	else {
+		//1D Mapping:
+		tileNumber += (y >> 3) * (xSize >> 3);
+	}
+	//Starting address of currently drawing sprite line:
+	var address = tileNumber << 5;
+	if (sprite.monolithicPalette) {
+		//256 Colors / 1 Palette:
+		address += ((y & 7) << 3) + x;
+		return this.gfx.paletteOBJ256[this.gfx.VRAM[address]];
+	}
+	else {
+		//16 Colors / 16 palettes:
+		address += (((y & 7) << 3) + x) >> 1;
+		if ((x & 0x1) == 0x1) {
+			return this.gfx.paletteOBJ16[sprite.paletteNumber][this.gfx.VRAM[address] & 0xF];
+		}
+		else {
+			return this.gfx.paletteOBJ16[sprite.paletteNumber][this.gfx.VRAM[address] >> 4];
 		}
 	}
 }
@@ -146,27 +208,34 @@ GameBoyAdvanceOBJRenderer.prototype.markSemiTransparent = function (xSize) {
 		this.scratchOBJBuffer[xSize] |= 0x200000;
 	}
 }
-GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xcoord, xSize) {
+GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xSize) {
+	//Simulate x-coord wrap around logic:
+	var xcoord = sprite.xcoord - ((sprite.matrix2D) ? (xSize >> 1) : 0);
+	if (xcoord > (0x200 - xSize)) {
+		xcoord -= 0x200;
+	}
+	//Resolve end point:
 	var xcoordEnd = Math.min(xcoord + xSize, 240);
 	if (sprite.mosaic) {
 		renderOBJMosaicHorizontal(this.scratchBuffer, xcoord, xcoordEnd);
 	}
+	//Flag for compositor to ID the pixels as OBJ:
 	var bitFlags = (sprite.priority << 22) | 0x80000;
 	if (!sprite.horizontalFlip || sprite.matrix2D) {
 		//Normal:
-		for (var xSource = 0; xcoord < xcoordEnd; ++xcoord) {
+		for (var xSource = 0; xcoord < xcoordEnd; ++xcoord, ++xSource) {
 			//Only overwrite transparency:
-			if ((this.scratchBuffer[xcoord] & 0x1000000) == 0x1000000) {
-				this.scratchBuffer[xcoord] = bitFlags | this.scratchOBJBuffer[xSource++];
+			if (xcoord > -1 && (this.scratchBuffer[xcoord] & 0x1000000) == 0x1000000) {
+				this.scratchBuffer[xcoord] = bitFlags | this.scratchOBJBuffer[xSource];
 			}
 		}
 	}
 	else {
 		//Flipped Horizontally:
-		for (var xSource = xSize; xcoord < xcoordEnd; ++xcoord) {
+		for (var xSource = xSize; xcoord < xcoordEnd; ++xcoord, --xSource) {
 			//Only overwrite transparency:
-			if ((this.scratchBuffer[xcoord] & 0x1000000) == 0x1000000) {
-				this.scratchBuffer[xcoordEnd] = bitFlags | this.scratchOBJBuffer[--xSource];
+			if (xcoord > -1 && (this.scratchBuffer[xcoord] & 0x1000000) == 0x1000000) {
+				this.scratchBuffer[xcoord] = bitFlags | this.scratchOBJBuffer[xSource];
 			}
 		}
 	}
@@ -176,10 +245,8 @@ GameBoyAdvanceOBJRenderer.prototype.isDrawable = function (sprite) {
 	if (sprite.mode < 2) {
 		if (!sprite.doubleSizeOrDisabled || sprite.matrix2D) {
 			if (sprite.shape < 3) {
-				if (sprite.xcoord < 240) {
-					if (this.gfx.BGMode < 3 || sprite.tileNumber >= 0x200) {
-						return true;
-					}
+				if (this.gfx.BGMode < 3 || sprite.tileNumber >= 0x200) {
+					return true;
 				}
 			}
 		}
