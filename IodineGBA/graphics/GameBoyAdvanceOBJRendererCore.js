@@ -217,7 +217,7 @@ GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xS
 	//Resolve end point:
 	var xcoordEnd = Math.min(xcoord + xSize, 240);
 	if (sprite.mosaic) {
-		this.gfx.renderOBJMosaicHorizontal(this.scratchBuffer, xcoord, xcoordEnd);
+		this.gfx.mosaicRenderer.renderOBJMosaicHorizontal(this.scratchBuffer, xcoord, xcoordEnd);
 	}
 	//Flag for compositor to ID the pixels as OBJ:
 	var bitFlags = (sprite.priority << 22) | 0x80000;
