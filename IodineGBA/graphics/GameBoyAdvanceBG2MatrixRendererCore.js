@@ -49,7 +49,7 @@ GameBoyAdvanceBG2MatrixRenderer.prototype.renderScanLine = function (line) {
 		y = referenceXDMYCounter + this.referenceYDMYCounter;
 		referenceXDMXCounter += this.gfx.actualBG2dx;
 		referenceXDMYCounter += this.gfx.actualBG2dy;
-		this.scratchBuffer[position] = this.priorityFlag | this.fetchPixel(x, y);
+		this.scratchBuffer[position] = this.priorityFlag | this.fetchPixel(x | 0, y | 0);
 	}
 	if (this.gfx.BG2Mosaic) {
 		//Pixelize the line horizontally:

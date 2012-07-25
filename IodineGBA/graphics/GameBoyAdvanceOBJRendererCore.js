@@ -101,7 +101,7 @@ GameBoyAdvanceOBJRenderer.prototype.renderMatrixSprite = function (sprite, xSize
 		y = pc + pd;
 		if (x < xSize && y < ySize) {
 			//Coordinates in range, fetch pixel:
-			this.scratchOBJBuffer[position] = this.fetchMatrixPixel(tileNumber, x, y, xSize);
+			this.scratchOBJBuffer[position] = this.fetchMatrixPixel(tileNumber, x | 0, y | 0, xSize);
 		}
 		else {
 			//Coordinates outside of range, transparency defaulted:

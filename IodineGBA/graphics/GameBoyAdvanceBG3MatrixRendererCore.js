@@ -49,7 +49,7 @@ GameBoyAdvanceBG3MatrixRenderer.prototype.renderScanLine = function (line) {
 		y = referenceXDMYCounter + this.referenceYDMYCounter;
 		referenceXDMXCounter += this.gfx.actualBG3dx;
 		referenceXDMYCounter += this.gfx.actualBG3dy;
-		this.scratchBuffer[position] = this.priorityFlag | this.fetchPixel(x, y);
+		this.scratchBuffer[position] = this.priorityFlag | this.fetchPixel(x | 0, y | 0);
 	}
 	if (this.gfx.BG3Mosaic) {
 		//Pixelize the line horizontally:
@@ -81,7 +81,7 @@ GameBoyAdvanceBG3MatrixRenderer.prototype.fetchPixel = function (x, y) {
 			y &= this.mapSizeComparer;
 		}
 		else {
-			return this.gfx.palette256[0];
+			return this.gfx.transparency;
 		}
 	}
 	var address = this.fetchTile((x >> 3) + ((y >> 3) * this.mapSize)) << 6;
