@@ -209,14 +209,14 @@ GameBoyAdvanceOBJRenderer.prototype.markSemiTransparent = function (xSize) {
 	}
 }
 GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xSize) {
-	//Perform the mosaic transform:
-	if (sprite.mosaic) {
-		this.gfx.mosaicRenderer.renderOBJMosaicHorizontal(this.scratchOBJBuffer, xSize);
-	}
 	//Simulate x-coord wrap around logic:
 	var xcoord = sprite.xcoord - ((sprite.matrix2D) ? (xSize >> 1) : 0);
 	if (xcoord > (0x200 - xSize)) {
 		xcoord -= 0x200;
+	}
+	//Perform the mosaic transform:
+	if (sprite.mosaic) {
+		this.gfx.mosaicRenderer.renderOBJMosaicHorizontal(this.scratchOBJBuffer, xcoord, xSize);
 	}
 	//Resolve end point:
 	var xcoordEnd = Math.min(xcoord + xSize, 240);
