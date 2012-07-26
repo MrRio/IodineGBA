@@ -20,11 +20,14 @@ function GameBoyAdvanceOBJWindowRenderer(gfx) {
 }
 GameBoyAdvanceOBJWindowRenderer.prototype.renderNormalScanLine = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
-	OBJBuffer = (this.gfx.WINOBJOBJOutside) ? OBJBuffer : null;
-	BG0Buffer = (this.gfx.WINOBJBG0Outside) ? BG0Buffer: null;
-	BG1Buffer = (this.gfx.WINOBJBG1Outside) ? BG1Buffer: null;
-	BG2Buffer = (this.gfx.WINOBJBG2Outside) ? BG2Buffer: null;
-	BG3Buffer = (this.gfx.WINOBJBG3Outside) ? BG3Buffer: null;
+	if (this.gfx.displayObjectWindowFlag || this.gfx.displayWindow1Flag || this.gfx.displayWindow0Flag) {
+		//Window registers can further disable background layers if one or more window layers enabled:
+		OBJBuffer = (this.gfx.WINOBJOBJOutside) ? OBJBuffer : null;
+		BG0Buffer = (this.gfx.WINOBJBG0Outside) ? BG0Buffer: null;
+		BG1Buffer = (this.gfx.WINOBJBG1Outside) ? BG1Buffer: null;
+		BG2Buffer = (this.gfx.WINOBJBG2Outside) ? BG2Buffer: null;
+		BG3Buffer = (this.gfx.WINOBJBG3Outside) ? BG3Buffer: null;
+	}
 	var layerStack = this.gfx.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
@@ -64,11 +67,14 @@ GameBoyAdvanceOBJWindowRenderer.prototype.renderNormalScanLine = function (line,
 }
 GameBoyAdvanceOBJWindowRenderer.prototype.renderScanLineWithEffects = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
-	OBJBuffer = (this.gfx.WINOBJOBJOutside) ? OBJBuffer : null;
-	BG0Buffer = (this.gfx.WINOBJBG0Outside) ? BG0Buffer: null;
-	BG1Buffer = (this.gfx.WINOBJBG1Outside) ? BG1Buffer: null;
-	BG2Buffer = (this.gfx.WINOBJBG2Outside) ? BG2Buffer: null;
-	BG3Buffer = (this.gfx.WINOBJBG3Outside) ? BG3Buffer: null;
+	if (this.gfx.displayObjectWindowFlag || this.gfx.displayWindow1Flag || this.gfx.displayWindow0Flag) {
+		//Window registers can further disable background layers if one or more window layers enabled:
+		OBJBuffer = (this.gfx.WINOBJOBJOutside) ? OBJBuffer : null;
+		BG0Buffer = (this.gfx.WINOBJBG0Outside) ? BG0Buffer: null;
+		BG1Buffer = (this.gfx.WINOBJBG1Outside) ? BG1Buffer: null;
+		BG2Buffer = (this.gfx.WINOBJBG2Outside) ? BG2Buffer: null;
+		BG3Buffer = (this.gfx.WINOBJBG3Outside) ? BG3Buffer: null;
+	}
 	var layerStack = this.gfx.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
