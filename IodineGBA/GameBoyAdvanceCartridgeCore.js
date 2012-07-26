@@ -81,7 +81,7 @@ GameBoyAdvanceCartridge.prototype.lookupCartridgeType = function () {
 	//Initialize the SRAM:
 	this.mapSRAM();
 	//Initialize the RTC:
-	this.mapRTC();
+	//this.mapRTC();
 }
 GameBoyAdvanceCartridge.prototype.mapSRAM = function () {
 	switch (this.saveType) {
@@ -96,9 +96,11 @@ GameBoyAdvanceCartridge.prototype.mapSRAM = function () {
 			this.loadExisting();
 			break;
 		//EEPROM
-		case 3:
+		/*case 3:
 			this.sram = new GameBoyAdvanceEEPROM(this, this.saveSize);
-			this.loadExisting();
+			this.loadExisting();*/
+		default:
+			this.saveType = 0;
 	}
 }
 GameBoyAdvanceCartridge.prototype.mapRTC = function () {
