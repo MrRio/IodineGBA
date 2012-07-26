@@ -41,7 +41,7 @@ GameBoyAdvanceOBJRenderer.prototype.initialize = function (line) {
 GameBoyAdvanceOBJRenderer.prototype.renderScanLine = function (line) {
 	this.clearScratch();
 	for (var objNumber = 0; objNumber < 128; ++objNumber) {
-		this.renderSprite(line, this.gfx.OAMTable[objNumber]);
+		this.renderSprite(line, this.gfx.OAMTable[objNumber], false);
 	}
 	return this.scratchBuffer;
 }
@@ -50,8 +50,15 @@ GameBoyAdvanceOBJRenderer.prototype.clearScratch = function () {
 		this.scratchBuffer[position] = this.gfx.transparency;
 	}
 }
-GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite) {
-	if (this.isDrawable(sprite)) {
+GameBoyAdvanceOBJRenderer.prototype.renderWindowScanLine = function (line) {
+	this.clearScratch();
+	for (var objNumber = 0; objNumber < 128; ++objNumber) {
+		this.renderSprite(line, this.gfx.OAMTable[objNumber], true);
+	}
+	return this.scratchBuffer;
+}
+GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite, doSpriteWindow) {
+	if (this.isDrawable(sprite, doSpriteWindow)) {
 		if (sprite.mosaic) {
 			//Correct line number for mosaic:
 			line -= this.gfx.mosaicRenderer.getOBJMosaicYOffset(line);
@@ -216,9 +223,6 @@ GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xS
 	}
 	//Resolve end point:
 	var xcoordEnd = Math.min(xcoord + xSize, 240);
-	if (sprite.mosaic) {
-		this.gfx.mosaicRenderer.renderOBJMosaicHorizontal(this.scratchBuffer, xcoord, xcoordEnd);
-	}
 	//Flag for compositor to ID the pixels as OBJ:
 	var bitFlags = (sprite.priority << 22) | 0x80000;
 	if (!sprite.horizontalFlip || sprite.matrix2D) {
@@ -239,10 +243,13 @@ GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xS
 			}
 		}
 	}
+	if (sprite.mosaic) {
+		this.gfx.mosaicRenderer.renderOBJMosaicHorizontal(this.scratchBuffer, xcoord, xcoordEnd);
+	}
 }
-GameBoyAdvanceOBJRenderer.prototype.isDrawable = function (sprite) {
+GameBoyAdvanceOBJRenderer.prototype.isDrawable = function (sprite, doWindowOBJ) {
 	//Make sure we pass some checks that real hardware does:
-	if (sprite.mode < 2) {
+	if ((sprite.mode < 2 && !doWindowOBJ) || (doWindowOBJ && sprite.mode == 2)) {
 		if (!sprite.doubleSizeOrDisabled || sprite.matrix2D) {
 			if (sprite.shape < 3) {
 				if (this.gfx.BGMode < 3 || sprite.tileNumber >= 0x200) {

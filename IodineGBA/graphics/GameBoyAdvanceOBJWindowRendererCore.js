@@ -20,17 +20,19 @@ function GameBoyAdvanceOBJWindowRenderer(gfx) {
 }
 GameBoyAdvanceOBJWindowRenderer.prototype.renderNormalScanLine = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
-	OBJBuffer = (this.gfx.WIN0OBJ) ? OBJBuffer : null;
-	BG0Buffer = (this.gfx.WIN0BG0) ? BG0Buffer : null;
-	BG1Buffer = (this.gfx.WIN0BG1) ? BG1Buffer : null;
-	BG2Buffer = (this.gfx.WIN0BG2) ? BG2Buffer : null;
-	BG3Buffer = (this.gfx.WIN0BG3) ? BG3Buffer : null;
+	OBJBuffer = (this.gfx.WINOBJOBJOutside) ? OBJBuffer : null;
+	BG0Buffer = (this.gfx.WINOBJBG0Outside) ? BG0Buffer: null;
+	BG1Buffer = (this.gfx.WINOBJBG1Outside) ? BG1Buffer: null;
+	BG2Buffer = (this.gfx.WINOBJBG2Outside) ? BG2Buffer: null;
+	BG3Buffer = (this.gfx.WINOBJBG3Outside) ? BG3Buffer: null;
 	var layerStack = this.gfx.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
-	if (this.WIN0YCoordTop <= line && line <= this.WIN0YCoordBottom) {
-		//Loop through each pixel on the line:
-		for (var pixelPosition = this.gfx.WIN0XCoordLeft, currentPixel = 0, workingPixel = 0, lowerPixel = 0, endPosition = Math.min(this.gfx.WIN0XCoordRight, 240); pixelPosition < endPosition; ++pixelPosition) {
+	var OBJWindowBuffer = this.gfx.objRenderer.renderWindowScanLine(line);
+	//Loop through each pixel on the line:
+	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0, lowerPixel = 0; pixelPosition < 240; ++pixelPosition) {
+		//If non-transparent OBJ (Marked for OBJ WIN) pixel detected:
+		if ((OBJWindowBuffer[pixelPosition] & this.gfx.transparency) == 0) {
 			//Start with backdrop color:
 			lowerPixel = currentPixel = this.gfx.transparency;
 			//Loop through all layers each pixel to resolve priority:
@@ -62,17 +64,19 @@ GameBoyAdvanceOBJWindowRenderer.prototype.renderNormalScanLine = function (line,
 }
 GameBoyAdvanceOBJWindowRenderer.prototype.renderScanLineWithEffects = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
-	OBJBuffer = (this.gfx.WIN0OBJ) ? OBJBuffer : null;
-	BG0Buffer = (this.gfx.WIN0BG0) ? BG0Buffer : null;
-	BG1Buffer = (this.gfx.WIN0BG1) ? BG1Buffer : null;
-	BG2Buffer = (this.gfx.WIN0BG2) ? BG2Buffer : null;
-	BG3Buffer = (this.gfx.WIN0BG3) ? BG3Buffer : null;
+	OBJBuffer = (this.gfx.WINOBJOBJOutside) ? OBJBuffer : null;
+	BG0Buffer = (this.gfx.WINOBJBG0Outside) ? BG0Buffer: null;
+	BG1Buffer = (this.gfx.WINOBJBG1Outside) ? BG1Buffer: null;
+	BG2Buffer = (this.gfx.WINOBJBG2Outside) ? BG2Buffer: null;
+	BG3Buffer = (this.gfx.WINOBJBG3Outside) ? BG3Buffer: null;
 	var layerStack = this.gfx.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
-	if (this.WIN0YCoordTop <= line && line <= this.WIN0YCoordBottom) {
-		//Loop through each pixel on the line:
-		for (var pixelPosition = this.gfx.WIN0XCoordLeft, currentPixel = 0, workingPixel = 0, lowerPixel = 0, endPosition = Math.min(this.gfx.WIN0XCoordRight, 240); pixelPosition < endPosition; ++pixelPosition) {
+	var OBJWindowBuffer = this.gfx.objRenderer.renderWindowScanLine(line);
+	//Loop through each pixel on the line:
+	for (var pixelPosition = 0, currentPixel = 0, workingPixel = 0, lowerPixel = 0; pixelPosition < 240; ++pixelPosition) {
+		//If non-transparent OBJ (Marked for OBJ WIN) pixel detected:
+		if ((OBJWindowBuffer[pixelPosition] & this.gfx.transparency) == 0) {
 			//Start with backdrop color:
 			lowerPixel = currentPixel = this.gfx.transparency;
 			//Loop through all layers each pixel to resolve priority:
