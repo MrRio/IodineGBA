@@ -112,7 +112,7 @@ GameBoyAdvanceOBJRenderer.prototype.renderMatrixSprite = function (sprite, xSize
 		y = pc + pd;
 		if (x < xSize && y < ySize) {
 			//Coordinates in range, fetch pixel:
-			this.scratchOBJBuffer[position] = this.fetchMatrixPixel(tileNumber, x | 0, y | 0, xSize);
+			this.scratchOBJBuffer[position] = this.fetchMatrixPixel(sprite, tileNumber, x | 0, y | 0, xSize);
 		}
 		else {
 			//Coordinates outside of range, transparency defaulted:
@@ -123,21 +123,8 @@ GameBoyAdvanceOBJRenderer.prototype.renderMatrixSprite = function (sprite, xSize
 		pc += params;
 	}
 }
-GameBoyAdvanceOBJRenderer.prototype.fetchMatrixPixel = function (tileNumber, x, y, xSize) {
-	if (!this.gfx.VRAMOneDimensional) {
-		//2D Mapping (32 8x8 tiles by 32 8x8 tiles):
-		if (sprite.monolithicPalette) {
-			//Hardware ignores the LSB in this case:
-			tileNumber &= -2;
-		}
-		tileNumber += (y >> 3) * 0x20;
-	}
-	else {
-		//1D Mapping:
-		tileNumber += (y >> 3) * (xSize >> 3);
-	}
-	//Starting address of currently drawing sprite line:
-	var address = tileNumber << 5;
+GameBoyAdvanceOBJRenderer.prototype.fetchMatrixPixel = function (sprite, tileNumber, x, y, xSize) {
+	var address = tileNumberToAddress(sprite, tileNumber, xSize, yOffset);
 	if (sprite.monolithicPalette) {
 		//256 Colors / 1 Palette:
 		address += ((y & 7) << 3) + x;
@@ -159,21 +146,7 @@ GameBoyAdvanceOBJRenderer.prototype.renderNormalSprite = function (sprite, xSize
 		//Flip y-coordinate offset:
 		yOffset = ySize - yOffset;
 	}
-	var tileNumber = sprite.tileNumber;
-	if (!this.gfx.VRAMOneDimensional) {
-		//2D Mapping (32 8x8 tiles by 32 8x8 tiles):
-		if (sprite.monolithicPalette) {
-			//Hardware ignores the LSB in this case:
-			tileNumber &= -2;
-		}
-		tileNumber += (yOffset >> 3) * 0x20;
-	}
-	else {
-		//1D Mapping:
-		tileNumber += (yOffset >> 3) * (xSize >> 3);
-	}
-	//Starting address of currently drawing sprite line:
-	var address = tileNumber << 5;
+	var address = tileNumberToAddress(sprite, sprite.tileNumber, xSize, yOffset);
 	var vram = this.gfx.VRAM;
 	var objBufferPosition = 0;
 	if (sprite.monolithicPalette) {
@@ -212,6 +185,22 @@ GameBoyAdvanceOBJRenderer.prototype.renderNormalSprite = function (sprite, xSize
 			address += 0x1D;
 		}
 	}
+}
+GameBoyAdvanceOBJRenderer.prototype.tileNumberToAddress = function (sprite, tileNumber, xSize, yOffset) {
+	if (!this.gfx.VRAMOneDimensional) {
+		//2D Mapping (32 8x8 tiles by 32 8x8 tiles):
+		if (sprite.monolithicPalette) {
+			//Hardware ignores the LSB in this case:
+			tileNumber &= -2;
+		}
+		tileNumber += (yOffset >> 3) * 0x20;
+	}
+	else {
+		//1D Mapping:
+		tileNumber += (yOffset >> 3) * (xSize >> 3);
+	}
+	//Starting address of currently drawing sprite line:
+	return tileNumber << 5;
 }
 GameBoyAdvanceOBJRenderer.prototype.markSemiTransparent = function (xSize) {
 	//Mark sprite pixels as semi-transparent:
