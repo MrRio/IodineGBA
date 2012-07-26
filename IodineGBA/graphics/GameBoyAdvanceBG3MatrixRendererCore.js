@@ -26,47 +26,50 @@ GameBoyAdvanceBG3MatrixRenderer.prototype.tileMapSize = [
 ];
 GameBoyAdvanceBG3MatrixRenderer.prototype.initialize = function () {
 	this.scratchBuffer = getInt32Array(240);
-	this.referenceYDMXCounter = 0;
-	this.referenceYDMYCounter = 0;
-	this.shadowReferenceYDMXCounter = 0;
-	this.shadowReferenceYDMYCounter = 0;
+	this.pb = 0;
+	this.pd = 0;
+	this.shadowPB = 0;
+	this.shadowPD = 0;
 	this.preprocess();
 }
 GameBoyAdvanceBG3MatrixRenderer.prototype.renderScanLine = function (line) {
 	if (this.gfx.BG3Mosaic) {
 		//Correct line number for mosaic:
-		this.shadowReferenceYDMXCounter = this.referenceYDMXCounter;
-		this.shadowReferenceYDMYCounter = this.referenceYDMYCounter;
-		this.referenceYDMXCounter -= this.gfx.actualBG3dmx * this.gfx.mosaicRenderer.getMosaicYOffset(line);
-		this.referenceYDMYCounter -= this.gfx.actualBG3dmy * this.gfx.mosaicRenderer.getMosaicYOffset(line);
+		this.shadowPB = this.pb;
+		this.shadowPD = this.pd;
+		this.pb -= this.gfx.actualBG3dmx * this.gfx.mosaicRenderer.getMosaicYOffset(line);
+		this.pd -= this.gfx.actualBG3dmy * this.gfx.mosaicRenderer.getMosaicYOffset(line);
 	}
 	var x = 0;
 	var y = 0;
-	var referenceXDMXCounter = (this.gfx.actualBG3dx * -this.gfx.actualBG3ReferenceX) + this.gfx.actualBG3ReferenceX;
-	var referenceXDMYCounter = (this.gfx.actualBG3dy * -this.gfx.actualBG3ReferenceX) + this.gfx.actualBG3ReferenceY;
+	var pa = 0;
+	var pc = 0;
 	for (var position = 0; position < 240; ++position) {
-		x = referenceXDMXCounter + this.referenceYDMXCounter;
-		y = referenceXDMYCounter + this.referenceYDMYCounter;
-		referenceXDMXCounter += this.gfx.actualBG3dx;
-		referenceXDMYCounter += this.gfx.actualBG3dy;
+		//Find (X, Y):
+		x = pa + this.pb;
+		y = pc + this.pd;
+		//Fetch pixel:
 		this.scratchBuffer[position] = this.priorityFlag | this.fetchPixel(x | 0, y | 0);
+		//Increment PA & PC for each X:
+		pa += this.gfx.actualBG3dx;
+		pc += this.gfx.actualBG3dy;
 	}
 	if (this.gfx.BG3Mosaic) {
 		//Pixelize the line horizontally:
-		this.referenceYDMXCounter = this.shadowReferenceYDMXCounter;
-		this.referenceYDMYCounter = this.shadowReferenceYDMYCounter;
+		this.pb = this.shadowPB;
+		this.pd = this.shadowPD;
 		this.gfx.mosaicRenderer.renderMosaicHorizontal(this.scratchBuffer);
 	}
 	this.incrementReferenceCounters();
 	return this.scratchBuffer;
 }
 GameBoyAdvanceBG3MatrixRenderer.prototype.incrementReferenceCounters = function () {
-	this.referenceYDMXCounter += this.gfx.actualBG3dmx;
-	this.referenceYDMYCounter += this.gfx.actualBG3dmy;
+	this.pb += this.gfx.actualBG3dmx;
+	this.pd += this.gfx.actualBG3dmy;
 }
 GameBoyAdvanceBG3MatrixRenderer.prototype.resetReferenceCounters = function () {
-	this.referenceYDMXCounter = this.gfx.actualBG3dmx * -this.gfx.actualBG3ReferenceY;
-	this.referenceYDMYCounter = this.gfx.actualBG3dmy * -this.gfx.actualBG3ReferenceY;
+	this.pb = this.gfx.actualBG3ReferenceY;
+	this.pd = this.gfx.actualBG3ReferenceY;
 }
 GameBoyAdvanceBG3MatrixRenderer.prototype.fetchTile = function (tileNumber) {
 	//Find the tile code to locate the tile block:
@@ -91,7 +94,7 @@ GameBoyAdvanceBG3MatrixRenderer.prototype.fetchPixel = function (x, y) {
 	return this.gfx.palette256[this.gfx.VRAM[address]];
 }
 GameBoyAdvanceBG3MatrixRenderer.prototype.preprocess = function () {
-	this.priorityFlag = (this.gfx.BG3Priority << 22) | 0x40000;
+	this.priorityFlag = (this.gfx.BG3Priority << 22) | 0x20000;
 	this.mapSize = this.tileMapSize[this.gfx.BG3ScreenSize];
 	this.mapSizeComparer = this.mapSize - 1;
 	this.baseBlockOffset = this.gfx.BG3CharacterBaseBlock << 14;
