@@ -149,7 +149,7 @@ GameBoyAdvanceGraphics.prototype.initializeIO = function () {
 	this.paletteRAM = getUint8Array(0x400);
 	this.VRAM = getUint8Array(0x18000);
 	this.OAMRAM = getUint8Array(0x400);
-	this.lineBuffer = getInt32Array(160);
+	this.lineBuffer = getInt32Array(240);
 	this.frameBuffer = getInt32Array(38400);
 	this.LCDTicks = 0;
 	this.totalLinesPassed = 0;
@@ -412,6 +412,11 @@ GameBoyAdvanceGraphics.prototype.compositorPreprocess = function () {
 }
 GameBoyAdvanceGraphics.prototype.compositeLayersNormal = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
+	OBJBuffer = (this.WINOBJOutside) ? OBJBuffer : null;
+	BG0Buffer = (this.WINBG0Outside) ? BG0Buffer : null;
+	BG1Buffer = (this.WINBG1Outside) ? BG1Buffer : null;
+	BG2Buffer = (this.WINBG2Outside) ? BG2Buffer : null;
+	BG3Buffer = (this.WINBG3Outside) ? BG3Buffer : null;
 	var layerStack = this.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
@@ -507,8 +512,21 @@ GameBoyAdvanceGraphics.prototype.cleanLayerStack = function (OBJBuffer, BG0Buffe
 }
 GameBoyAdvanceGraphics.prototype.copyLineToFrameBuffer = function (line) {
 	var offsetStart = line * 240;
-	for (var offsetEnd = offsetStart + 240; offsetStart < offsetEnd; ++offsetStart) {
-		this.frameBuffer[offsetStart] = this.lineBuffer[offsetStart];
+	var position = 0;
+	if (!this.greenSwap) {
+		for (var offsetEnd = offsetStart + 240; position < 240; ++offsetStart) {
+			this.frameBuffer[offsetStart] = this.lineBuffer[position++];
+		}
+	}
+	else {
+		var pixel0 = 0;
+		var pixel1 = 0;
+		for (var offsetEnd = offsetStart + 240; position < 240;) {
+			pixel0 = this.lineBuffer[position++];
+			pixel1 = this.lineBuffer[position++];
+			this.frameBuffer[offsetStart++] = (pixel0 & 0x7C1F) | (pixel1 & 0x3E0);
+			this.frameBuffer[offsetStart++] = (pixel1 & 0x7C1F) | (pixel0 & 0x3E0);
+		}
 	}
 }
 GameBoyAdvanceGraphics.prototype.writeDISPCNT0 = function (data) {
