@@ -36,12 +36,13 @@ GameBoyAdvanceOBJRenderer.prototype.lookupXSize = [
 ];
 GameBoyAdvanceOBJRenderer.prototype.initialize = function (line) {
 	this.scratchBuffer = getInt32Array(240);
+	this.scratchWindowBuffer = getInt32Array(240);
 	this.scratchOBJBuffer = getInt32Array(128);
 }
 GameBoyAdvanceOBJRenderer.prototype.renderScanLine = function (line) {
 	this.clearScratch();
 	for (var objNumber = 0; objNumber < 128; ++objNumber) {
-		this.renderSprite(line, this.gfx.OAMTable[objNumber], false);
+		this.renderSprite(line, this.gfx.OAMTable[objNumber]);
 	}
 	return this.scratchBuffer;
 }
@@ -51,14 +52,19 @@ GameBoyAdvanceOBJRenderer.prototype.clearScratch = function () {
 	}
 }
 GameBoyAdvanceOBJRenderer.prototype.renderWindowScanLine = function (line) {
-	this.clearScratch();
+	this.clearWindowScratch();
 	for (var objNumber = 0; objNumber < 128; ++objNumber) {
-		this.renderSprite(line, this.gfx.OAMTable[objNumber], true);
+		this.renderWindowSprite(line, this.gfx.OAMTable[objNumber]);
 	}
-	return this.scratchBuffer;
+	return this.scratchWindowBuffer;
 }
-GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite, doSpriteWindow) {
-	if (this.isDrawable(sprite, doSpriteWindow)) {
+GameBoyAdvanceOBJRenderer.prototype.clearWindowScratch = function () {
+	for (var position = 0; position < 240; ++position) {
+		this.scratchBuffer[position] = this.gfx.transparency;
+	}
+}
+GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite) {
+	if (this.isDrawable(sprite, false)) {
 		if (sprite.mosaic) {
 			//Correct line number for mosaic:
 			line -= this.gfx.mosaicRenderer.getOBJMosaicYOffset(line);
@@ -89,6 +95,37 @@ GameBoyAdvanceOBJRenderer.prototype.renderSprite = function (line, sprite, doSpr
 			}
 			//Copy OBJ scratch buffer to scratch line buffer:
 			this.outputSpriteToScratch(sprite, xSize);
+		}
+	}
+}
+GameBoyAdvanceOBJRenderer.prototype.renderWindowSprite = function (line, sprite) {
+	if (this.isDrawable(sprite, true)) {
+		if (sprite.mosaic) {
+			//Correct line number for mosaic:
+			line -= this.gfx.mosaicRenderer.getOBJMosaicYOffset(line);
+		}
+		//Obtain vertical size info:
+		var ySize = this.lookupYSize[(sprite.shape << 2) | sprite.size] << ((sprite.doubleSizeOrDisabled) ? 1 : 0);
+		var ycoord = sprite.ycoord - ((sprite.matrix2D) ? (ySize >> 1) : 0);
+		var yOffset = line + ySize - ycoord;
+		//Simulate y-coord wrap around logic:
+		if (ycoord > (0x100 - ySize)) {
+			yOffset += 0x100;
+		}
+		//Make a sprite line:
+		if ((yOffset & --ySize) == yOffset) {
+			//Obtain horizontal size info:
+			var xSize = this.lookupXSize[(sprite.shape << 2) | sprite.size] << ((sprite.doubleSizeOrDisabled) ? 1 : 0);
+			if (sprite.matrix2D) {
+				//Scale & Rotation:
+				this.renderMatrixSprite(sprite, xSize, ySize + 1, yOffset);
+			}
+			else {
+				//Regular Scrolling:
+				this.renderNormalSprite(sprite, xSize, ySize, yOffset);
+			}
+			//Copy OBJ scratch buffer to scratch line buffer:
+			this.outputSpriteToWindowScratch(sprite, xSize);
 		}
 	}
 }
@@ -245,6 +282,38 @@ GameBoyAdvanceOBJRenderer.prototype.outputSpriteToScratch = function (sprite, xS
 	}
 	if (sprite.mosaic) {
 		this.gfx.mosaicRenderer.renderOBJMosaicHorizontal(this.scratchBuffer, xcoord, xcoordEnd);
+	}
+}
+GameBoyAdvanceOBJRenderer.prototype.outputSpriteToWindowScratch = function (sprite, xSize) {
+	//Simulate x-coord wrap around logic:
+	var xcoord = sprite.xcoord - ((sprite.matrix2D) ? (xSize >> 1) : 0);
+	if (xcoord > (0x200 - xSize)) {
+		xcoord -= 0x200;
+	}
+	//Resolve end point:
+	var xcoordEnd = Math.min(xcoord + xSize, 240);
+	//Flag for compositor to ID the pixels as OBJ:
+	var bitFlags = (sprite.priority << 22) | 0x80000;
+	if (!sprite.horizontalFlip || sprite.matrix2D) {
+		//Normal:
+		for (var xSource = 0; xcoord < xcoordEnd; ++xcoord, ++xSource) {
+			//Only overwrite transparency:
+			if (xcoord > -1 && (this.scratchWindowBuffer[xcoord] & 0x1000000) == 0x1000000) {
+				this.scratchWindowBuffer[xcoord] = bitFlags | this.scratchOBJBuffer[xSource];
+			}
+		}
+	}
+	else {
+		//Flipped Horizontally:
+		for (var xSource = xSize; xcoord < xcoordEnd; ++xcoord, --xSource) {
+			//Only overwrite transparency:
+			if (xcoord > -1 && (this.scratchWindowBuffer[xcoord] & 0x1000000) == 0x1000000) {
+				this.scratchWindowBuffer[xcoord] = bitFlags | this.scratchOBJBuffer[xSource];
+			}
+		}
+	}
+	if (sprite.mosaic) {
+		this.gfx.mosaicRenderer.renderOBJMosaicHorizontal(this.scratchWindowBuffer, xcoord, xcoordEnd);
 	}
 }
 GameBoyAdvanceOBJRenderer.prototype.isDrawable = function (sprite, doWindowOBJ) {
