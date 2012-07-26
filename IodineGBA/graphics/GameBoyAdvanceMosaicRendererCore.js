@@ -31,16 +31,15 @@ GameBoyAdvanceMosaicRenderer.prototype.renderMosaicHorizontal = function (layer)
 		}
 	}
 }
-GameBoyAdvanceMosaicRenderer.prototype.renderOBJMosaicHorizontal = function (layer, position, to) {
-	var currentPixel = (position > 0) ? layer[position - 1] : this.gfx.transparency;
+GameBoyAdvanceMosaicRenderer.prototype.renderOBJMosaicHorizontal = function (layer, xSize) {
+	var currentPixel = this.gfx.transparency;
 	var mosaicBlur = this.gfx.OBJMosaicHSize + 1;
 	if (mosaicBlur > 1) {	//Don't perform a useless loop.
-		for (; position < to; ++position) {
+		for (var position = 0; position < xSize; ++position) {
+			//Properly emulate OBJ mosaic glitching on first pixel (Never a non-transparent).
+			layer[position] = currentPixel;
 			if ((position % mosaicBlur) == 0) {
 				currentPixel = layer[position];
-			}
-			else {
-				layer[position] = currentPixel;
 			}
 		}
 	}
