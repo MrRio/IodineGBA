@@ -2086,19 +2086,19 @@ GameBoyAdvanceIO.prototype.readWriteOnly = function (parentObj) {
 }
 GameBoyAdvanceIO.prototype.readUnused = function (parentObj, address, busReqNumber) {
 	parentObj.wait.FASTAccess();
-	return (parentObj.cpu.fetch >> ((address & 0x3) << 3)) & 0xFF;
+	return (parentObj.cpu.getCurrentFetchValue() >> ((address & 0x3) << 3)) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused0 = function (parentObj) {
-	return parentObj.cpu.fetch & 0xFF;
+	return parentObj.cpu.getCurrentFetchValue() & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused1 = function (parentObj) {
-	return (parentObj.cpu.fetch >> 8) & 0xFF;
+	return (parentObj.cpu.getCurrentFetchValue() >> 8) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused2 = function (parentObj) {
-	return (parentObj.cpu.fetch >> 16) & 0xFF;
+	return (parentObj.cpu.getCurrentFetchValue() >> 16) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.readUnused3 = function (parentObj) {
-	return (parentObj.cpu.fetch >> 24) & 0xFF;
+	return (parentObj.cpu.getCurrentFetchValue() >> 24) & 0xFF;
 }
 GameBoyAdvanceIO.prototype.iterate = function () {
 	//Find out how many clocks to iterate through this run:
