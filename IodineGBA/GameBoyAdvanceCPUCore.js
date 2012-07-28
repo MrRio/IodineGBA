@@ -55,7 +55,7 @@ ARM7TDMI.prototype.initializeRegisters = function () {
 	this.IRQDisabled = true;		//I Bit
 	this.FIQDisabled = true;		//F Bit
 	this.InTHUMB = false;			//T Bit
-	this.MODEBits = 0x10;			//M0 thru M4 Bits
+	this.MODEBits = 0x13;			//M0 thru M4 Bits
 	//Banked SPSR Registers:
 	this.SPSRFIQ = [false, false, false, false, true, true, false];	//FIQ
 	this.SPSRIRQ = [false, false, false, false, true, true, false];	//IRQ
