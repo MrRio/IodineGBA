@@ -1876,5 +1876,603 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ofrp
 			]
 		],
+		//1A
+		[
+			[
+				this.MOV,
+				this.lli
+			],
+			[
+				this.MOV,
+				this.llr
+			],
+			[
+				this.MOV,
+				this.lri
+			],
+			[
+				this.MOV,
+				this.lrr
+			],
+			[
+				this.MOV,
+				this.ari
+			],
+			[
+				this.MOV,
+				this.arr
+			],
+			[
+				this.MOV,
+				this.rri
+			],
+			[
+				this.MOV,
+				this.rrr
+			],
+			[
+				this.MOV,
+				this.lli
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.MOV,
+				this.lri
+			],
+			[
+				this.STRH,
+				this.prrp
+			],
+			[
+				this.MOV,
+				this.ari
+			],
+			[
+				this.LDRD,
+				this.prrp
+			],
+			[
+				this.MOV,
+				this.rri
+			],
+			[
+				this.STRD,
+				this.prrp
+			]
+		],
+		//1B
+		[
+			[
+				this.MOVS,
+				this.lli
+			],
+			[
+				this.MOVS,
+				this.llr
+			],
+			[
+				this.MOVS,
+				this.lri
+			],
+			[
+				this.MOVS,
+				this.lrr
+			],
+			[
+				this.MOVS,
+				this.ari
+			],
+			[
+				this.MOVS,
+				this.arr
+			],
+			[
+				this.MOVS,
+				this.rri
+			],
+			[
+				this.MOVS,
+				this.rrr
+			],
+			[
+				this.MOVS,
+				this.lli
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.MOVS,
+				this.lri
+			],
+			[
+				this.LDRH,
+				this.prrp
+			],
+			[
+				this.MOVS,
+				this.ari
+			],
+			[
+				this.LDRSB,
+				this.prrp
+			],
+			[
+				this.MOVS,
+				this.rri
+			],
+			[
+				this.LDRSH,
+				this.prrp
+			]
+		],
+		//1C
+		[
+			[
+				this.BIC,
+				this.lli
+			],
+			[
+				this.BIC,
+				this.llr
+			],
+			[
+				this.BIC,
+				this.lri
+			],
+			[
+				this.BIC,
+				this.lrr
+			],
+			[
+				this.BIC,
+				this.ari
+			],
+			[
+				this.BIC,
+				this.arr
+			],
+			[
+				this.BIC,
+				this.rri
+			],
+			[
+				this.BIC,
+				this.rrr
+			],
+			[
+				this.BIC,
+				this.lli
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.BIC,
+				this.lri
+			],
+			[
+				this.STRH,
+				this.ofip
+			],
+			[
+				this.BIC,
+				this.ari
+			],
+			[
+				this.LDRD,
+				this.ofip
+			],
+			[
+				this.BIC,
+				this.rri
+			],
+			[
+				this.STRD,
+				this.ofip
+			]
+		],
+		//1D
+		[
+			[
+				this.BICS,
+				this.lli
+			],
+			[
+				this.BICS,
+				this.llr
+			],
+			[
+				this.BICS,
+				this.lri
+			],
+			[
+				this.BICS,
+				this.lrr
+			],
+			[
+				this.BICS,
+				this.ari
+			],
+			[
+				this.BICS,
+				this.arr
+			],
+			[
+				this.BICS,
+				this.rri
+			],
+			[
+				this.BICS,
+				this.rrr
+			],
+			[
+				this.BICS,
+				this.lli
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.BICS,
+				this.lri
+			],
+			[
+				this.LDRH,
+				this.ofip
+			],
+			[
+				this.BICS,
+				this.ari
+			],
+			[
+				this.LDRSB,
+				this.ofip
+			],
+			[
+				this.BICS,
+				this.rri
+			],
+			[
+				this.LDRSH,
+				this.ofip
+			]
+		],
+		//1E
+		[
+			[
+				this.MVN,
+				this.lli
+			],
+			[
+				this.MVN,
+				this.llr
+			],
+			[
+				this.MVN,
+				this.lri
+			],
+			[
+				this.MVN,
+				this.lrr
+			],
+			[
+				this.MVN,
+				this.ari
+			],
+			[
+				this.MVN,
+				this.arr
+			],
+			[
+				this.MVN,
+				this.rri
+			],
+			[
+				this.MVN,
+				this.rrr
+			],
+			[
+				this.MVN,
+				this.lli
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.MVN,
+				this.lri
+			],
+			[
+				this.STRH,
+				this.prip
+			],
+			[
+				this.MVN,
+				this.ari
+			],
+			[
+				this.LDRD,
+				this.prip
+			],
+			[
+				this.MVN,
+				this.rri
+			],
+			[
+				this.STRD,
+				this.prip
+			]
+		],
+		//1F
+		[
+			[
+				this.MVNS,
+				this.lli
+			],
+			[
+				this.MVNS,
+				this.llr
+			],
+			[
+				this.MVNS,
+				this.lri
+			],
+			[
+				this.MVNS,
+				this.lrr
+			],
+			[
+				this.MVNS,
+				this.ari
+			],
+			[
+				this.MVNS,
+				this.arr
+			],
+			[
+				this.MVNS,
+				this.rri
+			],
+			[
+				this.MVNS,
+				this.rrr
+			],
+			[
+				this.MVNS,
+				this.lli
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.MVNS,
+				this.lri
+			],
+			[
+				this.LDRH,
+				this.prip
+			],
+			[
+				this.MVNS,
+				this.ari
+			],
+			[
+				this.LDRSB,
+				this.prip
+			],
+			[
+				this.MVNS,
+				this.rri
+			],
+			[
+				this.LDRSH,
+				this.prip
+			]
+		],
+		//20
+		this.generateLowMap(this.AND, this.imm),
+		//21
+		this.generateLowMap(this.ANDS, this.imm),
+		//22
+		this.generateLowMap(this.EOR, this.imm),
+		//23
+		this.generateLowMap(this.EORS, this.imm),
+		//24
+		this.generateLowMap(this.SUB, this.imm),
+		//25
+		this.generateLowMap(this.SUBS, this.imm),
+		//26
+		this.generateLowMap(this.RSB, this.imm),
+		//27
+		this.generateLowMap(this.RSBS, this.imm),
+		//28
+		this.generateLowMap(this.ADD, this.imm),
+		//29
+		this.generateLowMap(this.ADDS, this.imm),
+		//2A
+		this.generateLowMap(this.ADC, this.imm),
+		//2B
+		this.generateLowMap(this.ADCS, this.imm),
+		//2C
+		this.generateLowMap(this.SBC, this.imm),
+		//2D
+		this.generateLowMap(this.SBCS, this.imm),
+		//2E
+		this.generateLowMap(this.RSC, this.imm),
+		//2F
+		this.generateLowMap(this.RSCS, this.imm),
+		//30
+		this.generateLowMap(this.UNDEFINED, this.NOP),
+		//31
+		this.generateLowMap(this.TSTS, this.imm),
+		//32
+		this.generateLowMap(this.MSR, this.ic),
+		//33
+		this.generateLowMap(this.TEQS, this.imm),
+		//34
+		this.generateLowMap(this.UNDEFINED, this.NOP),
+		//35
+		this.generateLowMap(this.CMPS, this.imm),
+		//36
+		this.generateLowMap(this.MSR, this.is),
+		//37
+		this.generateLowMap(this.CMNS, this.imm),
+		//38
+		this.generateLowMap(this.ORR, this.imm),
+		//39
+		this.generateLowMap(this.ORRS, this.imm),
+		//3A
+		this.generateLowMap(this.MOV, this.imm),
+		//3B
+		this.generateLowMap(this.MOVS, this.imm),
+		//3C
+		this.generateLowMap(this.BIC, this.imm),
+		//3D
+		this.generateLowMap(this.BICS, this.imm),
+		//3E
+		this.generateLowMap(this.MVN, this.imm),
+		//3F
+		this.generateLowMap(this.MVNS, this.imm),
+		//40
+		this.generateLowMap(this.STR, this.ptim),
+		//41
+		this.generateLowMap(this.LDR, this.ptim),
+		//42
+		this.generateLowMap(this.STRT, this.ptim),
+		//43
+		this.generateLowMap(this.LDRT, this.ptim),
+		//44
+		this.generateLowMap(this.STRB, this.ptim),
+		//45
+		this.generateLowMap(this.LDRB, this.ptim),
+		//46
+		this.generateLowMap(this.STRBT, this.ptim),
+		//47
+		this.generateLowMap(this.LDRBT, this.ptim),
+		//48
+		this.generateLowMap(this.STR, this.ptip),
+		//49
+		this.generateLowMap(this.LDR, this.ptip),
+		//4A
+		this.generateLowMap(this.STRT, this.ptip),
+		//4B
+		this.generateLowMap(this.LDRT, this.ptip),
+		//4C
+		this.generateLowMap(this.STRB, this.ptip),
+		//4D
+		this.generateLowMap(this.LDRB, this.ptip),
+		//4E
+		this.generateLowMap(this.STRBT, this.ptip),
+		//4F
+		this.generateLowMap(this.LDRBT, this.ptip),
+		//50
+		this.generateLowMap(this.STR, this.ofim),
+		//51
+		this.generateLowMap(this.LDR, this.ofim),
+		//52
+		this.generateLowMap(this.STR, this.prim),
+		//53
+		this.generateLowMap(this.LDR, this.prim),
+		//54
+		this.generateLowMap(this.STRB, this.ofim),
+		//55
+		this.generateLowMap(this.LDRB, this.ofim),
+		//56
+		this.generateLowMap(this.STRB, this.prim),
+		//57
+		this.generateLowMap(this.LDRB, this.prim),
+		//58
+		this.generateLowMap(this.STR, this.ofip),
+		//59
+		this.generateLowMap(this.LDR, this.ofip),
+		//5A
+		this.generateLowMap(this.STR, this.prip),
+		//5B
+		this.generateLowMap(this.LDR, this.prip),
+		//5C
+		this.generateLowMap(this.STRB, this.ofip),
+		//5D
+		this.generateLowMap(this.LDRB, this.ofip),
+		//5E
+		this.generateLowMap(this.STRB, this.prip),
+		//5F
+		this.generateLowMap(this.LDRB, this.prip),
+	];
+}
+ARMInstructionSet.prototype.generateLowMap = function (instructionOpcode, dataOpcode) {
+	return [
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		],
+		[
+			instructionOpcode,
+			dataOpcode
+		]
 	];
 }
