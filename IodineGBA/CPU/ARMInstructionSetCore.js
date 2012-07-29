@@ -2407,6 +2407,10 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		//5F
 		this.generateLowMap(this.LDRB, this.prip),
 	];
+	//60-6F
+	this.generateStoreLoadInstructionSector1();
+	//70-7F
+	this.generateStoreLoadInstructionSector2();
 }
 ARMInstructionSet.prototype.generateLowMap = function (instructionOpcode, dataOpcode) {
 	return [
@@ -2475,4 +2479,96 @@ ARMInstructionSet.prototype.generateLowMap = function (instructionOpcode, dataOp
 			dataOpcode
 		]
 	];
+}
+ARMInstructionSet.prototype.generateStoreLoadInstructionSector1 = function () {
+	var instrMap = [
+		this.STR,
+		this.LDR,
+		this.STRT,
+		this.LDRT,
+		this.STRB,
+		this.LDRB,
+		this.STRBT,
+		this.LDRBT
+	];
+	var dataMap = [
+		this.ptrmll,
+		this.ptrmlr,
+		this.ptrmar,
+		this.ptrmrr
+	];
+	for (var instrIndex = 0; instrIndex < 0x10; ++instrIndex) {
+		var lowMap = [];
+		for (var dataIndex = 0; dataIndex < 0x10; ++dataIndex) {
+			if ((dataIndex & 0x1) == 0) {
+				lowMap.push([
+					instrMap[instrIndex & 0x7],
+					dataMap[(dataIndex >> 1) & 0x3]
+				]);
+			}
+			else {
+				lowMap.push([
+					this.UNDEFINED,
+					this.NOP
+				]);
+			}
+		}
+		this.instructionMap.push(lowMap);
+	}
+}
+ARMInstructionSet.prototype.generateStoreLoadInstructionSector2 = function () {
+	var instrMap = [
+		this.STR,
+		this.LDR,
+		this.STR,
+		this.LDR,
+		this.STRB,
+		this.LDRB,
+		this.STRB,
+		this.LDRB,
+	];
+	var dataMap = [
+		[
+			this.ofrmll,
+			this.ofrmlr,
+			this.ofrmar,
+			this.ofrmrr
+		],
+		[
+			this.prrmll,
+			this.prrmlr,
+			this.prrmar,
+			this.prrmrr
+		],
+		[
+			this.ofrpll,
+			this.ofrplr,
+			this.ofrpar,
+			this.ofrprr
+		],
+		[
+			this.prrpll,
+			this.prrplr,
+			this.prrpar,
+			this.prrprr
+		]
+	];
+	for (var instrIndex = 0; instrIndex < 0x10; ++instrIndex) {
+		var lowMap = [];
+		for (var dataIndex = 0; dataIndex < 0x10; ++dataIndex) {
+			if ((dataIndex & 0x1) == 0) {
+				lowMap.push([
+					instrMap[instrIndex & 0x7],
+					dataMap[((instrIndex & 0x8)  >> 2) | ((instrIndex & 0x3) >> 1)][(dataIndex >> 1) & 0x3]
+				]);
+			}
+			else {
+				lowMap.push([
+					this.UNDEFINED,
+					this.NOP
+				]);
+			}
+		}
+		this.instructionMap.push(lowMap);
+	}
 }
