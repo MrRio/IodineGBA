@@ -2411,6 +2411,264 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.generateStoreLoadInstructionSector1();
 	//70-7F
 	this.generateStoreLoadInstructionSector2();
+	this.instructionMap = this.instructionMap.concat([
+		//80
+		this.generateLowMap(this.STMDA, this.NOP),
+		//81
+		this.generateLowMap(this.LDMDA, this.NOP),
+		//82
+		this.generateLowMap(this.STMDA, this.w),
+		//83
+		this.generateLowMap(this.LDMDA, this.w),
+		//84
+		this.generateLowMap(this.STMDA, this.u),
+		//85
+		this.generateLowMap(this.LDMDA, this.u),
+		//86
+		this.generateLowMap(this.STMDA, this.u | this.w),
+		//87
+		this.generateLowMap(this.LDMDA, this.u | this.w),
+		//88
+		this.generateLowMap(this.STMIA, this.NOP),
+		//89
+		this.generateLowMap(this.LDMIA, this.NOP),
+		//8A
+		this.generateLowMap(this.STMIA, this.w),
+		//8B
+		this.generateLowMap(this.LDMIA, this.w),
+		//8C
+		this.generateLowMap(this.STMIA, this.u),
+		//8D
+		this.generateLowMap(this.LDMIA, this.u),
+		//8E
+		this.generateLowMap(this.STMIA, this.u | this.w),
+		//8F
+		this.generateLowMap(this.LDMIA, this.u | this.w),
+		//90
+		this.generateLowMap(this.STMDB, this.NOP),
+		//91
+		this.generateLowMap(this.LDMDB, this.NOP),
+		//92
+		this.generateLowMap(this.STMDB, this.w),
+		//93
+		this.generateLowMap(this.LDMDB, this.w),
+		//94
+		this.generateLowMap(this.STMDB, this.u),
+		//95
+		this.generateLowMap(this.LDMDB, this.u),
+		//96
+		this.generateLowMap(this.STMDB, this.u | this.w),
+		//97
+		this.generateLowMap(this.LDMDB, this.u | this.w),
+		//98
+		this.generateLowMap(this.STMIB, this.NOP),
+		//99
+		this.generateLowMap(this.LDMIB, this.NOP),
+		//9A
+		this.generateLowMap(this.STMIB, this.w),
+		//9B
+		this.generateLowMap(this.LDMIB, this.w),
+		//9C
+		this.generateLowMap(this.STMIB, this.u),
+		//9D
+		this.generateLowMap(this.LDMIB, this.u),
+		//9E
+		this.generateLowMap(this.STMIB, this.u | this.w),
+		//9F
+		this.generateLowMap(this.LDMIB, this.u | this.w),
+		//A0
+		this.generateLowMap(this.B, this.NOP),
+		//A1
+		this.generateLowMap(this.B, this.NOP),
+		//A2
+		this.generateLowMap(this.B, this.NOP),
+		//A3
+		this.generateLowMap(this.B, this.NOP),
+		//A4
+		this.generateLowMap(this.B, this.NOP),
+		//A5
+		this.generateLowMap(this.B, this.NOP),
+		//A6
+		this.generateLowMap(this.B, this.NOP),
+		//A7
+		this.generateLowMap(this.B, this.NOP),
+		//A8
+		this.generateLowMap(this.B, this.NOP),
+		//A9
+		this.generateLowMap(this.B, this.NOP),
+		//AA
+		this.generateLowMap(this.B, this.NOP),
+		//AB
+		this.generateLowMap(this.B, this.NOP),
+		//AC
+		this.generateLowMap(this.B, this.NOP),
+		//AD
+		this.generateLowMap(this.B, this.NOP),
+		//AE
+		this.generateLowMap(this.B, this.NOP),
+		//AF
+		this.generateLowMap(this.B, this.NOP),
+		//B0
+		this.generateLowMap(this.BL, this.NOP),
+		//B1
+		this.generateLowMap(this.BL, this.NOP),
+		//B2
+		this.generateLowMap(this.BL, this.NOP),
+		//B3
+		this.generateLowMap(this.BL, this.NOP),
+		//B4
+		this.generateLowMap(this.BL, this.NOP),
+		//B5
+		this.generateLowMap(this.BL, this.NOP),
+		//B6
+		this.generateLowMap(this.BL, this.NOP),
+		//B7
+		this.generateLowMap(this.BL, this.NOP),
+		//B8
+		this.generateLowMap(this.BL, this.NOP),
+		//B9
+		this.generateLowMap(this.BL, this.NOP),
+		//BA
+		this.generateLowMap(this.BL, this.NOP),
+		//BB
+		this.generateLowMap(this.BL, this.NOP),
+		//BC
+		this.generateLowMap(this.BL, this.NOP),
+		//BD
+		this.generateLowMap(this.BL, this.NOP),
+		//BE
+		this.generateLowMap(this.BL, this.NOP),
+		//BF
+		this.generateLowMap(this.BL, this.NOP),
+		//C0
+		this.generateLowMap(this.STC, this.ofm),
+		//C1
+		this.generateLowMap(this.LDC, this.ofm),
+		//C2
+		this.generateLowMap(this.STC, this.prm),
+		//C3
+		this.generateLowMap(this.LDC, this.prm),
+		//C4
+		this.generateLowMap(this.STC, this.ofm),
+		//C5
+		this.generateLowMap(this.LDC, this.ofm),
+		//C6
+		this.generateLowMap(this.STC, this.prm),
+		//C7
+		this.generateLowMap(this.LDC, this.prm),
+		//C8
+		this.generateLowMap(this.STC, this.ofp),
+		//C9
+		this.generateLowMap(this.LDC, this.ofp),
+		//CA
+		this.generateLowMap(this.STC, this.prp),
+		//CB
+		this.generateLowMap(this.LDC, this.prp),
+		//CC
+		this.generateLowMap(this.STC, this.ofp),
+		//CD
+		this.generateLowMap(this.LDC, this.ofp),
+		//CE
+		this.generateLowMap(this.STC, this.prp),
+		//CF
+		this.generateLowMap(this.LDC, this.prp),
+		//D0
+		this.generateLowMap(this.STC, this.unm),
+		//D1
+		this.generateLowMap(this.LDC, this.unm),
+		//D2
+		this.generateLowMap(this.STC, this.ptm),
+		//D3
+		this.generateLowMap(this.LDC, this.ptm),
+		//D4
+		this.generateLowMap(this.STC, this.unm),
+		//D5
+		this.generateLowMap(this.LDC, this.unm),
+		//D6
+		this.generateLowMap(this.STC, this.ptm),
+		//D7
+		this.generateLowMap(this.LDC, this.ptm),
+		//D8
+		this.generateLowMap(this.STC, this.unp),
+		//D9
+		this.generateLowMap(this.LDC, this.unp),
+		//DA
+		this.generateLowMap(this.STC, this.ptp),
+		//DB
+		this.generateLowMap(this.LDC, this.ptp),
+		//DC
+		this.generateLowMap(this.STC, this.unp),
+		//DD
+		this.generateLowMap(this.LDC, this.unp),
+		//DE
+		this.generateLowMap(this.STC, this.ptp),
+		//DF
+		this.generateLowMap(this.LDC, this.ptp),
+		//E0
+		this.generateLowMap2(this.CDP, this.MCR),
+		//E1
+		this.generateLowMap2(this.CDP, this.MRC),
+		//E2
+		this.generateLowMap2(this.CDP, this.MCR),
+		//E3
+		this.generateLowMap2(this.CDP, this.MRC),
+		//E4
+		this.generateLowMap2(this.CDP, this.MCR),
+		//E5
+		this.generateLowMap2(this.CDP, this.MRC),
+		//E6
+		this.generateLowMap2(this.CDP, this.MCR),
+		//E7
+		this.generateLowMap2(this.CDP, this.MRC),
+		//E8
+		this.generateLowMap2(this.CDP, this.MCR),
+		//E9
+		this.generateLowMap2(this.CDP, this.MRC),
+		//EA
+		this.generateLowMap2(this.CDP, this.MCR),
+		//EB
+		this.generateLowMap2(this.CDP, this.MRC),
+		//EC
+		this.generateLowMap2(this.CDP, this.MCR),
+		//ED
+		this.generateLowMap2(this.CDP, this.MRC),
+		//EE
+		this.generateLowMap2(this.CDP, this.MCR),
+		//EF
+		this.generateLowMap2(this.CDP, this.MRC),
+		//F0
+		this.generateLowMap(this.SWI, this.NOP),
+		//F1
+		this.generateLowMap(this.SWI, this.NOP),
+		//F2
+		this.generateLowMap(this.SWI, this.NOP),
+		//F3
+		this.generateLowMap(this.SWI, this.NOP),
+		//F4
+		this.generateLowMap(this.SWI, this.NOP),
+		//F5
+		this.generateLowMap(this.SWI, this.NOP),
+		//F6
+		this.generateLowMap(this.SWI, this.NOP),
+		//F7
+		this.generateLowMap(this.SWI, this.NOP),
+		//F8
+		this.generateLowMap(this.SWI, this.NOP),
+		//F9
+		this.generateLowMap(this.SWI, this.NOP),
+		//FA
+		this.generateLowMap(this.SWI, this.NOP),
+		//FB
+		this.generateLowMap(this.SWI, this.NOP),
+		//FC
+		this.generateLowMap(this.SWI, this.NOP),
+		//FD
+		this.generateLowMap(this.SWI, this.NOP),
+		//FE
+		this.generateLowMap(this.SWI, this.NOP),
+		//FF
+		this.generateLowMap(this.SWI, this.NOP)
+	]);
 }
 ARMInstructionSet.prototype.generateLowMap = function (instructionOpcode, dataOpcode) {
 	return [
@@ -2477,6 +2735,74 @@ ARMInstructionSet.prototype.generateLowMap = function (instructionOpcode, dataOp
 		[
 			instructionOpcode,
 			dataOpcode
+		]
+	];
+}
+ARMInstructionSet.prototype.generateLowMap2 = function (instructionOpcode, instructionOpcode2) {
+	return [
+		[
+			instructionOpcode,
+			this.NOP
+		],
+		[
+			instructionOpcode2,
+			this.NOP
+		],
+		[
+			instructionOpcode,
+			this.NOP
+		],
+		[
+			instructionOpcode2,
+			this.NOP
+		],
+		[
+			instructionOpcode,
+			this.NOP
+		],
+		[
+			instructionOpcode2,
+			this.NOP
+		],
+		[
+			instructionOpcode,
+			this.NOP
+		],
+		[
+			instructionOpcode2,
+			this.NOP
+		],
+		[
+			instructionOpcode,
+			this.NOP
+		],
+		[
+			instructionOpcode2,
+			this.NOP
+		],
+		[
+			instructionOpcode,
+			this.NOP
+		],
+		[
+			instructionOpcode2,
+			this.NOP
+		],
+		[
+			instructionOpcode,
+			this.NOP
+		],
+		[
+			instructionOpcode2,
+			this.NOP
+		],
+		[
+			instructionOpcode,
+			this.NOP
+		],
+		[
+			instructionOpcode2,
+			this.NOP
 		]
 	];
 }
