@@ -318,4 +318,65 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.generateLowMap3(this.LDMIAr6);
 	//CF
 	this.generateLowMap3(this.LDMIAr7);
+	//D0
+	this.generateLowMap3(this.BEQ);
+	//D1
+	this.generateLowMap3(this.BNE);
+	//D2
+	this.generateLowMap3(this.BCS);
+	//D3
+	this.generateLowMap3(this.BCC);
+	//D4
+	this.generateLowMap3(this.BMI);
+	//D5
+	this.generateLowMap3(this.BPL);
+	//D6
+	this.generateLowMap3(this.BVS);
+	//D7
+	this.generateLowMap3(this.BVC);
+	//D8
+	this.generateLowMap3(this.BHI);
+	//D9
+	this.generateLowMap3(this.BLS);
+	//DA
+	this.generateLowMap3(this.BGE);
+	//DB
+	this.generateLowMap3(this.BLT);
+	//DC
+	this.generateLowMap3(this.BGT);
+	//DD
+	this.generateLowMap3(this.BLE);
+	//DE
+	this.generateLowMap3(this.UNDEFINED);
+	//DF
+	this.generateLowMap3(this.SWI);
+	//E0-E7
+	this.generateLowMap(this.B);
+	//E8-EF
+	this.generateLowMap(this.UNDEFINED);
+	//F0-F7
+	this.generateLowMap(this.BLsetup);
+	//F8-FF
+	this.generateLowMap(this.BLoff);
+}
+THUMBInstructionSet.prototype.generateLowMap = function (instruction) {
+	for (var index = 0; index < 0x20; ++index) {
+		this.instructionMap.push(instruction);
+	}
+}
+THUMBInstructionSet.prototype.generateLowMap2 = function (instruction) {
+	for (var index = 0; index < 0x8; ++index) {
+		this.instructionMap.push(instruction);
+	}
+}
+THUMBInstructionSet.prototype.generateLowMap3 = function (instruction) {
+	for (var index = 0; index < 0x4; ++index) {
+		this.instructionMap.push(instruction);
+	}
+}
+THUMBInstructionSet.prototype.generateLowMap4 = function (instruction1, instruction2, instruction3, instruction4) {
+	this.instructionMap.push(instruction1);
+	this.instructionMap.push(instruction2);
+	this.instructionMap.push(instruction3);
+	this.instructionMap.push(instruction4);
 }
