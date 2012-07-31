@@ -301,6 +301,24 @@ THUMBInstructionSet.prototype.SBC = function (parentObj) {
 	//Update destination register:
 	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
 }
+THUMBInstructionSet.prototype.ROR = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7] & 0x1F;
+	if (destination > 0) {
+		//CPSR Carry is set by the last bit shifted out:
+		parentObj.CPUCore.CPSRCarry = (((source >>> (destination - 1)) & 0x1) != 0);
+		//Perform rotate:
+		source = (source << (0x20 - destination)) | (source >>> destination);
+	}
+	else {
+		parentObj.CPUCore.CPSRCarry = false;
+	}
+	//Perform CPSR updates for N and Z (But not V):
+	parentObj.CPUCore.CPSRNegative = (source < 0);
+	parentObj.CPUCore.CPSRZero = (source == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = source;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
