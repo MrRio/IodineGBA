@@ -326,6 +326,17 @@ THUMBInstructionSet.prototype.TST = function (parentObj) {
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
+THUMBInstructionSet.prototype.NEG = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSROverflow = ((source ^ (-source)) < 0);
+	//Perform Subtraction:
+	source = (-source) & -1;
+	parentObj.CPUCore.CPSRNegative = (source < 0);
+	parentObj.CPUCore.CPSRZero = (source == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = source;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
