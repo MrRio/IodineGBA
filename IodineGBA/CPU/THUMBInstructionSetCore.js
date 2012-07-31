@@ -203,7 +203,6 @@ THUMBInstructionSet.prototype.AND = function (parentObj) {
 	//Perform bitwise AND:
 	var result = source & destination;
 	parentObj.CPUCore.CPSRCarry = false;
-	parentObj.CPUCore.CPSROverflow = ((source ^ result) < 0);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 	//Update destination register:
@@ -215,7 +214,6 @@ THUMBInstructionSet.prototype.EOR = function (parentObj) {
 	//Perform bitwise EOR:
 	var result = source ^ destination;
 	parentObj.CPUCore.CPSRCarry = false;
-	parentObj.CPUCore.CPSROverflow = ((source ^ result) < 0);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 	//Update destination register:
@@ -318,6 +316,15 @@ THUMBInstructionSet.prototype.ROR = function (parentObj) {
 	parentObj.CPUCore.CPSRZero = (source == 0);
 	//Update destination register:
 	parentObj.registers[parentObj.execute & 0x7] = source;
+}
+THUMBInstructionSet.prototype.TST = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7];
+	//Perform bitwise AND:
+	var result = source & destination;
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
