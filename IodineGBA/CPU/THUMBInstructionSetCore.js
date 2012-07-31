@@ -158,7 +158,7 @@ THUMBInstructionSet.prototype.SUBimm3 = function (parentObj) {
 }
 THUMBInstructionSet.prototype.MOVimm8 = function (parentObj) {
 	//Get the 8-bit value to move into the register:
-	var result = parentObj.registers[parentObj.execute & 0xFF];
+	var result = parentObj.execute & 0xFF;
 	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
@@ -168,7 +168,7 @@ THUMBInstructionSet.prototype.MOVimm8 = function (parentObj) {
 THUMBInstructionSet.prototype.CMPimm8 = function (parentObj) {
 	//Compare an 8-bit immediate value with a register:
 	var source = parentObj.registers[(parentObj.execute >> 8) & 0x7];
-	var dirtyResult = source - parentObj.registers[parentObj.execute & 0xFF];
+	var dirtyResult = source - (parentObj.execute & 0xFF);
 	var result = dirtyResult & -1;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
 	parentObj.CPUCore.CPSROverflow = ((source ^ result) < 0);
@@ -178,7 +178,7 @@ THUMBInstructionSet.prototype.CMPimm8 = function (parentObj) {
 THUMBInstructionSet.prototype.ADDimm8 = function (parentObj) {
 	//Add an 8-bit immediate value with a register:
 	var source = parentObj.registers[(parentObj.execute >> 8) & 0x7];
-	var dirtyResult = source + parentObj.registers[parentObj.execute & 0xFF];
+	var dirtyResult = source + (parentObj.execute & 0xFF);
 	var result = dirtyResult & -1;
 	parentObj.CPUCore.CPSRCarry = (result != dirtyResult);
 	parentObj.CPUCore.CPSROverflow = ((source ^ result) < 0);
@@ -189,7 +189,7 @@ THUMBInstructionSet.prototype.ADDimm8 = function (parentObj) {
 THUMBInstructionSet.prototype.SUBimm8 = function (parentObj) {
 	//Subtract an 8-bit immediate value from a register:
 	var source = parentObj.registers[(parentObj.execute >> 8) & 0x7];
-	var dirtyResult = source - parentObj.registers[parentObj.execute & 0xFF];
+	var dirtyResult = source - (parentObj.execute & 0xFF);
 	var result = dirtyResult & -1;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
 	parentObj.CPUCore.CPSROverflow = ((source ^ result) < 0);
@@ -275,6 +275,32 @@ THUMBInstructionSet.prototype.ASR = function (parentObj) {
 	//Update destination register:
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
+THUMBInstructionSet.prototype.ADC = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7] + ((parentObj.CPUCore.CPSRCarry) ? 1 : 0);
+	//Perform Addition:
+	var dirtyResult = source + destination;
+	parentObj.CPUCore.CPSRCarry = ((dirtyResult & -1) != dirtyResult);
+	dirtyResult &= -1;
+	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
+	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
+	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
+}
+THUMBInstructionSet.prototype.SBC = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var offset = parentObj.registers[parentObj.execute & 0x7];
+	//Perform Subtraction:
+	var dirtyResult = source - offset - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1);
+	parentObj.CPUCore.CPSRCarry = ((dirtyResult & -1) == dirtyResult);
+	dirtyResult &= -1;
+	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
+	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
+	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
@@ -302,7 +328,7 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	//40
 	this.generateLowMap4(this.AND, this.EOR, this.LSL, this.LSR);
 	//41
-	this.generateLowMap4(this.ASR, this.ADD, this.SUB, this.ROR);
+	this.generateLowMap4(this.ASR, this.ADC, this.SBC, this.ROR);
 	//42
 	this.generateLowMap4(this.TST, this.NEG, this.CMP, this.CMN);
 	//43
