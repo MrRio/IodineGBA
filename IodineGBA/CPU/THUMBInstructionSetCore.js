@@ -181,22 +181,8 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.generateLowMap2(this.ADDimm3);
 	//1E-1F
 	this.generateLowMap2(this.SUBimm3);
-	//20
-	this.generateLowMap3(this.MOV);
-	//21
-	this.generateLowMap3(this.MOV);
-	//22
-	this.generateLowMap3(this.MOV);
-	//23
-	this.generateLowMap3(this.MOV);
-	//24
-	this.generateLowMap3(this.MOV);
-	//25
-	this.generateLowMap3(this.MOV);
-	//26
-	this.generateLowMap3(this.MOV);
-	//27
-	this.generateLowMap3(this.MOV);
+	//20-27
+	this.generateLowMap(this.MOV);
 	//28
 	this.generateLowMap3(this.CMPr0);
 	//29
