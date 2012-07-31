@@ -51,8 +51,8 @@ THUMBInstructionSet.prototype.executeTHUMB = function () {
 	}
 }
 THUMBInstructionSet.prototype.LSLimm = function (parentObj) {
-	var source = parentObj.registers[(parentObj.execute >> 2) & 0x3];
-	var offset = (parentObj.execute >> 4) & 0x1F;
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var offset = (parentObj.execute >> 6) & 0x1F;
 	if (offset > 0) {
 		//CPSR Carry is set by the last bit shifted out:
 		parentObj.CPUCore.CPSRCarry = (((source << (offset - 1)) & 0x80000000) != 0);
@@ -66,11 +66,11 @@ THUMBInstructionSet.prototype.LSLimm = function (parentObj) {
 	parentObj.CPUCore.CPSRNegative = (source < 0);
 	parentObj.CPUCore.CPSRZero = (source == 0);
 	//Update destination register:
-	parentObj.registers[parentObj.execute & 0x3] = source;
+	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.LSRimm = function (parentObj) {
-	var source = parentObj.registers[(parentObj.execute >> 2) & 0x3];
-	var offset = (parentObj.execute >> 4) & 0x1F;
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var offset = (parentObj.execute >> 6) & 0x1F;
 	if (offset > 0) {
 		//CPSR Carry is set by the last bit shifted out:
 		parentObj.CPUCore.CPSRCarry = (((source >>> (offset - 1)) & 0x1) != 0);
@@ -84,11 +84,11 @@ THUMBInstructionSet.prototype.LSRimm = function (parentObj) {
 	parentObj.CPUCore.CPSRNegative = (source < 0);
 	parentObj.CPUCore.CPSRZero = (source == 0);
 	//Update destination register:
-	parentObj.registers[parentObj.execute & 0x3] = source;
+	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.ASRimm = function (parentObj) {
-	var source = parentObj.registers[(parentObj.execute >> 2) & 0x3];
-	var offset = (parentObj.execute >> 4) & 0x1F;
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var offset = (parentObj.execute >> 6) & 0x1F;
 	if (offset > 0) {
 		//CPSR Carry is set by the last bit shifted out:
 		parentObj.CPUCore.CPSRCarry = (((source >> (offset - 1)) & 0x1) != 0);
@@ -102,7 +102,20 @@ THUMBInstructionSet.prototype.ASRimm = function (parentObj) {
 	parentObj.CPUCore.CPSRNegative = (source < 0);
 	parentObj.CPUCore.CPSRZero = (source == 0);
 	//Update destination register:
-	parentObj.registers[parentObj.execute & 0x3] = source;
+	parentObj.registers[parentObj.execute & 0x7] = source;
+}
+THUMBInstructionSet.prototype.ADDreg = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var offset = parentObj.registers[(parentObj.execute >> 6) & 0x7];
+	//Perform Addition:
+	var dirtyResult = source + offset;
+	parentObj.CPUCore.CPSRCarry = ((dirtyResult & -1) != dirtyResult);
+	dirtyResult &= -1;
+	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
+	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
+	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
