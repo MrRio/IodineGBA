@@ -175,6 +175,28 @@ THUMBInstructionSet.prototype.CMPimm8 = function (parentObj) {
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
+THUMBInstructionSet.prototype.ADDimm8 = function (parentObj) {
+	//Add an 8-bit immediate value with a register:
+	var source = parentObj.registers[(parentObj.execute >> 8) & 0x7];
+	var dirtyResult = source + parentObj.registers[parentObj.execute & 0xFF];
+	var result = dirtyResult & -1;
+	parentObj.CPUCore.CPSRCarry = (result != dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((source ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = result;
+}
+THUMBInstructionSet.prototype.SUBimm8 = function (parentObj) {
+	//Subtract an 8-bit immediate value from a register:
+	var source = parentObj.registers[(parentObj.execute >> 8) & 0x7];
+	var dirtyResult = source - parentObj.registers[parentObj.execute & 0xFF];
+	var result = dirtyResult & -1;
+	parentObj.CPUCore.CPSRCarry = (result != dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((source ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = result;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
@@ -195,38 +217,10 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.generateLowMap(this.MOVimm8);
 	//28-2F
 	this.generateLowMap(this.CMPimm8);
-	//30
-	this.generateLowMap3(this.ADDr0);
-	//31
-	this.generateLowMap3(this.ADDr1);
-	//32
-	this.generateLowMap3(this.ADDr2);
-	//33
-	this.generateLowMap3(this.ADDr3);
-	//34
-	this.generateLowMap3(this.ADDr4);
-	//35
-	this.generateLowMap3(this.ADDr5);
-	//36
-	this.generateLowMap3(this.ADDr6);
-	//37
-	this.generateLowMap3(this.ADDr7);
-	//38
-	this.generateLowMap3(this.SUBr0);
-	//39
-	this.generateLowMap3(this.SUBr1);
-	//3A
-	this.generateLowMap3(this.SUBr2);
-	//3B
-	this.generateLowMap3(this.SUBr3);
-	//3C
-	this.generateLowMap3(this.SUBr4);
-	//3D
-	this.generateLowMap3(this.SUBr5);
-	//3E
-	this.generateLowMap3(this.SUBr6);
-	//3F
-	this.generateLowMap3(this.SUBr7);
+	//30-37
+	this.generateLowMap(this.ADDimm8);
+	//38-3F
+	this.generateLowMap(this.SUBimm8);
 	//40
 	this.generateLowMap4(this.AND, this.EOR, this.LSL, this.LSR);
 	//41
