@@ -56,12 +56,12 @@ THUMBInstructionSet.prototype.LSLimm = function (parentObj) {
 	if (offset > 0) {
 		//CPSR Carry is set by the last bit shifted out:
 		parentObj.CPUCore.CPSRCarry = (((source << (offset - 1)) & 0x80000000) != 0);
+		//Perform shift:
+		source <<= offset;
 	}
 	else {
 		parentObj.CPUCore.CPSRCarry = false;
 	}
-	//Perform shift:
-	source <<= offset;
 	//Perform CPSR updates for N and Z (But not V):
 	parentObj.CPUCore.CPSRNegative = (source < 0);
 	parentObj.CPUCore.CPSRZero = (source == 0);
@@ -74,12 +74,12 @@ THUMBInstructionSet.prototype.LSRimm = function (parentObj) {
 	if (offset > 0) {
 		//CPSR Carry is set by the last bit shifted out:
 		parentObj.CPUCore.CPSRCarry = (((source >>> (offset - 1)) & 0x1) != 0);
+		//Perform shift:
+		source >>>= offset;
 	}
 	else {
 		parentObj.CPUCore.CPSRCarry = false;
 	}
-	//Perform shift:
-	source = (source >>> offset) & -1;
 	//Perform CPSR updates for N and Z (But not V):
 	parentObj.CPUCore.CPSRNegative = (source < 0);
 	parentObj.CPUCore.CPSRZero = (source == 0);
@@ -92,12 +92,12 @@ THUMBInstructionSet.prototype.ASRimm = function (parentObj) {
 	if (offset > 0) {
 		//CPSR Carry is set by the last bit shifted out:
 		parentObj.CPUCore.CPSRCarry = (((source >> (offset - 1)) & 0x1) != 0);
+		//Perform shift:
+		source >>= offset;
 	}
 	else {
 		parentObj.CPUCore.CPSRCarry = false;
 	}
-	//Perform shift:
-	source >>= offset;
 	//Perform CPSR updates for N and Z (But not V):
 	parentObj.CPUCore.CPSRNegative = (source < 0);
 	parentObj.CPUCore.CPSRZero = (source == 0);
@@ -223,16 +223,52 @@ THUMBInstructionSet.prototype.EOR = function (parentObj) {
 }
 THUMBInstructionSet.prototype.LSL = function (parentObj) {
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
-	var destination = parentObj.registers[parentObj.execute & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7] & 0x1F;
 	if (destination > 0) {
 		//CPSR Carry is set by the last bit shifted out:
 		parentObj.CPUCore.CPSRCarry = (((source << (destination - 1)) & 0x80000000) != 0);
+		//Perform shift:
+		source <<= destination;
 	}
 	else {
 		parentObj.CPUCore.CPSRCarry = false;
 	}
-	//Perform shift:
-	source <<= destination;
+	//Perform CPSR updates for N and Z (But not V):
+	parentObj.CPUCore.CPSRNegative = (source < 0);
+	parentObj.CPUCore.CPSRZero = (source == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = source;
+}
+THUMBInstructionSet.prototype.LSR = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7] & 0x1F;
+	if (destination > 0) {
+		//CPSR Carry is set by the last bit shifted out:
+		parentObj.CPUCore.CPSRCarry = (((source >>> (destination - 1)) & 0x1) != 0);
+		//Perform shift:
+		source >>>= destination;
+	}
+	else {
+		parentObj.CPUCore.CPSRCarry = false;
+	}
+	//Perform CPSR updates for N and Z (But not V):
+	parentObj.CPUCore.CPSRNegative = (source < 0);
+	parentObj.CPUCore.CPSRZero = (source == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = source;
+}
+THUMBInstructionSet.prototype.ASR = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7] & 0x1F;
+	if (destination > 0) {
+		//CPSR Carry is set by the last bit shifted out:
+		parentObj.CPUCore.CPSRCarry = (((source >>> (destination - 1)) & 0x1) != 0);
+		//Perform shift:
+		source >>= destination;
+	}
+	else {
+		parentObj.CPUCore.CPSRCarry = false;
+	}
 	//Perform CPSR updates for N and Z (But not V):
 	parentObj.CPUCore.CPSRNegative = (source < 0);
 	parentObj.CPUCore.CPSRZero = (source == 0);
