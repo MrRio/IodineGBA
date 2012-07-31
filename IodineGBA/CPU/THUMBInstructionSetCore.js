@@ -156,6 +156,15 @@ THUMBInstructionSet.prototype.SUBimm3 = function (parentObj) {
 	//Update destination register:
 	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
 }
+THUMBInstructionSet.prototype.MOV = function (parentObj) {
+	//Get the 8-bit value to move into the register:
+	var result = parentObj.registers[parentObj.execute & 0xFF];
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register:
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = result;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
@@ -173,21 +182,21 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	//1E-1F
 	this.generateLowMap2(this.SUBimm3);
 	//20
-	this.generateLowMap3(this.MOVr0);
+	this.generateLowMap3(this.MOV);
 	//21
-	this.generateLowMap3(this.MOVr1);
+	this.generateLowMap3(this.MOV);
 	//22
-	this.generateLowMap3(this.MOVr2);
+	this.generateLowMap3(this.MOV);
 	//23
-	this.generateLowMap3(this.MOVr3);
+	this.generateLowMap3(this.MOV);
 	//24
-	this.generateLowMap3(this.MOVr4);
+	this.generateLowMap3(this.MOV);
 	//25
-	this.generateLowMap3(this.MOVr5);
+	this.generateLowMap3(this.MOV);
 	//26
-	this.generateLowMap3(this.MOVr6);
+	this.generateLowMap3(this.MOV);
 	//27
-	this.generateLowMap3(this.MOVr7);
+	this.generateLowMap3(this.MOV);
 	//28
 	this.generateLowMap3(this.CMPr0);
 	//29
