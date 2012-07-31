@@ -117,6 +117,19 @@ THUMBInstructionSet.prototype.ADDreg = function (parentObj) {
 	//Update destination register:
 	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
 }
+THUMBInstructionSet.prototype.SUBreg = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var offset = parentObj.registers[(parentObj.execute >> 6) & 0x7];
+	//Perform Addition:
+	var dirtyResult = source - offset;
+	parentObj.CPUCore.CPSRCarry = ((dirtyResult & -1) != dirtyResult);
+	dirtyResult &= -1;
+	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
+	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
+	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
