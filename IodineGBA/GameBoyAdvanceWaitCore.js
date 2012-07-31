@@ -138,7 +138,7 @@ GameBoyAdvanceWait.prototype.CPUGetOpcode16 = function (address) {
 				--this.ROMPrebuffer;
 				this.FASTAccess();
 				return (this.IOCore.cartridge.readROM(address & 0x1FFFFFF) +
-						(this.IOCore.cartridge.readROM((address + 1) & 0x1FFFFFF) << 8));
+					(this.IOCore.cartridge.readROM((address + 1) & 0x1FFFFFF) << 8));
 			}
 		}
 		else {
@@ -162,7 +162,6 @@ GameBoyAdvanceWait.prototype.CPUGetOpcode32 = function (address) {
 				//Buffer miss if only 16 bits out of 32 bits stored:
 				--this.ROMPrebuffer;
 			}
-			
 		}
 		else {
 			this.NonSequentialBroadcast();
