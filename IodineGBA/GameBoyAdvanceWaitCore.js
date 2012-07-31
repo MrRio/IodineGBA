@@ -96,22 +96,49 @@ GameBoyAdvanceWait.prototype.readConfigureWRAM = function (address) {
 	}
 }
 GameBoyAdvanceWait.prototype.CPUInternalCyclePrefetch = function (address, clocks) {
-	if (address >= 0x8000000 && address < 0xE000000) {
-		if (this.prefetchEnabled) {
-			this.ROMPrebuffer += clocks;
-			if (this.ROMPrebuffer > 8) {
-				this.ROMPrebuffer = 8;
-			}
-			this.IOCore.clocks = clocks;
-			this.IOCore.updateCore();
+	//Clock for idle CPU time:
+	this.IOCore.clocks = clocks;
+	this.IOCore.updateCore();
+	//Check for ROM prefetching:
+	if (this.prefetchEnabled) {
+		//We were already in ROM, so if prefetch do so as sequential:
+		//Only case for non-sequential ROM prefetch is invalid anyways:
+		switch ((address >>> 24) & 0xF) {
+			case 0x8:
+			case 0x9:
+				while (clocks >= this.CARTWaitState0Second) {
+					clocks -= this.CARTWaitState0Second;
+					++this.ROMPrebuffer;
+				}
+				break;
+			case 0xA:
+			case 0xB:
+				while (clocks >= this.CARTWaitState1Second) {
+					clocks -= this.CARTWaitState1Second;
+					++this.ROMPrebuffer;
+				}
+				break;
+			case 0xC:
+			case 0xD:
+				while (clocks >= this.CARTWaitState1Second) {
+					clocks -= this.CARTWaitState1Second;
+					++this.ROMPrebuffer;
+				}
 		}
-	}	
+		//ROM buffer caps out at 8 x 16 bit:
+		if (this.ROMPrebuffer > 8) {
+			this.ROMPrebuffer = 8;
+		}
+	}
 }
 GameBoyAdvanceWait.prototype.CPUGetOpcode16 = function (address) {
 	if (address >= 0x8000000 && address < 0xE000000) {
 		if (this.prefetchEnabled) {
 			if (this.ROMPrebuffer > 0) {
 				--this.ROMPrebuffer;
+				this.FASTAccess();
+				return (this.IOCore.cartridge.readROM(address & 0x1FFFFFF) +
+						(this.IOCore.cartridge.readROM((address + 1) & 0x1FFFFFF) << 8));
 			}
 		}
 		else {
@@ -123,9 +150,19 @@ GameBoyAdvanceWait.prototype.CPUGetOpcode16 = function (address) {
 GameBoyAdvanceWait.prototype.CPUGetOpcode32 = function (address) {
 	if (address >= 0x8000000 && address < 0xE000000) {
 		if (this.prefetchEnabled) {
-			if (this.ROMPrebuffer > 0) {
+			if (this.ROMPrebuffer > 1) {
 				this.ROMPrebuffer -= 2;
+				this.FASTAccess();
+				return (this.IOCore.cartridge.readROM(address & 0x1FFFFFF) |
+					(this.IOCore.cartridge.readROM((address + 1) & 0x1FFFFFF) << 8) |
+					(this.IOCore.cartridge.readROM((address + 2) & 0x1FFFFFF) << 16) |
+					(this.IOCore.cartridge.readROM((address + 3) & 0x1FFFFFF) << 24));
 			}
+			else if (this.ROMPrebuffer == 1) {
+				//Buffer miss if only 16 bits out of 32 bits stored:
+				--this.ROMPrebuffer;
+			}
+			
 		}
 		else {
 			this.NonSequentialBroadcast();
