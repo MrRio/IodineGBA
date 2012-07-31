@@ -50,6 +50,60 @@ THUMBInstructionSet.prototype.executeTHUMB = function () {
 		this.pipelineInvalid >>= 1;
 	}
 }
+THUMBInstructionSet.prototype.LSLimm = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 2) & 0x3];
+	var offset = (parentObj.execute >> 4) & 0x1F;
+	if (offset > 0) {
+		//CPSR Carry is set by the last bit shifted out:
+		parentObj.CPUCore.CPSRCarry = (((source << (offset - 1)) & 0x80000000) != 0);
+	}
+	else {
+		parentObj.CPUCore.CPSRCarry = false;
+	}
+	//Perform shift:
+	source <<= offset;
+	//Perform CPSR updates for N and Z (But not V):
+	parentObj.CPUCore.CPSRNegative = (source < 0);
+	parentObj.CPUCore.CPSRZero = (source == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x3] = source;
+}
+THUMBInstructionSet.prototype.LSRimm = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 2) & 0x3];
+	var offset = (parentObj.execute >> 4) & 0x1F;
+	if (offset > 0) {
+		//CPSR Carry is set by the last bit shifted out:
+		parentObj.CPUCore.CPSRCarry = (((source >>> (offset - 1)) & 0x1) != 0);
+	}
+	else {
+		parentObj.CPUCore.CPSRCarry = false;
+	}
+	//Perform shift:
+	source = (source >>> offset) & -1;
+	//Perform CPSR updates for N and Z (But not V):
+	parentObj.CPUCore.CPSRNegative = (source < 0);
+	parentObj.CPUCore.CPSRZero = (source == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x3] = source;
+}
+THUMBInstructionSet.prototype.ASRimm = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 2) & 0x3];
+	var offset = (parentObj.execute >> 4) & 0x1F;
+	if (offset > 0) {
+		//CPSR Carry is set by the last bit shifted out:
+		parentObj.CPUCore.CPSRCarry = (((source >> (offset - 1)) & 0x1) != 0);
+	}
+	else {
+		parentObj.CPUCore.CPSRCarry = false;
+	}
+	//Perform shift:
+	source >>= offset;
+	//Perform CPSR updates for N and Z (But not V):
+	parentObj.CPUCore.CPSRNegative = (source < 0);
+	parentObj.CPUCore.CPSRZero = (source == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x3] = source;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
