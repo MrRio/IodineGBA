@@ -339,8 +339,18 @@ THUMBInstructionSet.prototype.NEG = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMP = function (parentObj) {
 	//Compare two registers:
-	var destination = parentObj.registers[(parentObj.execute >> 8) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7];
 	var dirtyResult = destination - parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var result = dirtyResult & -1;
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+}
+THUMBInstructionSet.prototype.CMN = function (parentObj) {
+	//Compare two registers:
+	var destination = parentObj.registers[parentObj.execute & 0x7];
+	var dirtyResult = destination + parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var result = dirtyResult & -1;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
 	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
