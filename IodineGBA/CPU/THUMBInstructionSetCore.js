@@ -371,7 +371,7 @@ THUMBInstructionSet.prototype.ORR = function (parentObj) {
 THUMBInstructionSet.prototype.MUL = function (parentObj) {
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
-	//Perform bitwise ORR:
+	//Perform MUL32:
 	var result = parentObj.CPUCore.performMUL32(source, destination);
 	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
