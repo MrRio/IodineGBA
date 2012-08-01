@@ -412,11 +412,14 @@ GameBoyAdvanceGraphics.prototype.compositorPreprocess = function () {
 }
 GameBoyAdvanceGraphics.prototype.compositeLayersNormal = function (OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
-	OBJBuffer = (this.WINOBJOutside) ? OBJBuffer : null;
-	BG0Buffer = (this.WINBG0Outside) ? BG0Buffer : null;
-	BG1Buffer = (this.WINBG1Outside) ? BG1Buffer : null;
-	BG2Buffer = (this.WINBG2Outside) ? BG2Buffer : null;
-	BG3Buffer = (this.WINBG3Outside) ? BG3Buffer : null;
+	if (this.gfx.displayObjectWindowFlag || this.gfx.displayWindow1Flag || this.gfx.displayWindow0Flag) {
+		//Window registers can further disable background layers if one or more window layers enabled:
+		OBJBuffer = (this.WINOBJOutside) ? OBJBuffer : null;
+		BG0Buffer = (this.WINBG0Outside) ? BG0Buffer : null;
+		BG1Buffer = (this.WINBG1Outside) ? BG1Buffer : null;
+		BG2Buffer = (this.WINBG2Outside) ? BG2Buffer : null;
+		BG3Buffer = (this.WINBG3Outside) ? BG3Buffer : null;
+	}
 	var layerStack = this.cleanLayerStack(OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer);
 	var stackDepth = layerStack.length;
 	var stackIndex = 0;
