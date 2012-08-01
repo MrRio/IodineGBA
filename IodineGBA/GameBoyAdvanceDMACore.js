@@ -202,6 +202,7 @@ GameBoyAdvanceDMA.prototype.process = function () {
 			if (this.currentMatch != this.lastCurrentMatch) {
 				//Re-broadcasting on address bus, so non-seq:
 				this.IOCore.wait.NonSequentialBroadcast();
+				this.lastCurrentMatch = this.lastCurrentMatch;
 			}
 			this.handleDMACopy(dmaPriority);
 			return false;
