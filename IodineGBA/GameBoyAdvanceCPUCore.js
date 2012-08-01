@@ -73,6 +73,19 @@ GameBoyAdvanceCPU.prototype.getCurrentFetchValue = function () {
 	return this.instructionHandle.fetch;
 }
 GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd) {
+	//Predict the internal cycle time:
+	if ((rd >>> 8) == 0 || (rd >>> 8) == 0xFFFFFF) {
+		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 1);
+	}
+	else if ((rd >>> 16) == 0 || (rd >>> 16) == 0xFFFF) {
+		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 2);
+	}
+	else if ((rd >>> 24) == 0 || (rd >>> 24) == 0xFF) {
+		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 3);
+	}
+	else {
+		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 4);
+	}
 	/*
 		We have to split up the 32 bit multiplication,
 		as JavaScript does multiplication on the FPU
