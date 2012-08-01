@@ -357,6 +357,28 @@ THUMBInstructionSet.prototype.CMN = function (parentObj) {
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
+THUMBInstructionSet.prototype.ORR = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7];
+	//Perform bitwise ORR:
+	var result = source | destination;
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = result;
+}
+THUMBInstructionSet.prototype.MUL = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7];
+	//Perform bitwise ORR:
+	var result = parentObj.CPUCore.performMUL32(source, destination);
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = result;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7

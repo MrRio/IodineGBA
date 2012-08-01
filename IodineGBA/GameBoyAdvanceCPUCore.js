@@ -72,3 +72,15 @@ GameBoyAdvanceCPU.prototype.triggerIRQ = function () {
 GameBoyAdvanceCPU.prototype.getCurrentFetchValue = function () {
 	return this.instructionHandle.fetch;
 }
+GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd) {
+	/*
+		We have to split up the 32 bit multiplication,
+		as JavaScript does multiplication on the FPU
+		as double floats, which drops the low bits
+		rather than the high bits.
+	*/
+	var lowMul = (rs & 0xFFFF) * rd;
+	var highMul = (rs >> 16) * rd;
+	//Cut off bits above bit 31 and return with proper sign:
+	return ((highMul << 16) + lowMul) & -1;
+}
