@@ -523,6 +523,21 @@ THUMBInstructionSet.prototype.MOVH_HH = function (parentObj) {
 	parentObj.CPUCore.CPSRZero = (result == 0);
 	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = result;
 }
+THUMBInstructionSet.prototype.BX_L = function (parentObj) {
+	//Branch & eXchange:
+	var address = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	if ((address & 0x1) == 0) {
+		//Enter ARM mode:
+		parentObj.CPUCore.enterARM();
+		address &= -4;
+	}
+	else {
+		//Stay in THUMB mode:
+		parentObj.resetPipeline();
+		address &= -2;
+	}
+	parentObj.registers[15] = address;
+}
 THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 	//Branch & eXchange:
 	var address = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
@@ -536,7 +551,7 @@ THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 		parentObj.resetPipeline();
 		address &= -2;
 	}
-	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = address;
+	parentObj.registers[15] = address;
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
