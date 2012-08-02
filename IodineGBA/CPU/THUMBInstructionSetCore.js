@@ -491,6 +491,38 @@ THUMBInstructionSet.prototype.CMPH_HH = function (parentObj) {
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
+THUMBInstructionSet.prototype.MOVH_LL = function (parentObj) {
+	//Move a registers content to another register:
+	var result = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	parentObj.registers[parentObj.execute & 0x7] = result;
+}
+THUMBInstructionSet.prototype.MOVH_LH = function (parentObj) {
+	//Move a registers content to another register:
+	var result = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	parentObj.registers[parentObj.execute & 0x7] = result;
+}
+THUMBInstructionSet.prototype.MOVH_HL = function (parentObj) {
+	//Move a registers content to another register:
+	var result = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = result;
+}
+THUMBInstructionSet.prototype.MOVH_HH = function (parentObj) {
+	//Move a registers content to another register:
+	var result = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = result;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
@@ -528,7 +560,7 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	//45
 	this.generateLowMap4(this.CMPH_LL, this.CMPH_LH, this.CMPH_HL, this.CMPH_HH);
 	//46
-	this.generateLowMap3(this.MOVH);
+	this.generateLowMap4(this.MOVH_LL, this.MOVH_LH, this.MOVH_HL, this.MOVH_HH);
 	//47
 	this.generateLowMap3(this.BX);
 	//48
