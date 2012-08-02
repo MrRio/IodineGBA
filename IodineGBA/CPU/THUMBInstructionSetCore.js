@@ -390,6 +390,15 @@ THUMBInstructionSet.prototype.BIC = function (parentObj) {
 	//Update destination register:
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
+THUMBInstructionSet.prototype.MVN = function (parentObj) {
+	//Perform bitwise NOT on source:
+	var source = ~parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (source < 0);
+	parentObj.CPUCore.CPSRZero = (source == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = source;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
