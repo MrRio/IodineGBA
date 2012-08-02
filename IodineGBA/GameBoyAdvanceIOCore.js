@@ -41,13 +41,13 @@ function GameBoyAdvanceIO(emulatorCore) {
 GameBoyAdvanceIO.prototype.memoryWrite8 = function (address, data) {
 	//Byte Write:
 	this.wait.width = 8;
-	this.memoryWrite(address >>> 0, data, 0);
+	this.memoryWrite(address >>> 0, data & 0xFF, 0);
 }
 GameBoyAdvanceIO.prototype.memoryWrite16 = function (address, data) {
 	//Half-Word Write:
 	this.wait.width = 16;
 	this.memoryWrite(address >>>= 0, data & 0xFF, 0);
-	this.memoryWrite(address + 1, data >> 8, 1);
+	this.memoryWrite(address + 1, (data >> 8) & 0xFF, 1);
 }
 GameBoyAdvanceIO.prototype.memoryWrite32 = function (address, data) {
 	//Word Write:

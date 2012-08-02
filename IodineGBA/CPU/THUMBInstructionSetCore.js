@@ -563,8 +563,20 @@ THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 }
 THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
 	//PC-Relative Load
-	var result = parentObj.IOCore.memoryRead32((parentObj.registers[15] + ((parentObj.execute & 0xFF) << 2)) | 0);
+	var result = parentObj.IOCore.memoryRead32(parentObj.registers[15] + ((parentObj.execute & 0xFF) << 2));
 	parentObj.guardHighRegisterWrite((parentObj.execute >> 8) & 0x7, result);
+}
+THUMBInstructionSet.prototype.STRreg = function (parentObj) {
+	//Store Word From Register
+	parentObj.IOCore.memoryWrite32(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF], parentObj.registers[parentObj.execute & 0xF]);
+}
+THUMBInstructionSet.prototype.STRHreg = function (parentObj) {
+	//Store Byte From Register
+	parentObj.IOCore.memoryWrite16(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF], parentObj.registers[parentObj.execute & 0xF]);
+}
+THUMBInstructionSet.prototype.STRBreg = function (parentObj) {
+	//Store Byte From Register
+	parentObj.IOCore.memoryWrite8(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF], parentObj.registers[parentObj.execute & 0xF]);
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
