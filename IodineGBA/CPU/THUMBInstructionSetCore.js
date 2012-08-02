@@ -31,6 +31,14 @@ THUMBInstructionSet.prototype.resetPipeline = function () {
 	this.execute = 0;
 	this.pipelineInvalid = 0x3;
 }
+THUMBInstructionSet.prototype.guardHighRegisterWrite = function (address, data) {
+	//Guard high register writing, as it may cause a branch:
+	this.registers[address] = data;
+	if (address == 15) {
+		//We performed a branch:
+		this.resetPipeline();
+	}
+}
 THUMBInstructionSet.prototype.executeIteration = function () {
 	//Push the new fetch access:
 	this.fetch = this.wait.CPUGetOpcode16(this.registers[15]);
@@ -436,7 +444,7 @@ THUMBInstructionSet.prototype.ADDH_HL = function (parentObj) {
 	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
 	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
 	//Update destination register:
-	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = dirtyResult;
+	parentObj.guardHighRegisterWrite(0x8 | (parentObj.execute & 0x7), dirtyResult);
 }
 THUMBInstructionSet.prototype.ADDH_HH = function (parentObj) {
 	var source = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
@@ -449,7 +457,7 @@ THUMBInstructionSet.prototype.ADDH_HH = function (parentObj) {
 	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
 	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
 	//Update destination register:
-	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = dirtyResult;
+	parentObj.guardHighRegisterWrite(0x8 | (parentObj.execute & 0x7), dirtyResult);
 }
 THUMBInstructionSet.prototype.CMPH_LL = function (parentObj) {
 	//Compare two registers:
@@ -513,7 +521,7 @@ THUMBInstructionSet.prototype.MOVH_HL = function (parentObj) {
 	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
-	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = result;
+	parentObj.guardHighRegisterWrite(0x8 | (parentObj.execute & 0x7), result);
 }
 THUMBInstructionSet.prototype.MOVH_HH = function (parentObj) {
 	//Move a register to another register:
@@ -521,7 +529,7 @@ THUMBInstructionSet.prototype.MOVH_HH = function (parentObj) {
 	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
-	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = result;
+	parentObj.guardHighRegisterWrite(0x8 | (parentObj.execute & 0x7), result);
 }
 THUMBInstructionSet.prototype.BX_L = function (parentObj) {
 	//Branch & eXchange:
@@ -552,6 +560,10 @@ THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 		address &= -2;
 	}
 	parentObj.registers[15] = address;
+}
+THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
+	//PC-Relative Load
+	parentObj.guardHighRegisterWrite((parentObj.execute >> 8) & 0x7, (parentObj.registers[15] + ((parentObj.execute & 0xFF) << 2)) | 0);
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
@@ -593,22 +605,8 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.generateLowMap4(this.MOVH_LL, this.MOVH_LH, this.MOVH_HL, this.MOVH_HH);
 	//47
 	this.generateLowMap4(this.BX_L, this.BX_H, this.BX_L, this.BX_H);
-	//48
-	this.generateLowMap3(this.LDRPCr0);
-	//49
-	this.generateLowMap3(this.LDRPCr1);
-	//4A
-	this.generateLowMap3(this.LDRPCr2);
-	//4B
-	this.generateLowMap3(this.LDRPCr3);
-	//4C
-	this.generateLowMap3(this.LDRPCr4);
-	//4D
-	this.generateLowMap3(this.LDRPCr5);
-	//4E
-	this.generateLowMap3(this.LDRPCr6);
-	//4F
-	this.generateLowMap3(this.LDRPCr7);
+	//48-4F
+	this.generateLowMap(this.LDRPC);
 	//50-51
 	this.generateLowMap2(this.STRreg);
 	//52-53
