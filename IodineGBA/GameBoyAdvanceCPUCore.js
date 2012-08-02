@@ -72,6 +72,14 @@ GameBoyAdvanceCPU.prototype.triggerIRQ = function () {
 GameBoyAdvanceCPU.prototype.getCurrentFetchValue = function () {
 	return this.instructionHandle.fetch;
 }
+GameBoyAdvanceCPU.prototype.enterARM = function () {
+	this.instructionHandle = this.ARM;
+	this.instructionHandle.resetPipeline();
+}
+GameBoyAdvanceCPU.prototype.enterTHUMB = function () {
+	this.instructionHandle = this.THUMB;
+	this.instructionHandle.resetPipeline();
+}
 GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd) {
 	//Predict the internal cycle time:
 	if ((rd >>> 8) == 0 || (rd >>> 8) == 0xFFFFFF) {
