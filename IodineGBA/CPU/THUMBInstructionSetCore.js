@@ -379,6 +379,17 @@ THUMBInstructionSet.prototype.MUL = function (parentObj) {
 	//Update destination register:
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
+THUMBInstructionSet.prototype.BIC = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7];
+	//Perform bitwise AND with a bitwise NOT on source:
+	var result = ~source & destination;
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = result;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
