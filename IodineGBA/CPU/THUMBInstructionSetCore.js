@@ -399,6 +399,58 @@ THUMBInstructionSet.prototype.MVN = function (parentObj) {
 	//Update destination register:
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
+THUMBInstructionSet.prototype.ADDH_LL = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[parentObj.execute & 0x7];
+	//Perform Addition:
+	var dirtyResult = source + destination;
+	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) != dirtyResult);
+	dirtyResult |= 0;
+	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
+	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
+	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
+}
+THUMBInstructionSet.prototype.ADDH_LH = function (parentObj) {
+	var source = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var destination = parentObj.registers[parentObj.execute & 0x7];
+	//Perform Addition:
+	var dirtyResult = source + destination;
+	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) != dirtyResult);
+	dirtyResult |= 0;
+	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
+	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
+	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	//Update destination register:
+	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
+}
+THUMBInstructionSet.prototype.ADDH_HL = function (parentObj) {
+	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
+	//Perform Addition:
+	var dirtyResult = source + destination;
+	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) != dirtyResult);
+	dirtyResult |= 0;
+	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
+	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
+	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	//Update destination register:
+	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = dirtyResult;
+}
+THUMBInstructionSet.prototype.ADDH_HH = function (parentObj) {
+	var source = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
+	//Perform Addition:
+	var dirtyResult = source + destination;
+	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) != dirtyResult);
+	dirtyResult |= 0;
+	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
+	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
+	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	//Update destination register:
+	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = dirtyResult;
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
@@ -432,7 +484,7 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	//43
 	this.generateLowMap4(this.ORR, this.MUL, this.BIC, this.MVN);
 	//44
-	this.generateLowMap3(this.ADDH);
+	this.generateLowMap4(this.ADDH_LL, this.ADDH_LH, this.ADDH_HL, this.ADDH_HH);
 	//45
 	this.generateLowMap3(this.CMPH);
 	//46
