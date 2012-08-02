@@ -563,7 +563,8 @@ THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 }
 THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
 	//PC-Relative Load
-	parentObj.guardHighRegisterWrite((parentObj.execute >> 8) & 0x7, (parentObj.registers[15] + ((parentObj.execute & 0xFF) << 2)) | 0);
+	var result = parentObj.IOCore.memoryRead32((parentObj.registers[15] + ((parentObj.execute & 0xFF) << 2)) | 0);
+	parentObj.guardHighRegisterWrite((parentObj.execute >> 8) & 0x7, result);
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
