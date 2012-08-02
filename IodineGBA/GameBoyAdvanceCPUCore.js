@@ -95,5 +95,5 @@ GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd) {
 	var lowMul = (rs & 0xFFFF) * rd;
 	var highMul = (rs >> 16) * rd;
 	//Cut off bits above bit 31 and return with proper sign:
-	return ((highMul << 16) + lowMul) & -1;
+	return ((highMul << 16) + lowMul) | 0;
 }
