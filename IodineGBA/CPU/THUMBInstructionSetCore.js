@@ -451,6 +451,46 @@ THUMBInstructionSet.prototype.ADDH_HH = function (parentObj) {
 	//Update destination register:
 	parentObj.registers[0x8 | (parentObj.execute & 0x7)] = dirtyResult;
 }
+THUMBInstructionSet.prototype.CMPH_LL = function (parentObj) {
+	//Compare two registers:
+	var destination = parentObj.registers[parentObj.execute & 0x7];
+	var dirtyResult = destination - parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+}
+THUMBInstructionSet.prototype.CMPH_LH = function (parentObj) {
+	//Compare two registers:
+	var destination = parentObj.registers[parentObj.execute & 0x7];
+	var dirtyResult = destination - parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+}
+THUMBInstructionSet.prototype.CMPH_HL = function (parentObj) {
+	//Compare two registers:
+	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
+	var dirtyResult = destination - parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+}
+THUMBInstructionSet.prototype.CMPH_HH = function (parentObj) {
+	//Compare two registers:
+	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
+	var dirtyResult = destination - parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
@@ -486,7 +526,7 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	//44
 	this.generateLowMap4(this.ADDH_LL, this.ADDH_LH, this.ADDH_HL, this.ADDH_HH);
 	//45
-	this.generateLowMap3(this.CMPH);
+	this.generateLowMap4(this.CMPH_LL, this.CMPH_LH, this.CMPH_HL, this.CMPH_HH);
 	//46
 	this.generateLowMap3(this.MOVH);
 	//47
