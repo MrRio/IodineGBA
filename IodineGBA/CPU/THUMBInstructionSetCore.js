@@ -570,35 +570,35 @@ THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
 }
 THUMBInstructionSet.prototype.STRreg = function (parentObj) {
 	//Store Word From Register
-	parentObj.IOCore.memoryWrite32(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF], parentObj.registers[parentObj.execute & 0xF]);
+	parentObj.IOCore.memoryWrite32(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
 }
 THUMBInstructionSet.prototype.STRHreg = function (parentObj) {
 	//Store Hald-Word From Register
-	parentObj.IOCore.memoryWrite16(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF], parentObj.registers[parentObj.execute & 0xF]);
+	parentObj.IOCore.memoryWrite16(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
 }
 THUMBInstructionSet.prototype.STRBreg = function (parentObj) {
 	//Store Byte From Register
-	parentObj.IOCore.memoryWrite8(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF], parentObj.registers[parentObj.execute & 0xF]);
+	parentObj.IOCore.memoryWrite8(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRSBreg = function (parentObj) {
 	//Load Signed Byte Into Register
-	parentObj.registers[parentObj.execute & 0xF] = (parentObj.IOCore.memoryRead8(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]) << 24) >> 24;
+	parentObj.registers[parentObj.execute & 0x7] = (parentObj.IOCore.memoryRead8(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]) << 24) >> 24;
 }
 THUMBInstructionSet.prototype.LDRreg = function (parentObj) {
 	//Load Word Into Register
-	parentObj.registers[parentObj.execute & 0xF] = parentObj.IOCore.memoryRead32(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]);
+	parentObj.registers[parentObj.execute & 0x7] = parentObj.IOCore.memoryRead32(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRHreg = function (parentObj) {
 	//Load Half-Word Into Register
-	parentObj.registers[parentObj.execute & 0xF] = parentObj.IOCore.memoryRead16(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]);
+	parentObj.registers[parentObj.execute & 0x7] = parentObj.IOCore.memoryRead16(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRBreg = function (parentObj) {
 	//Load Byte Into Register
-	parentObj.registers[parentObj.execute & 0xF] = parentObj.IOCore.memoryRead8(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]);
+	parentObj.registers[parentObj.execute & 0x7] = parentObj.IOCore.memoryRead8(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRSHreg = function (parentObj) {
 	//Load Signed Half-Word Into Register
-	parentObj.registers[parentObj.execute & 0xF] = (parentObj.IOCore.memoryRead16(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]) << 16) >> 16;
+	parentObj.registers[parentObj.execute & 0x7] = (parentObj.IOCore.memoryRead16(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]) << 16) >> 16;
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
