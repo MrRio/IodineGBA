@@ -42,6 +42,8 @@ THUMBInstructionSet.prototype.guardHighRegisterWrite = function (address, data) 
 THUMBInstructionSet.prototype.executeIteration = function () {
 	//Push the new fetch access:
 	this.fetch = this.wait.CPUGetOpcode16(this.registers[15]);
+	//Increment The Program Counter:
+	this.registers[15] = (this.registers[15] + 2) & -2;
 	//Execute Instruction:
 	this.executeTHUMB();
 	//Update the pipelining state:
@@ -571,12 +573,32 @@ THUMBInstructionSet.prototype.STRreg = function (parentObj) {
 	parentObj.IOCore.memoryWrite32(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF], parentObj.registers[parentObj.execute & 0xF]);
 }
 THUMBInstructionSet.prototype.STRHreg = function (parentObj) {
-	//Store Byte From Register
+	//Store Hald-Word From Register
 	parentObj.IOCore.memoryWrite16(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF], parentObj.registers[parentObj.execute & 0xF]);
 }
 THUMBInstructionSet.prototype.STRBreg = function (parentObj) {
 	//Store Byte From Register
 	parentObj.IOCore.memoryWrite8(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF], parentObj.registers[parentObj.execute & 0xF]);
+}
+THUMBInstructionSet.prototype.LDRSBreg = function (parentObj) {
+	//Load Signed Byte Into Register
+	parentObj.registers[parentObj.execute & 0xF] = (parentObj.IOCore.memoryRead8(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]) << 24) >> 24;
+}
+THUMBInstructionSet.prototype.LDRreg = function (parentObj) {
+	//Load Word Into Register
+	parentObj.registers[parentObj.execute & 0xF] = parentObj.IOCore.memoryRead32(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]);
+}
+THUMBInstructionSet.prototype.LDRHreg = function (parentObj) {
+	//Load Half-Word Into Register
+	parentObj.registers[parentObj.execute & 0xF] = parentObj.IOCore.memoryRead16(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]);
+}
+THUMBInstructionSet.prototype.LDRBreg = function (parentObj) {
+	//Load Byte Into Register
+	parentObj.registers[parentObj.execute & 0xF] = parentObj.IOCore.memoryRead8(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]);
+}
+THUMBInstructionSet.prototype.LDRSHreg = function (parentObj) {
+	//Load Signed Half-Word Into Register
+	parentObj.registers[parentObj.execute & 0xF] = (parentObj.IOCore.memoryRead16(parentObj.registers[(parentObj.execute >> 6) & 0xF] + parentObj.registers[(parentObj.execute >> 3) & 0xF]) << 16) >> 16;
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
