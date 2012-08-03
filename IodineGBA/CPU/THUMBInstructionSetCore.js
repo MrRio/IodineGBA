@@ -600,6 +600,30 @@ THUMBInstructionSet.prototype.LDRSHreg = function (parentObj) {
 	//Load Signed Half-Word Into Register
 	parentObj.registers[parentObj.execute & 0x7] = (parentObj.IOCore.memoryRead16(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]) << 16) >> 16;
 }
+THUMBInstructionSet.prototype.STRimm5 = function (parentObj) {
+	//Store Word From Register
+	parentObj.IOCore.memoryWrite32((((parentObj.execute >> 6) & 0x1F) << 2) + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
+}
+THUMBInstructionSet.prototype.LDRimm5 = function (parentObj) {
+	//Load Word Into Register
+	parentObj.registers[parentObj.execute & 0x7] = parentObj.IOCore.memoryRead32((((parentObj.execute >> 6) & 0x1F) << 2) + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
+}
+THUMBInstructionSet.prototype.STRBimm5 = function (parentObj) {
+	//Store Byte From Register
+	parentObj.IOCore.memoryWrite8(((parentObj.execute >> 6) & 0x1F) + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
+}
+THUMBInstructionSet.prototype.LDRBimm5 = function (parentObj) {
+	//Load Byte Into Register
+	parentObj.registers[parentObj.execute & 0x7] = parentObj.IOCore.memoryRead8(((parentObj.execute >> 6) & 0x1F) + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
+}
+THUMBInstructionSet.prototype.STRHimm5 = function (parentObj) {
+	//Store Half-Word From Register
+	parentObj.IOCore.memoryWrite16((((parentObj.execute >> 6) & 0x1F) << 1) + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
+}
+THUMBInstructionSet.prototype.LDRHimm5 = function (parentObj) {
+	//Load Half-Word Into Register
+	parentObj.registers[parentObj.execute & 0x7] = parentObj.IOCore.memoryRead16((((parentObj.execute >> 6) & 0x1F) << 1) + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
