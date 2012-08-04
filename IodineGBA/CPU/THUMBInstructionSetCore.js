@@ -22,22 +22,23 @@ THUMBInstructionSet.prototype.initialize = function () {
 	this.IOCore = this.CPUCore.IOCore;
 	this.wait = this.IOCore.wait;
 	this.registers = this.CPUCore.registers;
+	this.fetch = 0;
+	this.decode = 0;
+	this.execute = 0;
 	this.resetPipeline();
 	this.compileInstructionMap();
 }
 THUMBInstructionSet.prototype.resetPipeline = function () {
-	this.fetch = 0;
-	this.decode = 0;
-	this.execute = 0;
 	this.pipelineInvalid = 0x3;
 }
 THUMBInstructionSet.prototype.guardHighRegisterWrite = function (address, data) {
-	//Guard high register writing, as it may cause a branch:
-	this.registers[address] = data;
 	if (address == 15) {
+		data &= -2;
 		//We performed a branch:
 		this.resetPipeline();
 	}
+	//Guard high register writing, as it may cause a branch:
+	this.registers[address] = data;
 }
 THUMBInstructionSet.prototype.executeIteration = function () {
 	//Push the new fetch access:
@@ -632,6 +633,14 @@ THUMBInstructionSet.prototype.LDRSP = function (parentObj) {
 	//Load Word Into Register
 	parentObj.registers[(parentObj.execute >> 8) & 0x7] = parentObj.IOCore.memoryRead32((parentObj.registers[parentObj.execute & 0xFF] << 2) + parentObj.registers[13]);
 }
+THUMBInstructionSet.prototype.ADDPC = function (parentObj) {
+	//Load Word Into Register
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = (parentObj.registers[parentObj.execute & 0xFF] << 2) + parentObj.registers[15];
+}
+THUMBInstructionSet.prototype.ADDSP = function (parentObj) {
+	//Load Word Into Register
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = (parentObj.registers[parentObj.execute & 0xFF] << 2) + parentObj.registers[13];
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
@@ -706,38 +715,10 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.generateLowMap(this.STRSP);
 	//98-9F
 	this.generateLowMap(this.LDRSP);
-	//A0
-	this.generateLowMap3(this.ADDPCr0);
-	//A1
-	this.generateLowMap3(this.ADDPCr1);
-	//A2
-	this.generateLowMap3(this.ADDPCr2);
-	//A3
-	this.generateLowMap3(this.ADDPCr3);
-	//A4
-	this.generateLowMap3(this.ADDPCr4);
-	//A5
-	this.generateLowMap3(this.ADDPCr5);
-	//A6
-	this.generateLowMap3(this.ADDPCr6);
-	//A7
-	this.generateLowMap3(this.ADDPCr7);
-	//A8
-	this.generateLowMap3(this.ADDSPr0);
-	//A9
-	this.generateLowMap3(this.ADDSPr1);
-	//AA
-	this.generateLowMap3(this.ADDSPr2);
-	//AB
-	this.generateLowMap3(this.ADDSPr3);
-	//AC
-	this.generateLowMap3(this.ADDSPr4);
-	//AD
-	this.generateLowMap3(this.ADDSPr5);
-	//AE
-	this.generateLowMap3(this.ADDSPr6);
-	//AF
-	this.generateLowMap3(this.ADDSPr7);
+	//A0-A7
+	this.generateLowMap(this.ADDPC);
+	//A8-AF
+	this.generateLowMap(this.ADDSP);
 	//B0
 	this.generateLowMap3(this.ADDSPimm7);
 	//B1
