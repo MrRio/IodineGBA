@@ -646,14 +646,17 @@ THUMBInstructionSet.prototype.ADDSPimm7 = function (parentObj) {
 	parentObj.registers[13] = ((((parentObj.execute & 0xFF) << 24) >> 22) + parentObj.registers[13]) | 0;
 }
 THUMBInstructionSet.prototype.PUSH = function (parentObj) {
-	//Updating the address bus away from PC fetch:
-	parentObj.wait.NonSequentialBroadcast();
-	//Push register(s) onto the stack
-	for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
-		if ((parentObj.execute & (1 << rListPosition)) != 0) {
-			//Push register onto the stack:
-			parentObj.registers[13] = (parentObj.registers[13] - 4) | 0;
-			parentObj.IOCore.memoryWrite32(parentObj.registers[13], parentObj.registers[rListPosition]);
+	//Only initialize the PUSH sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push register(s) onto the stack
+		for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push register onto the stack:
+				parentObj.registers[13] = (parentObj.registers[13] - 4) | 0;
+				parentObj.IOCore.memoryWrite32(parentObj.registers[13], parentObj.registers[rListPosition]);
+			}
 		}
 	}
 }
