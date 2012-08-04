@@ -40,6 +40,12 @@ THUMBInstructionSet.prototype.guardHighRegisterWrite = function (address, data) 
 	//Guard high register writing, as it may cause a branch:
 	this.registers[address] = data;
 }
+THUMBInstructionSet.prototype.writePC = function (data) {
+	//We performed a branch:
+	this.resetPipeline();
+	//Guard high register writing, as it may cause a branch:
+	this.registers[15] = data & -2;
+}
 THUMBInstructionSet.prototype.executeIteration = function () {
 	//Execute Instruction:
 	this.executeTHUMB();
@@ -567,7 +573,7 @@ THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
 	//PC-Relative Load
 	var result = parentObj.CPUCore.read32(parentObj.registers[15] + ((parentObj.execute & 0xFF) << 2));
-	parentObj.guardHighRegisterWrite((parentObj.execute >> 8) & 0x7, result);
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = result;
 }
 THUMBInstructionSet.prototype.STRreg = function (parentObj) {
 	//Store Word From Register
@@ -650,7 +656,7 @@ THUMBInstructionSet.prototype.PUSH = function (parentObj) {
 	if ((parentObj.execute & 0xFF) > 0) {
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
-		//Push register(s) onto the stack
+		//Push register(s) onto the stack:
 		for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Push register onto the stack:
@@ -663,7 +669,7 @@ THUMBInstructionSet.prototype.PUSH = function (parentObj) {
 THUMBInstructionSet.prototype.PUSHlr = function (parentObj) {
 	//Updating the address bus away from PC fetch:
 	parentObj.wait.NonSequentialBroadcast();
-	//Push register(s) onto the stack
+	//Push register(s) onto the stack:
 	for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
 		if ((parentObj.execute & (1 << rListPosition)) != 0) {
 			//Push register onto the stack:
@@ -674,6 +680,36 @@ THUMBInstructionSet.prototype.PUSHlr = function (parentObj) {
 	//Push link register onto the stack:
 	parentObj.registers[13] = (parentObj.registers[13] - 4) | 0;
 	parentObj.IOCore.memoryWrite32(parentObj.registers[13], parentObj.registers[14]);
+}
+THUMBInstructionSet.prototype.POP = function (parentObj) {
+	//Only initialize the POP sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//POP stack into register(s):
+		for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//POP stack into a register:
+				parentObj.registers[rListPosition] = parentObj.IOCore.memoryRead32(parentObj.registers[13]);
+				parentObj.registers[13] = (parentObj.registers[13] + 4) | 0;
+			}
+		}
+	}
+}
+THUMBInstructionSet.prototype.POPpc = function (parentObj) {
+	//Updating the address bus away from PC fetch:
+	parentObj.wait.NonSequentialBroadcast();
+	//POP stack into register(s):
+	for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
+		if ((parentObj.execute & (1 << rListPosition)) != 0) {
+			//POP stack into a register:
+			parentObj.registers[rListPosition] = parentObj.IOCore.memoryRead32(parentObj.registers[13]);
+			parentObj.registers[13] = (parentObj.registers[13] + 4) | 0;
+		}
+	}
+	//POP stack into the program counter (r15):
+	parentObj.writePC(parentObj.IOCore.memoryRead32(parentObj.registers[13]));
+	parentObj.registers[13] = (parentObj.registers[13] + 4) | 0;
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
