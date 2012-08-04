@@ -624,6 +624,14 @@ THUMBInstructionSet.prototype.LDRHimm5 = function (parentObj) {
 	//Load Half-Word Into Register
 	parentObj.registers[parentObj.execute & 0x7] = parentObj.IOCore.memoryRead16((((parentObj.execute >> 6) & 0x1F) << 1) + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
+THUMBInstructionSet.prototype.STRSP = function (parentObj) {
+	//Store Word From Register
+	parentObj.IOCore.memoryWrite32(((parentObj.execute & 0xFF) << 2) + parentObj.registers[13], parentObj.registers[(parentObj.execute >> 8) & 0x7]);
+}
+THUMBInstructionSet.prototype.LDRSP = function (parentObj) {
+	//Load Word Into Register
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = parentObj.IOCore.memoryRead32((parentObj.registers[parentObj.execute & 0xFF] << 2) + parentObj.registers[13]);
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
@@ -694,38 +702,10 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.generateLowMap(this.STRHimm5);
 	//88-8F
 	this.generateLowMap(this.LDRHimm5);
-	//90
-	this.generateLowMap3(this.STRSPr0);
-	//91
-	this.generateLowMap3(this.STRSPr1);
-	//92
-	this.generateLowMap3(this.STRSPr2);
-	//93
-	this.generateLowMap3(this.STRSPr3);
-	//94
-	this.generateLowMap3(this.STRSPr4);
-	//95
-	this.generateLowMap3(this.STRSPr5);
-	//96
-	this.generateLowMap3(this.STRSPr6);
-	//97
-	this.generateLowMap3(this.STRSPr7);
-	//98
-	this.generateLowMap3(this.LDRSPr0);
-	//99
-	this.generateLowMap3(this.LDRSPr1);
-	//9A
-	this.generateLowMap3(this.LDRSPr2);
-	//9B
-	this.generateLowMap3(this.LDRSPr3);
-	//9C
-	this.generateLowMap3(this.LDRSPr4);
-	//9D
-	this.generateLowMap3(this.LDRSPr5);
-	//9E
-	this.generateLowMap3(this.LDRSPr6);
-	//9F
-	this.generateLowMap3(this.LDRSPr7);
+	//90-97
+	this.generateLowMap(this.STRSP);
+	//98-9F
+	this.generateLowMap(this.LDRSP);
 	//A0
 	this.generateLowMap3(this.ADDPCr0);
 	//A1
