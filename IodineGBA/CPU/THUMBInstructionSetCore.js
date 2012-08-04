@@ -631,15 +631,19 @@ THUMBInstructionSet.prototype.STRSP = function (parentObj) {
 }
 THUMBInstructionSet.prototype.LDRSP = function (parentObj) {
 	//Load Word Into Register
-	parentObj.registers[(parentObj.execute >> 8) & 0x7] = parentObj.IOCore.memoryRead32((parentObj.registers[parentObj.execute & 0xFF] << 2) + parentObj.registers[13]);
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = parentObj.IOCore.memoryRead32(((parentObj.execute & 0xFF) << 2) + parentObj.registers[13]);
 }
 THUMBInstructionSet.prototype.ADDPC = function (parentObj) {
-	//Load Word Into Register
-	parentObj.registers[(parentObj.execute >> 8) & 0x7] = (parentObj.registers[parentObj.execute & 0xFF] << 2) + parentObj.registers[15];
+	//Add PC With Offset Into Register
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = (((parentObj.execute & 0xFF) << 2) + parentObj.registers[15]) | 0;
 }
 THUMBInstructionSet.prototype.ADDSP = function (parentObj) {
-	//Load Word Into Register
-	parentObj.registers[(parentObj.execute >> 8) & 0x7] = (parentObj.registers[parentObj.execute & 0xFF] << 2) + parentObj.registers[13];
+	//Add SP With Offset Into Register
+	parentObj.registers[(parentObj.execute >> 8) & 0x7] = (((parentObj.execute & 0xFF) << 2) + parentObj.registers[13]) | 0;
+}
+THUMBInstructionSet.prototype.ADDSPimm7 = function (parentObj) {
+	//Add Signed Offset Into SP
+	parentObj.registers[13] = ((((parentObj.execute & 0xFF) << 24) >> 22) + parentObj.registers[13]) | 0;
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
