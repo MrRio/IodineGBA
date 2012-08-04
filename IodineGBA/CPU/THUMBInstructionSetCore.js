@@ -41,12 +41,12 @@ THUMBInstructionSet.prototype.guardHighRegisterWrite = function (address, data) 
 	this.registers[address] = data;
 }
 THUMBInstructionSet.prototype.executeIteration = function () {
+	//Execute Instruction:
+	this.executeTHUMB();
 	//Push the new fetch access:
 	this.fetch = this.wait.CPUGetOpcode16(this.registers[15]);
 	//Increment The Program Counter:
 	this.registers[15] = (this.registers[15] + 2) & -2;
-	//Execute Instruction:
-	this.executeTHUMB();
 	//Update the pipelining state:
 	this.execute = this.decode;
 	this.decode = this.fetch;
