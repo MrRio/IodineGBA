@@ -43,8 +43,14 @@ THUMBInstructionSet.prototype.guardHighRegisterWrite = function (address, data) 
 THUMBInstructionSet.prototype.writePC = function (data) {
 	//We performed a branch:
 	this.resetPipeline();
-	//Guard high register writing, as it may cause a branch:
+	//Update the program counter to branch address:
 	this.registers[15] = data & -2;
+}
+THUMBInstructionSet.prototype.offsetPC = function (data) {
+	//We performed a branch:
+	this.resetPipeline();
+	//Update the program counter to branch address:
+	this.registers[15] = (this.registers[15] + ((data << 24) >> 23)) | 0;
 }
 THUMBInstructionSet.prototype.executeIteration = function () {
 	//Execute Instruction:
@@ -747,6 +753,30 @@ THUMBInstructionSet.prototype.LDMIA = function (parentObj) {
 		}
 		//Store the updated base address back into register:
 		parentObj.registers[(parentObj.execute >> 8) & 0x7] = currentAddress;
+	}
+}
+THUMBInstructionSet.prototype.BEQ = function (parentObj) {
+	//Branch if EQual:
+	if (parentObj.CPUCore.CPSRZero) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BNE = function (parentObj) {
+	//Branch if Not Equal:
+	if (!parentObj.CPUCore.CPSRZero) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BCS = function (parentObj) {
+	//Branch if Carry Set:
+	if (parentObj.CPUCore.CPSRCarry) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BCC = function (parentObj) {
+	//Branch if Carry Clear:
+	if (parentObj.CPUCore.CPSRCarry) {
+		parentObj.offsetPC(parentObj.execute);
 	}
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
