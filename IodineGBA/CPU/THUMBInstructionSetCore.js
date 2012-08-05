@@ -711,6 +711,44 @@ THUMBInstructionSet.prototype.POPpc = function (parentObj) {
 	parentObj.writePC(parentObj.IOCore.memoryRead32(parentObj.registers[13]));
 	parentObj.registers[13] = (parentObj.registers[13] + 4) | 0;
 }
+THUMBInstructionSet.prototype.STMIA = function (parentObj) {
+	//Only initialize the STMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 8) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push registers(s) into memory:
+		for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push a register into memory:
+				parentObj.IOCore.memoryWrite32(currentAddress, parentObj.registers[rListPosition]);
+				currentAddress = (currentAddress + 4) | 0;
+			}
+		}
+		//Store the updated base address back into register:
+		parentObj.registers[(parentObj.execute >> 8) & 0x7] = currentAddress;
+	}
+}
+THUMBInstructionSet.prototype.LDMIA = function (parentObj) {
+	//Only initialize the LDMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 8) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Load  registers(s) from memory:
+		for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Load a register from memory:
+				parentObj.registers[rListPosition] = parentObj.IOCore.memoryRead32(currentAddress);
+				currentAddress = (currentAddress + 4) | 0;
+			}
+		}
+		//Store the updated base address back into register:
+		parentObj.registers[(parentObj.execute >> 8) & 0x7] = currentAddress;
+	}
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
@@ -821,38 +859,10 @@ THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.generateLowMap3(this.UNDEFINED);
 	//BF
 	this.generateLowMap3(this.UNDEFINED);
-	//C0
-	this.generateLowMap3(this.STMIAr0);
-	//C1
-	this.generateLowMap3(this.STMIAr1);
-	//C2
-	this.generateLowMap3(this.STMIAr2);
-	//C3
-	this.generateLowMap3(this.STMIAr3);
-	//C4
-	this.generateLowMap3(this.STMIAr4);
-	//C5
-	this.generateLowMap3(this.STMIAr5);
-	//C6
-	this.generateLowMap3(this.STMIAr6);
-	//C7
-	this.generateLowMap3(this.STMIAr7);
-	//C8
-	this.generateLowMap3(this.LDMIAr0);
-	//C9
-	this.generateLowMap3(this.LDMIAr1);
-	//CA
-	this.generateLowMap3(this.LDMIAr2);
-	//CB
-	this.generateLowMap3(this.LDMIAr3);
-	//CC
-	this.generateLowMap3(this.LDMIAr4);
-	//CD
-	this.generateLowMap3(this.LDMIAr5);
-	//CE
-	this.generateLowMap3(this.LDMIAr6);
-	//CF
-	this.generateLowMap3(this.LDMIAr7);
+	//C0-C7
+	this.generateLowMap(this.STMIA);
+	//C8-CF
+	this.generateLowMap(this.LDMIA);
 	//D0
 	this.generateLowMap3(this.BEQ);
 	//D1
