@@ -805,6 +805,18 @@ THUMBInstructionSet.prototype.BPL = function (parentObj) {
 		parentObj.offsetPC(parentObj.execute);
 	}
 }
+THUMBInstructionSet.prototype.BVS = function (parentObj) {
+	//Branch if Overflow Set:
+	if (parentObj.CPUCore.CPSROverflow) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BVC = function (parentObj) {
+	//Branch if Overflow Clear:
+	if (!parentObj.CPUCore.CPSROverflow) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
