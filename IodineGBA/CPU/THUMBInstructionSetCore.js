@@ -54,6 +54,12 @@ THUMBInstructionSet.prototype.offsetPC = function (data) {
 	//Update the program counter to branch address:
 	this.registers[15] = (this.registers[15] + ((data << 24) >> 23)) | 0;
 }
+THUMBInstructionSet.prototype.offsetPC2 = function (data) {
+	//We performed a branch:
+	this.resetPipeline();
+	//Update the program counter to branch address:
+	this.registers[15] = (this.registers[15] + ((data << 21) >> 20)) | 0;
+}
 THUMBInstructionSet.prototype.executeIteration = function () {
 	//Execute Instruction:
 	this.executeTHUMB();
@@ -852,6 +858,29 @@ THUMBInstructionSet.prototype.BLE = function (parentObj) {
 	if (parentObj.CPUCore.CPSRZero && parentObj.CPUCore.CPSRNegative != parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+}
+THUMBInstructionSet.prototype.SWI = function (parentObj) {
+	//Software Interrupt:
+	parentObj.CPUCore.SWI((parentObj.registers[15] - 2) | 0);
+}
+THUMBInstructionSet.prototype.B = function (parentObj) {
+	//Unconditional Branch:
+	parentObj.offsetPC2(parentObj.execute);
+}
+THUMBInstructionSet.prototype.BLsetup = function (parentObj) {
+	//Brank with Link (High offset)
+	//Update the link register to branch address:
+	this.registers[14] = (this.registers[15] + ((parentObj.execute & 0x7FF) << 12)) | 0;
+}
+THUMBInstructionSet.prototype.BLoff = function (parentObj) {
+	//Brank with Link (High offset)
+	this.resetPipeline();
+	//Update the link register to branch address:
+	this.registers[14] = (this.registers[15] + ((parentObj.execute & 0x7FF) << 1)) | 0;
+	//Copy LR to PC:
+	this.registers[15] = this.registers[14];
+	//Set bit 0 of LR high:
+	this.registers[14] |= 0x1;
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
