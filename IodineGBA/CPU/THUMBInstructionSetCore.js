@@ -670,6 +670,8 @@ THUMBInstructionSet.prototype.PUSH = function (parentObj) {
 				parentObj.IOCore.memoryWrite32(parentObj.registers[13], parentObj.registers[rListPosition]);
 			}
 		}
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 THUMBInstructionSet.prototype.PUSHlr = function (parentObj) {
@@ -686,6 +688,8 @@ THUMBInstructionSet.prototype.PUSHlr = function (parentObj) {
 	//Push link register onto the stack:
 	parentObj.registers[13] = (parentObj.registers[13] - 4) | 0;
 	parentObj.IOCore.memoryWrite32(parentObj.registers[13], parentObj.registers[14]);
+	//Updating the address bus back to PC fetch:
+	parentObj.wait.NonSequentialBroadcast();
 }
 THUMBInstructionSet.prototype.POP = function (parentObj) {
 	//Only initialize the POP sequence if the register list is non-empty:
@@ -700,6 +704,8 @@ THUMBInstructionSet.prototype.POP = function (parentObj) {
 				parentObj.registers[13] = (parentObj.registers[13] + 4) | 0;
 			}
 		}
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 THUMBInstructionSet.prototype.POPpc = function (parentObj) {
@@ -716,6 +722,8 @@ THUMBInstructionSet.prototype.POPpc = function (parentObj) {
 	//POP stack into the program counter (r15):
 	parentObj.writePC(parentObj.IOCore.memoryRead32(parentObj.registers[13]));
 	parentObj.registers[13] = (parentObj.registers[13] + 4) | 0;
+	//Updating the address bus back to PC fetch:
+	parentObj.wait.NonSequentialBroadcast();
 }
 THUMBInstructionSet.prototype.STMIA = function (parentObj) {
 	//Only initialize the STMIA sequence if the register list is non-empty:
@@ -734,6 +742,8 @@ THUMBInstructionSet.prototype.STMIA = function (parentObj) {
 		}
 		//Store the updated base address back into register:
 		parentObj.registers[(parentObj.execute >> 8) & 0x7] = currentAddress;
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 THUMBInstructionSet.prototype.LDMIA = function (parentObj) {
@@ -753,6 +763,8 @@ THUMBInstructionSet.prototype.LDMIA = function (parentObj) {
 		}
 		//Store the updated base address back into register:
 		parentObj.registers[(parentObj.execute >> 8) & 0x7] = currentAddress;
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 THUMBInstructionSet.prototype.BEQ = function (parentObj) {
