@@ -829,6 +829,30 @@ THUMBInstructionSet.prototype.BLS = function (parentObj) {
 		parentObj.offsetPC(parentObj.execute);
 	}
 }
+THUMBInstructionSet.prototype.BGE = function (parentObj) {
+	//Branch if Negative equal to Overflow
+	if (parentObj.CPUCore.CPSRNegative == parentObj.CPUCore.CPSROverflow) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BLT = function (parentObj) {
+	//Branch if Negative NOT equal to Overflow
+	if (parentObj.CPUCore.CPSRNegative != parentObj.CPUCore.CPSROverflow) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BGT = function (parentObj) {
+	//Branch if Zero Clear and Negative equal to Overflow
+	if (!parentObj.CPUCore.CPSRZero && parentObj.CPUCore.CPSRNegative == parentObj.CPUCore.CPSROverflow) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BLE = function (parentObj) {
+	//Branch if Zero Set and Negative NOT equal to Overflow
+	if (parentObj.CPUCore.CPSRZero && parentObj.CPUCore.CPSRNegative != parentObj.CPUCore.CPSROverflow) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
