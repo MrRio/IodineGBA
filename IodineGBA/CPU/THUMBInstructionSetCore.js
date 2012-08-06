@@ -54,12 +54,6 @@ THUMBInstructionSet.prototype.offsetPC = function (data) {
 	//Update the program counter to branch address:
 	this.registers[15] = (this.registers[15] + ((data << 24) >> 23)) | 0;
 }
-THUMBInstructionSet.prototype.offsetPC2 = function (data) {
-	//We performed a branch:
-	this.resetPipeline();
-	//Update the program counter to branch address:
-	this.registers[15] = (this.registers[15] + ((data << 21) >> 20)) | 0;
-}
 THUMBInstructionSet.prototype.executeIteration = function () {
 	//Execute Instruction:
 	this.executeTHUMB();
@@ -865,7 +859,9 @@ THUMBInstructionSet.prototype.SWI = function (parentObj) {
 }
 THUMBInstructionSet.prototype.B = function (parentObj) {
 	//Unconditional Branch:
-	parentObj.offsetPC2(parentObj.execute);
+	parentObj.resetPipeline();
+	//Update the program counter to branch address:
+	parentObj.registers[15] = (parentObj.registers[15] + ((parentObj.execute << 21) >> 20)) | 0;
 }
 THUMBInstructionSet.prototype.BLsetup = function (parentObj) {
 	//Brank with Link (High offset)
