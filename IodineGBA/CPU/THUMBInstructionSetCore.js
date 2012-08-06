@@ -817,6 +817,18 @@ THUMBInstructionSet.prototype.BVC = function (parentObj) {
 		parentObj.offsetPC(parentObj.execute);
 	}
 }
+THUMBInstructionSet.prototype.BHI = function (parentObj) {
+	//Branch if Carry & Non-Zero:
+	if (parentObj.CPUCore.CPSRCarry && !parentObj.CPUCore.CPSRZero) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BLS = function (parentObj) {
+	//Branch if Carry Clear or is Zero Set:
+	if (!parentObj.CPUCore.CPSRCarry || parentObj.CPUCore.CPSRZero) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
