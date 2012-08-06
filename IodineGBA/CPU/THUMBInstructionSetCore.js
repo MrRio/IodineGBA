@@ -30,6 +30,8 @@ THUMBInstructionSet.prototype.initialize = function () {
 }
 THUMBInstructionSet.prototype.resetPipeline = function () {
 	this.pipelineInvalid = 0x3;
+	//Next PC fetch has to update the address bus:
+	this.wait.NonSequentialBroadcast();
 }
 THUMBInstructionSet.prototype.guardHighRegisterWrite = function (address, data) {
 	if (address == 15) {
@@ -787,7 +789,19 @@ THUMBInstructionSet.prototype.BCS = function (parentObj) {
 }
 THUMBInstructionSet.prototype.BCC = function (parentObj) {
 	//Branch if Carry Clear:
-	if (parentObj.CPUCore.CPSRCarry) {
+	if (!parentObj.CPUCore.CPSRCarry) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BMI = function (parentObj) {
+	//Branch if Negative Set:
+	if (parentObj.CPUCore.CPSRNegative) {
+		parentObj.offsetPC(parentObj.execute);
+	}
+}
+THUMBInstructionSet.prototype.BPL = function (parentObj) {
+	//Branch if Negative Clear:
+	if (!parentObj.CPUCore.CPSRNegative) {
 		parentObj.offsetPC(parentObj.execute);
 	}
 }

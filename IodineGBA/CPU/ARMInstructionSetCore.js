@@ -30,6 +30,8 @@ ARMInstructionSet.prototype.initialize = function () {
 }
 ARMInstructionSet.prototype.resetPipeline = function () {
 	this.pipelineInvalid = 0x3;
+	//Next PC fetch has to update the address bus:
+	this.wait.NonSequentialBroadcast();
 }
 ARMInstructionSet.prototype.executeIteration = function () {
 	//Execute Conditional Instruction:
