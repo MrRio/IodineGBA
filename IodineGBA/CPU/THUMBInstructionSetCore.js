@@ -882,6 +882,10 @@ THUMBInstructionSet.prototype.BLoff = function (parentObj) {
 	//Set bit 0 of LR high:
 	this.registers[14] |= 0x1;
 }
+THUMBInstructionSet.prototype.UNDEFINED = function (parentObj) {
+	//Undefined Exception:
+	parentObj.CPUCore.UNDEFINED((parentObj.registers[15] - 2) | 0);
+}
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
 	//0-7
