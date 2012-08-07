@@ -38,6 +38,8 @@ THUMBInstructionSet.prototype.guardHighRegisterWrite = function (address, data) 
 		data &= -2;
 		//We performed a branch:
 		this.resetPipeline();
+		//Restore SPSR to CPSR:
+		this.CPUCore.SPSRtoCPSR();
 	}
 	//Guard high register writing, as it may cause a branch:
 	this.registers[address] = data;

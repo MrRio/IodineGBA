@@ -57,11 +57,11 @@ ARM7TDMI.prototype.initializeRegisters = function () {
 	this.InTHUMB = false;			//T Bit
 	this.MODEBits = 0x13;			//M0 thru M4 Bits
 	//Banked SPSR Registers:
-	this.SPSRFIQ = [false, false, false, false, true, true, false];	//FIQ
-	this.SPSRIRQ = [false, false, false, false, true, true, false];	//IRQ
-	this.SPSRSVC = [false, false, false, false, true, true, false];	//Supervisor
-	this.SPSRABT = [false, false, false, false, true, true, false];	//Abort
-	this.SPSRUND = [false, false, false, false, true, true, false];	//Undefined
+	this.SPSRFIQ = [false, false, false, false, true, true, false, 0x13];	//FIQ
+	this.SPSRIRQ = [false, false, false, false, true, true, false, 0x13];	//IRQ
+	this.SPSRSVC = [false, false, false, false, true, true, false, 0x13];	//Supervisor
+	this.SPSRABT = [false, false, false, false, true, true, false, 0x13];	//Abort
+	this.SPSRUND = [false, false, false, false, true, true, false, 0x13];	//Undefined
 	this.triggeredIRQ = false;		//Pending IRQ found.
 }
 GameBoyAdvanceCPU.prototype.executeIteration = function () {
@@ -95,6 +95,8 @@ GameBoyAdvanceCPU.prototype.FIQ = function (LR) {
 		this.registers[14] = LR;
 		//FIQ exception vector:
 		this.registers[15] = 0x1C;
+		//Protect the CPSR:
+		this.CPSRtoSPSR(0x11);
 		//Mode bits are set to FIQ:
 		this.MODEBits = 0x11;
 		//Disable IRQ:
@@ -111,6 +113,8 @@ GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
 		this.registers[14] = LR;
 		//IRQ exception vector:
 		this.registers[15] = 0x18;
+		//Protect the CPSR:
+		this.CPSRtoSPSR(0x12);
 		//Mode bits are set to IRQ:
 		this.MODEBits = 0x12;
 		//Disable IRQ:
@@ -125,6 +129,8 @@ GameBoyAdvanceCPU.prototype.SWI = function (LR) {
 	//SWI enters the SVC vector:
 	this.registers[15] = 0x8;
 	//Mode bits are set to SVC:
+	//Protect the CPSR:
+	this.CPSRtoSPSR(0x13);
 	this.MODEBits = 0x13;
 	//Disable IRQ:
 	this.IRQDisabled = true;
@@ -136,10 +142,74 @@ GameBoyAdvanceCPU.prototype.UNDEFINED = function (LR) {
 	this.registers[14] = LR;
 	//Undefined exception vector:
 	this.registers[15] = 0x4;
+	//Protect the CPSR:
+	this.CPSRtoSPSR(0x1B);
 	//Mode bits are set to UNDEFINED:
-	this.MODEBits = 0x1C;
+	this.MODEBits = 0x1B;
 	//Disable IRQ:
 	this.IRQDisabled = true;
+}
+GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
+	//Used for leaving an exception and returning to the previous state:
+	switch (this.MODEBits) {
+		case 0x10:	//User
+		case 0x1F:	//System
+			return;
+		case 0x11:	//FIQ
+			var spsr = this.SPSRFIQ[0];
+			break;
+		case 0x12:	//IRQ
+			var spsr = this.SPSRIRQ[1];
+			break;
+		case 0x13:	//Supervisor
+			var spsr = this.SPSRSVC[2];
+			break;
+		case 0x17:	//Abort
+			var spsr = this.SPSRABT[3];
+			break;
+		case 0x1B:	//Undefined
+			var spsr = this.SPSRUND[4];
+	}
+	this.CPSRNegative = spsr[0];
+	this.CPSRZero = spsr[1];
+	this.CPSROverflow = spsr[2];
+	this.CPSRCarry = spsr[3];
+	this.IRQDisabled = spsr[4];
+	this.FIQDisabled = spsr[5];
+	this.InTHUMB = spsr[6];
+	this.MODEBits = spsr[7];
+}
+GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function (newMode) {
+	//Used for leaving an exception and returning to the previous state:
+	switch (newMode) {
+		case 0x10:	//User
+		case 0x1F:	//System
+			return;
+		case 0x11:	//FIQ
+			var spsr = this.SPSRFIQ[0];
+			break;
+		case 0x12:	//IRQ
+			var spsr = this.SPSRIRQ[1];
+			break;
+		case 0x13:	//Supervisor
+			var spsr = this.SPSRSVC[2];
+			break;
+		case 0x17:	//Abort
+			var spsr = this.SPSRABT[3];
+			break;
+		case 0x1B:	//Undefined
+			var spsr = this.SPSRUND[4];
+	}
+	spsr = [
+		this.CPSRNegative,
+		this.CPSRZero,
+		this.CPSROverflow,
+		this.CPSRCarry,
+		this.IRQDisabled,
+		this.FIQDisabled,
+		this.InTHUMB,
+		this.MODEBits
+	];
 }
 GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd) {
 	//Predict the internal cycle time:

@@ -139,6 +139,46 @@ ARMInstructionSet.prototype.conditionCodeTest = function () {
 			return false;
 	}
 }
+ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
+	address &= 0xF;
+	if (address == 15) {
+		data &= -2;
+		//We performed a branch:
+		this.resetPipeline();
+	}
+	//Guard high register writing, as it may cause a branch:
+	this.registers[address] = data;
+}
+ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
+	address &= 0xF;
+	if (address == 15) {
+		data &= -2;
+		//We performed a branch:
+		this.resetPipeline();
+		//Restore SPSR to CPSR:
+		this.CPUCore.SPSRtoCPSR();
+	}
+	//Guard high register writing, as it may cause a branch:
+	this.registers[address] = data;
+}
+ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform bitwise AND:
+	//Update destination register:
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 & operand2);
+}
+ARMInstructionSet.prototype.ANDS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform bitwise AND:
+	var result = operand1 & operand2;
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register and guard CPSR for PC:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
+}
 ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [
 		//0
