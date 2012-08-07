@@ -36,7 +36,6 @@ THUMBInstructionSet.prototype.resetPipeline = function () {
 THUMBInstructionSet.prototype.guardHighRegisterWrite = function (data) {
 	var address = 0x8 | (this.execute & 0x7);
 	if (address == 15) {
-		data &= -2;
 		//We performed a branch:
 		this.resetPipeline();
 	}

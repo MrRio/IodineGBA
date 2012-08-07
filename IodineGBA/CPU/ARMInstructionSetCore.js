@@ -142,17 +142,15 @@ ARMInstructionSet.prototype.conditionCodeTest = function () {
 ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
 	address &= 0xF;
 	if (address == 15) {
-		data &= -2;
 		//We performed a branch:
 		this.resetPipeline();
 	}
 	//Guard high register writing, as it may cause a branch:
 	this.registers[address] = data;
 }
-ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
+ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
 	address &= 0xF;
 	if (address == 15) {
-		data &= -2;
 		//We performed a branch:
 		this.resetPipeline();
 		//Restore SPSR to CPSR:
