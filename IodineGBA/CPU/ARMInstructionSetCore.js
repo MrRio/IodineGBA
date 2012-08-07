@@ -195,6 +195,46 @@ ARMInstructionSet.prototype.EORS = function (parentObj, operand2OP) {
 	//Update destination register and guard CPSR for PC:
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
+ARMInstructionSet.prototype.SUB = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform Subtraction:
+	//Update destination register:
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2) | 0);
+}
+ARMInstructionSet.prototype.SUBS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform Subtraction:
+	var dirtyResult = operand1 - operand2;
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((operand1 ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
+}
+ARMInstructionSet.prototype.RSB = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform Subtraction:
+	//Update destination register:
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2) | 0);
+}
+ARMInstructionSet.prototype.RSBS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform Subtraction:
+	var dirtyResult = operand2 - operand1;
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((operand1 ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
+}
 ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [
 		//0
