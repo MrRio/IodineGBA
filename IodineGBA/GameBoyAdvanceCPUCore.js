@@ -62,12 +62,19 @@ ARM7TDMI.prototype.initializeRegisters = function () {
 	this.SPSRSVC = [false, false, false, false, true, true, false];	//Supervisor
 	this.SPSRABT = [false, false, false, false, true, true, false];	//Abort
 	this.SPSRUND = [false, false, false, false, true, true, false];	//Undefined
+	this.triggeredIRQ = false;		//Pending IRQ found.
 }
 GameBoyAdvanceCPU.prototype.executeIteration = function () {
+	//Check for pending IRQ:
+	if (this.triggeredIRQ) {
+		this.triggeredIRQ = false;
+		this.IRQ(this.instructionHandle.getIRQLR());
+	}
+	//Tick the pipeline of the selected instruction set:
 	this.instructionHandle.executeIteration();
 }
 GameBoyAdvanceCPU.prototype.triggerIRQ = function () {
-	return this.instructionHandle.raiseIRQException();
+	this.triggeredIRQ = !this.IRQDisabled;
 }
 GameBoyAdvanceCPU.prototype.getCurrentFetchValue = function () {
 	return this.instructionHandle.fetch;
@@ -79,6 +86,60 @@ GameBoyAdvanceCPU.prototype.enterARM = function () {
 GameBoyAdvanceCPU.prototype.enterTHUMB = function () {
 	this.instructionHandle = this.THUMB;
 	this.instructionHandle.resetPipeline();
+}
+GameBoyAdvanceCPU.prototype.FIQ = function (LR) {
+	if (!this.FIQDisabled) {
+		//Exception always enter ARM mode:
+		this.enterARM();
+		//Save link register:
+		this.registers[14] = LR;
+		//FIQ exception vector:
+		this.registers[15] = 0x1C;
+		//Mode bits are set to FIQ:
+		this.MODEBits = 0x11;
+		//Disable IRQ:
+		this.IRQDisabled = true;
+		//Disable FIQ:
+		this.FIQDisabled = true;
+	}
+}
+GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
+	if (!this.IRQDisabled) {
+		//Exception always enter ARM mode:
+		this.enterARM();
+		//Save link register:
+		this.registers[14] = LR;
+		//IRQ exception vector:
+		this.registers[15] = 0x18;
+		//Mode bits are set to IRQ:
+		this.MODEBits = 0x12;
+		//Disable IRQ:
+		this.IRQDisabled = true;
+	}
+}
+GameBoyAdvanceCPU.prototype.SWI = function (LR) {
+	//Exception always enter ARM mode:
+	this.enterARM();
+	//Save link register:
+	this.registers[14] = LR;
+	//SWI enters the SVC vector:
+	this.registers[15] = 0x8;
+	//Mode bits are set to SVC:
+	this.MODEBits = 0x13;
+	//Disable IRQ:
+	this.IRQDisabled = true;
+}
+GameBoyAdvanceCPU.prototype.UNDEFINED = function (LR) {
+	//Exception always enter ARM mode:
+	this.enterARM();
+	//Save link register:
+	this.registers[14] = LR;
+	//Undefined exception vector:
+	this.registers[15] = 0x4;
+	//Mode bits are set to UNDEFINED:
+	this.MODEBits = 0x1C;
+	//Disable IRQ:
+	this.IRQDisabled = true;
 }
 GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd) {
 	//Predict the internal cycle time:

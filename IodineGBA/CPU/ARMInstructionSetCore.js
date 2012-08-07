@@ -33,13 +33,16 @@ ARMInstructionSet.prototype.resetPipeline = function () {
 	//Next PC fetch has to update the address bus:
 	this.wait.NonSequentialBroadcast();
 }
+THUMBInstructionSet.prototype.getIRQLR = function () {
+	return (this.registers[15] - 8) | 0;
+}
 ARMInstructionSet.prototype.executeIteration = function () {
-	//Execute Conditional Instruction:
-	this.executeARM(this.instructionMap[(this.execute >> 20) & 0xFF][(this.execute >> 4) & 0xF]);
 	//Push the new fetch access:
 	this.fetch = this.wait.CPUGetOpcode32(this.registers[15]);
+	//Execute Conditional Instruction:
+	this.executeARM(this.instructionMap[(this.execute >> 20) & 0xFF][(this.execute >> 4) & 0xF]);
 	//Increment The Program Counter:
-	this.registers[15] = (this.registers[15] + 4) & -4;
+	this.registers[15] = (this.registers[15] + 4) | 0;
 	//Update the pipelining state:
 	this.execute = this.decode;
 	this.decode = this.fetch;

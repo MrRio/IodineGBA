@@ -54,13 +54,16 @@ THUMBInstructionSet.prototype.offsetPC = function (data) {
 	//Update the program counter to branch address:
 	this.registers[15] = (this.registers[15] + ((data << 24) >> 23)) | 0;
 }
+THUMBInstructionSet.prototype.getIRQLR = function () {
+	return (this.registers[15] - 4) | 0;
+}
 THUMBInstructionSet.prototype.executeIteration = function () {
-	//Execute Instruction:
-	this.executeTHUMB();
 	//Push the new fetch access:
 	this.fetch = this.wait.CPUGetOpcode16(this.registers[15]);
+	//Execute Instruction:
+	this.executeTHUMB();
 	//Increment The Program Counter:
-	this.registers[15] = (this.registers[15] + 2) & -2;
+	this.registers[15] = (this.registers[15] + 2) | 0;
 	//Update the pipelining state:
 	this.execute = this.decode;
 	this.decode = this.fetch;

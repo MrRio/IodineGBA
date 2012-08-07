@@ -132,7 +132,7 @@ GameBoyAdvanceWait.prototype.CPUInternalCyclePrefetch = function (address, clock
 	}
 }
 GameBoyAdvanceWait.prototype.CPUGetOpcode16 = function (address) {
-	if (address >= 0x8000000 && address < 0xE000000) {
+	if ((address >>> 24) >= 0x8 && (address >>> 24) < 0xE) {
 		if (this.prefetchEnabled) {
 			if (this.ROMPrebuffer > 0) {
 				--this.ROMPrebuffer;
@@ -148,7 +148,7 @@ GameBoyAdvanceWait.prototype.CPUGetOpcode16 = function (address) {
 	return this.IOCore.memoryRead16(address);
 }
 GameBoyAdvanceWait.prototype.CPUGetOpcode32 = function (address) {
-	if (address >= 0x8000000 && address < 0xE000000) {
+	if ((address >>> 24) >= 0x8 && (address >>> 24) < 0xE) {
 		if (this.prefetchEnabled) {
 			if (this.ROMPrebuffer > 1) {
 				this.ROMPrebuffer -= 2;
