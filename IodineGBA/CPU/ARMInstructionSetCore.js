@@ -177,6 +177,24 @@ ARMInstructionSet.prototype.ANDS = function (parentObj, operand2OP) {
 	//Update destination register and guard CPSR for PC:
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
+ARMInstructionSet.prototype.EOR = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform bitwise EOR:
+	//Update destination register:
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 ^ operand2);
+}
+ARMInstructionSet.prototype.EORS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform bitwise EOR:
+	var result = operand1 ^ operand2;
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register and guard CPSR for PC:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
+}
 ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [
 		//0
