@@ -235,6 +235,26 @@ ARMInstructionSet.prototype.RSBS = function (parentObj, operand2OP) {
 	//Update destination register:
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
+ARMInstructionSet.prototype.ADD = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform Subtraction:
+	//Update destination register:
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 + operand2) | 0);
+}
+ARMInstructionSet.prototype.ADDS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform Subtraction:
+	var dirtyResult = operand1 + operand2;
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((operand1 ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
+}
 ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [
 		//0
