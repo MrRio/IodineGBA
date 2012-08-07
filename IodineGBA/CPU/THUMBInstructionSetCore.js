@@ -33,13 +33,12 @@ THUMBInstructionSet.prototype.resetPipeline = function () {
 	//Next PC fetch has to update the address bus:
 	this.wait.NonSequentialBroadcast();
 }
-THUMBInstructionSet.prototype.guardHighRegisterWrite = function (address, data) {
+THUMBInstructionSet.prototype.guardHighRegisterWrite = function (data) {
+	var address = 0x8 | (this.execute & 0x7);
 	if (address == 15) {
 		data &= -2;
 		//We performed a branch:
 		this.resetPipeline();
-		//Restore SPSR to CPSR:
-		this.CPUCore.SPSRtoCPSR();
 	}
 	//Guard high register writing, as it may cause a branch:
 	this.registers[address] = data;
@@ -433,53 +432,29 @@ THUMBInstructionSet.prototype.ADDH_LL = function (parentObj) {
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform Addition:
-	var dirtyResult = source + destination;
-	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) != dirtyResult);
-	dirtyResult |= 0;
-	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
-	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
-	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
 	//Update destination register:
-	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
+	parentObj.registers[parentObj.execute & 0x7] = (source + destination) | 0;
 }
 THUMBInstructionSet.prototype.ADDH_LH = function (parentObj) {
 	var source = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform Addition:
-	var dirtyResult = source + destination;
-	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) != dirtyResult);
-	dirtyResult |= 0;
-	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
-	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
-	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
 	//Update destination register:
-	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
+	parentObj.registers[parentObj.execute & 0x7] = (source + destination) | 0;
 }
 THUMBInstructionSet.prototype.ADDH_HL = function (parentObj) {
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
 	//Perform Addition:
-	var dirtyResult = source + destination;
-	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) != dirtyResult);
-	dirtyResult |= 0;
-	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
-	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
-	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
 	//Update destination register:
-	parentObj.guardHighRegisterWrite(0x8 | (parentObj.execute & 0x7), dirtyResult);
+	parentObj.guardHighRegisterWrite((source + destination) | 0);
 }
 THUMBInstructionSet.prototype.ADDH_HH = function (parentObj) {
 	var source = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
 	//Perform Addition:
-	var dirtyResult = source + destination;
-	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) != dirtyResult);
-	dirtyResult |= 0;
-	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
-	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
-	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
 	//Update destination register:
-	parentObj.guardHighRegisterWrite(0x8 | (parentObj.execute & 0x7), dirtyResult);
+	parentObj.guardHighRegisterWrite((source + destination) | 0);
 }
 THUMBInstructionSet.prototype.CMPH_LL = function (parentObj) {
 	//Compare two registers:
@@ -523,35 +498,19 @@ THUMBInstructionSet.prototype.CMPH_HH = function (parentObj) {
 }
 THUMBInstructionSet.prototype.MOVH_LL = function (parentObj) {
 	//Move a register to another register:
-	var result = parentObj.registers[(parentObj.execute >> 3) & 0x7];
-	parentObj.CPUCore.CPSRCarry = false;
-	parentObj.CPUCore.CPSRNegative = (result < 0);
-	parentObj.CPUCore.CPSRZero = (result == 0);
-	parentObj.registers[parentObj.execute & 0x7] = result;
+	parentObj.registers[parentObj.execute & 0x7] = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 }
 THUMBInstructionSet.prototype.MOVH_LH = function (parentObj) {
 	//Move a register to another register:
-	var result = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
-	parentObj.CPUCore.CPSRCarry = false;
-	parentObj.CPUCore.CPSRNegative = (result < 0);
-	parentObj.CPUCore.CPSRZero = (result == 0);
-	parentObj.registers[parentObj.execute & 0x7] = result;
+	parentObj.registers[parentObj.execute & 0x7] = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 }
 THUMBInstructionSet.prototype.MOVH_HL = function (parentObj) {
 	//Move a register to another register:
-	var result = parentObj.registers[(parentObj.execute >> 3) & 0x7];
-	parentObj.CPUCore.CPSRCarry = false;
-	parentObj.CPUCore.CPSRNegative = (result < 0);
-	parentObj.CPUCore.CPSRZero = (result == 0);
-	parentObj.guardHighRegisterWrite(0x8 | (parentObj.execute & 0x7), result);
+	parentObj.guardHighRegisterWrite(parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
 THUMBInstructionSet.prototype.MOVH_HH = function (parentObj) {
 	//Move a register to another register:
-	var result = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
-	parentObj.CPUCore.CPSRCarry = false;
-	parentObj.CPUCore.CPSRNegative = (result < 0);
-	parentObj.CPUCore.CPSRZero = (result == 0);
-	parentObj.guardHighRegisterWrite(0x8 | (parentObj.execute & 0x7), result);
+	parentObj.guardHighRegisterWrite(parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)]);
 }
 THUMBInstructionSet.prototype.BX_L = function (parentObj) {
 	//Branch & eXchange:
