@@ -171,7 +171,6 @@ ARMInstructionSet.prototype.ANDS = function (parentObj, operand2OP) {
 	var operand2 = operand2OP(parentObj.execute);
 	//Perform bitwise AND:
 	var result = operand1 & operand2;
-	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 	//Update destination register and guard CPSR for PC:
@@ -189,7 +188,6 @@ ARMInstructionSet.prototype.EORS = function (parentObj, operand2OP) {
 	var operand2 = operand2OP(parentObj.execute);
 	//Perform bitwise EOR:
 	var result = operand1 ^ operand2;
-	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 	//Update destination register and guard CPSR for PC:
@@ -320,7 +318,6 @@ ARMInstructionSet.prototype.TSTS = function (parentObj, operand2OP) {
 	var operand2 = operand2OP(parentObj.execute);
 	//Perform bitwise AND:
 	var result = operand1 & operand2;
-	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
@@ -329,7 +326,6 @@ ARMInstructionSet.prototype.TEQS = function (parentObj, operand2OP) {
 	var operand2 = operand2OP(parentObj.execute);
 	//Perform bitwise EOR:
 	var result = operand1 ^ operand2;
-	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
@@ -367,7 +363,6 @@ ARMInstructionSet.prototype.ORRS = function (parentObj, operand2OP) {
 	var operand2 = operand2OP(parentObj.execute);
 	//Perform bitwise OR:
 	var result = operand1 | operand2;
-	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 	//Update destination register and guard CPSR for PC:
@@ -381,7 +376,6 @@ ARMInstructionSet.prototype.MOV = function (parentObj, operand2OP) {
 ARMInstructionSet.prototype.MOVS = function (parentObj, operand2OP) {
 	var operand2 = operand2OP(parentObj.execute);
 	//Perform move:
-	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (operand2 < 0);
 	parentObj.CPUCore.CPSRZero = (operand2 == 0);
 	//Update destination register and guard CPSR for PC:
@@ -401,7 +395,6 @@ ARMInstructionSet.prototype.BICS = function (parentObj, operand2OP) {
 	var operand2 = ~operand2OP(parentObj.execute);
 	//Perform bitwise AND:
 	var result = operand1 & operand2;
-	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 	//Update destination register and guard CPSR for PC:
@@ -415,11 +408,202 @@ ARMInstructionSet.prototype.MVN = function (parentObj, operand2OP) {
 ARMInstructionSet.prototype.MVNS = function (parentObj, operand2OP) {
 	var operand2 = ~operand2OP(parentObj.execute);
 	//Perform move negative:
-	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (operand2 < 0);
 	parentObj.CPUCore.CPSRZero = (operand2 == 0);
 	//Update destination register and guard CPSR for PC:
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, operand2);
+}
+ARMInstructionSet.prototype.lli = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Shift the register data left:
+	return register << ((operand >> 7) & 0xFF);
+}
+ARMInstructionSet.prototype.llis = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Get the shift amount:
+	var shifter = ((operand >> 7) & 0xFF);
+	//Check to see if we need to update CPSR:
+	if (shifter > 0) {
+		this.CPUCore.CPSRCarry = ((register << (shifter - 1)) < 0); 
+	}
+	//Shift the register data left:
+	return register << shifter;
+}
+ARMInstructionSet.prototype.llr = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Shift the register data left:
+	return register << (this.registers[(operand >> 8) & 0xF] & 0xFF);
+}
+ARMInstructionSet.prototype.llrs = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Get the shift amount:
+	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	//Check to see if we need to update CPSR:
+	if (shifter > 0) {
+		this.CPUCore.CPSRCarry = ((register << (shifter - 1)) < 0); 
+	}
+	//Shift the register data left:
+	return register << shifter;
+}
+ARMInstructionSet.prototype.lri = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Shift the register data right logically:
+	return (register >>> ((operand >> 7) & 0xFF)) | 0;
+}
+ARMInstructionSet.prototype.lris = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Get the shift amount:
+	var shifter = ((operand >> 7) & 0xFF);
+	//Check to see if we need to update CPSR:
+	if (shifter > 0) {
+		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
+	}
+	//Shift the register data right logically:
+	return (register >>> shifter) | 0;
+}
+ARMInstructionSet.prototype.lrr = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Shift the register data right logically:
+	return (register >>> (this.registers[(operand >> 8) & 0xF] & 0xFF)) | 0;
+}
+ARMInstructionSet.prototype.lrrs = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Get the shift amount:
+	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	//Check to see if we need to update CPSR:
+	if (shifter > 0) {
+		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
+	}
+	//Shift the register data right logically:
+	return (register >>> shifter) | 0;
+}
+ARMInstructionSet.prototype.ari = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Shift the register data right:
+	return register >> ((operand >> 7) & 0xFF);
+}
+ARMInstructionSet.prototype.aris = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Get the shift amount:
+	var shifter = ((operand >> 7) & 0xFF);
+	//Check to see if we need to update CPSR:
+	if (shifter > 0) {
+		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
+	}
+	//Shift the register data right:
+	return register >> shifter;
+}
+ARMInstructionSet.prototype.arr = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Shift the register data right:
+	return register >> (this.registers[(operand >> 8) & 0xF] & 0xFF);
+}
+ARMInstructionSet.prototype.arrs = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Get the shift amount:
+	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	//Check to see if we need to update CPSR:
+	if (shifter > 0) {
+		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
+	}
+	//Shift the register data right:
+	return register >> shifter;
 }
 ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [
@@ -494,39 +678,39 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.ANDS,
-				this.lli
+				this.llis
 			],
 			[
 				this.ANDS,
-				this.llr
+				this.llrs
 			],
 			[
 				this.ANDS,
-				this.lri
+				this.lris
 			],
 			[
 				this.ANDS,
-				this.lrr
+				this.lrrs
 			],
 			[
 				this.ANDS,
-				this.ari
+				this.aris
 			],
 			[
 				this.ANDS,
-				this.arr
+				this.arrs
 			],
 			[
 				this.ANDS,
-				this.rri
+				this.rris
 			],
 			[
 				this.ANDS,
-				this.rrr
+				this.rrrs
 			],
 			[
 				this.ANDS,
-				this.lli
+				this.llis
 			],
 			[
 				this.MULS,
@@ -534,7 +718,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.ANDS,
-				this.lri
+				this.lris
 			],
 			[
 				this.LDRH,
@@ -542,7 +726,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.ANDS,
-				this.ari
+				this.aris
 			],
 			[
 				this.LDRSB,
@@ -550,7 +734,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.ANDS,
-				this.rri
+				this.rris
 			],
 			[
 				this.LDRSH,
@@ -628,39 +812,39 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.EORS,
-				this.lli
+				this.llis
 			],
 			[
 				this.EORS,
-				this.llr
+				this.llrs
 			],
 			[
 				this.EORS,
-				this.lri
+				this.lris
 			],
 			[
 				this.EORS,
-				this.lrr
+				this.lrrs
 			],
 			[
 				this.EORS,
-				this.ari
+				this.aris
 			],
 			[
 				this.EORS,
-				this.arr
+				this.arrs
 			],
 			[
 				this.EORS,
-				this.rri
+				this.rris
 			],
 			[
 				this.EORS,
-				this.rrr
+				this.rrrs
 			],
 			[
 				this.EORS,
-				this.lli
+				this.llis
 			],
 			[
 				this.MLAS,
@@ -668,7 +852,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.EORS,
-				this.lri
+				this.lris
 			],
 			[
 				this.LDRH,
@@ -676,7 +860,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.EORS,
-				this.ari
+				this.aris
 			],
 			[
 				this.LDRSB,
@@ -684,7 +868,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.EORS,
-				this.rri
+				this.rris
 			],
 			[
 				this.LDRSH,
@@ -1566,39 +1750,39 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.TSTS,
-				this.lli
+				this.llis
 			],
 			[
 				this.TSTS,
-				this.llr
+				this.llrs
 			],
 			[
 				this.TSTS,
-				this.lri
+				this.lris
 			],
 			[
 				this.TSTS,
-				this.lrr
+				this.lrrs
 			],
 			[
 				this.TSTS,
-				this.ari
+				this.aris
 			],
 			[
 				this.TSTS,
-				this.arr
+				this.arrs
 			],
 			[
 				this.TSTS,
-				this.rri
+				this.rris
 			],
 			[
 				this.TSTS,
-				this.rrr
+				this.rrrs
 			],
 			[
 				this.TSTS,
-				this.lli
+				this.llis
 			],
 			[
 				this.UNDEFINED,
@@ -1606,7 +1790,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.TSTS,
-				this.lri
+				this.lris
 			],
 			[
 				this.LDRH,
@@ -1614,7 +1798,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.TSTS,
-				this.ari
+				this.aris
 			],
 			[
 				this.LDRSB,
@@ -1622,7 +1806,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.TSTS,
-				this.rri
+				this.rris
 			],
 			[
 				this.LDRSH,
@@ -1700,39 +1884,39 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.TEQS,
-				this.lli
+				this.llis
 			],
 			[
 				this.TEQS,
-				this.llr
+				this.llrs
 			],
 			[
 				this.TEQS,
-				this.lri
+				this.lris
 			],
 			[
 				this.TEQS,
-				this.lrr
+				this.lrrs
 			],
 			[
 				this.TEQS,
-				this.ari
+				this.aris
 			],
 			[
 				this.TEQS,
-				this.arr
+				this.arrs
 			],
 			[
 				this.TEQS,
-				this.rri
+				this.rris
 			],
 			[
 				this.TEQS,
-				this.rrr
+				this.rrrs
 			],
 			[
 				this.TEQS,
-				this.lli
+				this.llis
 			],
 			[
 				this.UNDEFINED,
@@ -1740,7 +1924,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.TEQS,
-				this.lri
+				this.lris
 			],
 			[
 				this.LDRH,
@@ -1748,7 +1932,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.TEQS,
-				this.ari
+				this.aris
 			],
 			[
 				this.LDRSB,
@@ -1756,7 +1940,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.TEQS,
-				this.rri
+				this.rris
 			],
 			[
 				this.LDRSH,
@@ -2102,39 +2286,39 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.ORRS,
-				this.lli
+				this.llis
 			],
 			[
 				this.ORRS,
-				this.llr
+				this.llrs
 			],
 			[
 				this.ORRS,
-				this.lri
+				this.lris
 			],
 			[
 				this.ORRS,
-				this.lrr
+				this.lrrs
 			],
 			[
 				this.ORRS,
-				this.ari
+				this.aris
 			],
 			[
 				this.ORRS,
-				this.arr
+				this.arrs
 			],
 			[
 				this.ORRS,
-				this.rri
+				this.rris
 			],
 			[
 				this.ORRS,
-				this.rrr
+				this.rrrs
 			],
 			[
 				this.ORRS,
-				this.lli
+				this.llis
 			],
 			[
 				this.UNDEFINED,
@@ -2142,7 +2326,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.ORRS,
-				this.lri
+				this.lris
 			],
 			[
 				this.LDRH,
@@ -2150,7 +2334,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.ORRS,
-				this.ari
+				this.aris
 			],
 			[
 				this.LDRSB,
@@ -2158,7 +2342,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.ORRS,
-				this.rri
+				this.rris
 			],
 			[
 				this.LDRSH,
@@ -2236,39 +2420,39 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.MOVS,
-				this.lli
+				this.llis
 			],
 			[
 				this.MOVS,
-				this.llr
+				this.llrs
 			],
 			[
 				this.MOVS,
-				this.lri
+				this.lris
 			],
 			[
 				this.MOVS,
-				this.lrr
+				this.lrrs
 			],
 			[
 				this.MOVS,
-				this.ari
+				this.aris
 			],
 			[
 				this.MOVS,
-				this.arr
+				this.arrs
 			],
 			[
 				this.MOVS,
-				this.rri
+				this.rris
 			],
 			[
 				this.MOVS,
-				this.rrr
+				this.rrrs
 			],
 			[
 				this.MOVS,
-				this.lli
+				this.llis
 			],
 			[
 				this.UNDEFINED,
@@ -2276,7 +2460,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.MOVS,
-				this.lri
+				this.lris
 			],
 			[
 				this.LDRH,
@@ -2284,7 +2468,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.MOVS,
-				this.ari
+				this.aris
 			],
 			[
 				this.LDRSB,
@@ -2292,7 +2476,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.MOVS,
-				this.rri
+				this.rris
 			],
 			[
 				this.LDRSH,
@@ -2370,39 +2554,39 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.BICS,
-				this.lli
+				this.llis
 			],
 			[
 				this.BICS,
-				this.llr
+				this.llrs
 			],
 			[
 				this.BICS,
-				this.lri
+				this.lris
 			],
 			[
 				this.BICS,
-				this.lrr
+				this.lrrs
 			],
 			[
 				this.BICS,
-				this.ari
+				this.aris
 			],
 			[
 				this.BICS,
-				this.arr
+				this.arrs
 			],
 			[
 				this.BICS,
-				this.rri
+				this.rris
 			],
 			[
 				this.BICS,
-				this.rrr
+				this.rrrs
 			],
 			[
 				this.BICS,
-				this.lli
+				this.llis
 			],
 			[
 				this.UNDEFINED,
@@ -2410,7 +2594,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.BICS,
-				this.lri
+				this.lris
 			],
 			[
 				this.LDRH,
@@ -2418,7 +2602,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.BICS,
-				this.ari
+				this.aris
 			],
 			[
 				this.LDRSB,
@@ -2426,7 +2610,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.BICS,
-				this.rri
+				this.rris
 			],
 			[
 				this.LDRSH,
@@ -2504,39 +2688,39 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.MVNS,
-				this.lli
+				this.llis
 			],
 			[
 				this.MVNS,
-				this.llr
+				this.llrs
 			],
 			[
 				this.MVNS,
-				this.lri
+				this.lris
 			],
 			[
 				this.MVNS,
-				this.lrr
+				this.lrrs
 			],
 			[
 				this.MVNS,
-				this.ari
+				this.aris
 			],
 			[
 				this.MVNS,
-				this.arr
+				this.arrs
 			],
 			[
 				this.MVNS,
-				this.rri
+				this.rris
 			],
 			[
 				this.MVNS,
-				this.rrr
+				this.rrrs
 			],
 			[
 				this.MVNS,
-				this.lli
+				this.llis
 			],
 			[
 				this.UNDEFINED,
@@ -2544,7 +2728,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.MVNS,
-				this.lri
+				this.lris
 			],
 			[
 				this.LDRH,
@@ -2552,7 +2736,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.MVNS,
-				this.ari
+				this.aris
 			],
 			[
 				this.LDRSB,
@@ -2560,7 +2744,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 			],
 			[
 				this.MVNS,
-				this.rri
+				this.rris
 			],
 			[
 				this.LDRSH,
