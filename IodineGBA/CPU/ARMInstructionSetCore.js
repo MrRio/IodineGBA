@@ -298,14 +298,14 @@ ARMInstructionSet.prototype.SBCS = function (parentObj, operand2OP) {
 ARMInstructionSet.prototype.RSC = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj.execute);
-	//Perform Subtraction w/ Carry:
+	//Perform Reverse Subtraction w/ Carry:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2 - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1)) | 0);
 }
 ARMInstructionSet.prototype.RSCS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj.execute);
-	//Perform Subtraction w/ Carry:
+	//Perform Reverse Subtraction w/ Carry:
 	var dirtyResult = operand1 - operand2 - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1);
 	var result = dirtyResult | 0;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
@@ -314,6 +314,112 @@ ARMInstructionSet.prototype.RSCS = function (parentObj, operand2OP) {
 	parentObj.CPUCore.CPSRZero = (result == 0);
 	//Update destination register:
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
+}
+ARMInstructionSet.prototype.TSTS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform bitwise AND:
+	var result = operand1 & operand2;
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+}
+ARMInstructionSet.prototype.TEQS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform bitwise EOR:
+	var result = operand1 ^ operand2;
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+}
+ARMInstructionSet.prototype.CMPS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform Subtraction:
+	var dirtyResult = operand1 - operand2;
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((operand1 ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+}
+ARMInstructionSet.prototype.CMNS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform Addition:
+	var dirtyResult = operand1 + operand2 + ((parentObj.CPUCore.CPSRCarry) ? 1 : 0);
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSRCarry = (result != dirtyResult);
+	parentObj.CPUCore.CPSROverflow = ((operand1 ^ result) < 0);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+}
+ARMInstructionSet.prototype.ORR = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform bitwise OR:
+	//Update destination register:
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 | operand2);
+}
+ARMInstructionSet.prototype.ORRS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform bitwise OR:
+	var result = operand1 | operand2;
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register and guard CPSR for PC:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
+}
+ARMInstructionSet.prototype.MOV = function (parentObj, operand2OP) {
+	//Perform move:
+	//Update destination register:
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand2OP(parentObj.execute));
+}
+ARMInstructionSet.prototype.MOVS = function (parentObj, operand2OP) {
+	var operand2 = operand2OP(parentObj.execute);
+	//Perform move:
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (operand2 < 0);
+	parentObj.CPUCore.CPSRZero = (operand2 == 0);
+	//Update destination register and guard CPSR for PC:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, operand2);
+}
+ARMInstructionSet.prototype.BIC = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	//NOT operand 2:
+	var operand2 = ~operand2OP(parentObj.execute);
+	//Perform bitwise AND:
+	//Update destination register:
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 & operand2);
+}
+ARMInstructionSet.prototype.BICS = function (parentObj, operand2OP) {
+	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	//NOT operand 2:
+	var operand2 = ~operand2OP(parentObj.execute);
+	//Perform bitwise AND:
+	var result = operand1 & operand2;
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register and guard CPSR for PC:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
+}
+ARMInstructionSet.prototype.MVN = function (parentObj, operand2OP) {
+	//Perform move negative:
+	//Update destination register:
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, ~operand2OP(parentObj.execute));
+}
+ARMInstructionSet.prototype.MVNS = function (parentObj, operand2OP) {
+	var operand2 = ~operand2OP(parentObj.execute);
+	//Perform move negative:
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (operand2 < 0);
+	parentObj.CPUCore.CPSRZero = (operand2 == 0);
+	//Update destination register and guard CPSR for PC:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, operand2);
 }
 ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [
