@@ -424,7 +424,8 @@ ARMInstructionSet.prototype.lli = function (operand) {
 	//Clock a cycle for the shift delaying the CPU:
 	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
 	//Shift the register data left:
-	return register << ((operand >> 7) & 0xFF);
+	var shifter = (operand >> 7) & 0xFF;
+	return (shifter < 0x20) ? (register << shifter) : 0;
 }
 ARMInstructionSet.prototype.llis = function (operand) {
 	var registerSelected = operand & 0xF;
@@ -439,7 +440,11 @@ ARMInstructionSet.prototype.llis = function (operand) {
 	//Get the shift amount:
 	var shifter = ((operand >> 7) & 0xFF);
 	//Check to see if we need to update CPSR:
-	if (shifter > 0) {
+	if (shifter >= 32) {
+		this.CPUCore.CPSRCarry = (shifter == 32 && (register & 0x1) == 0x1); 
+		return 0;
+	}
+	else if (shifter > 0) {
 		this.CPUCore.CPSRCarry = ((register << (shifter - 1)) < 0); 
 	}
 	//Shift the register data left:
@@ -456,7 +461,8 @@ ARMInstructionSet.prototype.llr = function (operand) {
 	//Clock a cycle for the shift delaying the CPU:
 	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
 	//Shift the register data left:
-	return register << (this.registers[(operand >> 8) & 0xF] & 0xFF);
+	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	return (shifter < 0x20) ? (register << shifter) : 0;
 }
 ARMInstructionSet.prototype.llrs = function (operand) {
 	var registerSelected = operand & 0xF;
@@ -471,7 +477,11 @@ ARMInstructionSet.prototype.llrs = function (operand) {
 	//Get the shift amount:
 	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
 	//Check to see if we need to update CPSR:
-	if (shifter > 0) {
+	if (shifter >= 32) {
+		this.CPUCore.CPSRCarry = (shifter == 32 && (register & 0x1) == 0x1); 
+		return 0;
+	}
+	else if (shifter > 0) {
 		this.CPUCore.CPSRCarry = ((register << (shifter - 1)) < 0); 
 	}
 	//Shift the register data left:
@@ -488,7 +498,8 @@ ARMInstructionSet.prototype.lri = function (operand) {
 	//Clock a cycle for the shift delaying the CPU:
 	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
 	//Shift the register data right logically:
-	return (register >>> ((operand >> 7) & 0xFF)) | 0;
+	var shifter = (operand >> 7) & 0xFF;
+	return (shifter < 0x20) ? ((register >>> shifter) | 0) : 0;
 }
 ARMInstructionSet.prototype.lris = function (operand) {
 	var registerSelected = operand & 0xF;
@@ -503,7 +514,11 @@ ARMInstructionSet.prototype.lris = function (operand) {
 	//Get the shift amount:
 	var shifter = ((operand >> 7) & 0xFF);
 	//Check to see if we need to update CPSR:
-	if (shifter > 0) {
+	if (shifter >= 32) {
+		this.CPUCore.CPSRCarry = (shifter == 32 && register < 0); 
+		return 0;
+	}
+	else if (shifter > 0) {
 		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
 	}
 	//Shift the register data right logically:
@@ -520,7 +535,8 @@ ARMInstructionSet.prototype.lrr = function (operand) {
 	//Clock a cycle for the shift delaying the CPU:
 	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
 	//Shift the register data right logically:
-	return (register >>> (this.registers[(operand >> 8) & 0xF] & 0xFF)) | 0;
+	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	return (shifter < 0x20) ? ((register >>> shifter) | 0) : 0;
 }
 ARMInstructionSet.prototype.lrrs = function (operand) {
 	var registerSelected = operand & 0xF;
@@ -535,7 +551,11 @@ ARMInstructionSet.prototype.lrrs = function (operand) {
 	//Get the shift amount:
 	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
 	//Check to see if we need to update CPSR:
-	if (shifter > 0) {
+	if (shifter >= 32) {
+		this.CPUCore.CPSRCarry = (shifter == 32 && register < 0); 
+		return 0;
+	}
+	else if (shifter > 0) {
 		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
 	}
 	//Shift the register data right logically:
@@ -552,7 +572,7 @@ ARMInstructionSet.prototype.ari = function (operand) {
 	//Clock a cycle for the shift delaying the CPU:
 	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
 	//Shift the register data right:
-	return register >> ((operand >> 7) & 0xFF);
+	return register >> Math.min((operand >> 7) & 0xFF, 0x1F);
 }
 ARMInstructionSet.prototype.aris = function (operand) {
 	var registerSelected = operand & 0xF;
@@ -565,7 +585,7 @@ ARMInstructionSet.prototype.aris = function (operand) {
 	//Clock a cycle for the shift delaying the CPU:
 	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
 	//Get the shift amount:
-	var shifter = ((operand >> 7) & 0xFF);
+	var shifter = Math.min((operand >> 7) & 0xFF, 0x1F);
 	//Check to see if we need to update CPSR:
 	if (shifter > 0) {
 		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
@@ -584,7 +604,7 @@ ARMInstructionSet.prototype.arr = function (operand) {
 	//Clock a cycle for the shift delaying the CPU:
 	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
 	//Shift the register data right:
-	return register >> (this.registers[(operand >> 8) & 0xF] & 0xFF);
+	return register >> Math.min(this.registers[(operand >> 8) & 0xF] & 0xFF, 0x1F);
 }
 ARMInstructionSet.prototype.arrs = function (operand) {
 	var registerSelected = operand & 0xF;
@@ -597,13 +617,103 @@ ARMInstructionSet.prototype.arrs = function (operand) {
 	//Clock a cycle for the shift delaying the CPU:
 	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
 	//Get the shift amount:
-	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	var shifter = Math.min(this.registers[(operand >> 8) & 0xF] & 0xFF, 0x1F);
 	//Check to see if we need to update CPSR:
 	if (shifter > 0) {
 		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
 	}
 	//Shift the register data right:
 	return register >> shifter;
+}
+ARMInstructionSet.prototype.rri = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Rotate the register right:
+	var offset = (operand >> 7) & 0x1F;
+	if (offset > 0) {
+		//ROR
+		return (register << (0x20 - offset)) | (register >>> offset);
+	}
+	else {
+		//RRX
+		return ((this.CPUCore.CPSRCarry) ? 0x80000000 : 0) | (register >>> offset);
+	}
+}
+ARMInstructionSet.prototype.rrr = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Rotate the register right:
+	var offset = this.registers[(operand >> 8) & 0xF] & 0x1F;
+	if (offset > 0) {
+		//ROR
+		return (register << (0x20 - offset)) | (register >>> offset);
+	}
+	else {
+		//RRX
+		return ((this.CPUCore.CPSRCarry) ? 0x80000000 : 0) | (register >>> offset);
+	}
+}
+ARMInstructionSet.prototype.rris = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Rotate the register right:
+	var shifter = (operand >> 7) & 0x1F;
+	if (shifter > 0) {
+		//ROR
+		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1);
+		return (register << (0x20 - shifter)) | (register >>> shifter);
+	}
+	else {
+		//RRX
+		var oldCarry = (this.CPUCore.CPSRCarry) ? 0x80000000 : 0;
+		this.CPUCore.CPSRCarry = ((register & 0x1) == 0x1);
+		return oldCarry | (register >>> 1);
+	}
+}
+ARMInstructionSet.prototype.rrrs = function (operand) {
+	var registerSelected = operand & 0xF;
+	//Get the register data to be shifted:
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	//Clock a cycle for the shift delaying the CPU:
+	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	//Rotate the register right:
+	var shifter = this.registers[(operand >> 8) & 0xF] & 0x1F;
+	if (shifter > 0) {
+		//ROR
+		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1);
+		return (register << (0x20 - shifter)) | (register >>> shifter);
+	}
+	else {
+		//RRX
+		var oldCarry = (this.CPUCore.CPSRCarry) ? 0x80000000 : 0;
+		this.CPUCore.CPSRCarry = ((register & 0x1) == 0x1);
+		return oldCarry | (register >>> 1);
+	}
 }
 ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [
