@@ -428,9 +428,18 @@ ARMInstructionSet.prototype.MULS = function (parentObj, operand2OP) {
 	//Update destination register and guard CPSR for PC:
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 16, result);
 }
+ARMInstructionSet.prototype.MLA = function (parentObj, operand2OP) {
+	//Perform multiplication:
+	var result = parentObj.CPUCore.performMUL32(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF]);
+	//Perform addition:
+	result += parentObj.registers[(parentObj.execute >> 12) & 0xF];
+	//Update destination register and guard CPSR for PC:
+	parentObj.guardRegisterWrite(parentObj.execute >> 16, result);
+}
 ARMInstructionSet.prototype.MLAS = function (parentObj, operand2OP) {
 	//Perform multiplication:
 	var result = parentObj.CPUCore.performMUL32(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF]);
+	//Perform addition:
 	result += parentObj.registers[(parentObj.execute >> 12) & 0xF];
 	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
