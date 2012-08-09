@@ -413,6 +413,21 @@ ARMInstructionSet.prototype.MVNS = function (parentObj, operand2OP) {
 	//Update destination register and guard CPSR for PC:
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, operand2);
 }
+ARMInstructionSet.prototype.MUL = function (parentObj, operand2OP) {
+	//Perform multiplication:
+	var result = parentObj.CPUCore.performMUL32(parentObj.execute & 0xF, (parentObj.execute >> 8) & 0xF);
+	//Update destination register and guard CPSR for PC:
+	parentObj.guardRegisterWrite(parentObj.execute >> 16, result);
+}
+ARMInstructionSet.prototype.MULS = function (parentObj, operand2OP) {
+	//Perform multiplication:
+	var result = parentObj.CPUCore.performMUL32(parentObj.execute & 0xF, (parentObj.execute >> 8) & 0xF);
+	parentObj.CPUCore.CPSRCarry = false;
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
+	//Update destination register and guard CPSR for PC:
+	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 16, result);
+}
 ARMInstructionSet.prototype.lli = function (operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
