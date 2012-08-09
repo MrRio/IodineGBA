@@ -161,14 +161,14 @@ ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
 }
 ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise AND:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 & operand2);
 }
 ARMInstructionSet.prototype.ANDS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise AND:
 	var result = operand1 & operand2;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
@@ -178,14 +178,14 @@ ARMInstructionSet.prototype.ANDS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.EOR = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise EOR:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 ^ operand2);
 }
 ARMInstructionSet.prototype.EORS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise EOR:
 	var result = operand1 ^ operand2;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
@@ -195,14 +195,14 @@ ARMInstructionSet.prototype.EORS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.SUB = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2) | 0);
 }
 ARMInstructionSet.prototype.SUBS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
 	var dirtyResult = operand1 - operand2;
 	var result = dirtyResult | 0;
@@ -215,14 +215,14 @@ ARMInstructionSet.prototype.SUBS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.RSB = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2) | 0);
 }
 ARMInstructionSet.prototype.RSBS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
 	var dirtyResult = operand2 - operand1;
 	var result = dirtyResult | 0;
@@ -235,14 +235,14 @@ ARMInstructionSet.prototype.RSBS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.ADD = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 + operand2) | 0);
 }
 ARMInstructionSet.prototype.ADDS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition:
 	var dirtyResult = operand1 + operand2 + ((parentObj.CPUCore.CPSRCarry) ? 1 : 0);
 	var result = dirtyResult | 0;
@@ -255,14 +255,14 @@ ARMInstructionSet.prototype.ADDS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.ADC = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition w/ Carry:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 + operand2) | 0);
 }
 ARMInstructionSet.prototype.ADCS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition w/ Carry:
 	var dirtyResult = operand1 + operand2 + ((parentObj.CPUCore.CPSRCarry) ? 1 : 0);
 	var result = dirtyResult | 0;
@@ -275,14 +275,14 @@ ARMInstructionSet.prototype.ADCS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.SBC = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction w/ Carry:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2 - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1)) | 0);
 }
 ARMInstructionSet.prototype.SBCS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction w/ Carry:
 	var dirtyResult = operand1 - operand2 - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1);
 	var result = dirtyResult | 0;
@@ -295,14 +295,14 @@ ARMInstructionSet.prototype.SBCS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.RSC = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Reverse Subtraction w/ Carry:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2 - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1)) | 0);
 }
 ARMInstructionSet.prototype.RSCS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Reverse Subtraction w/ Carry:
 	var dirtyResult = operand1 - operand2 - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1);
 	var result = dirtyResult | 0;
@@ -315,7 +315,7 @@ ARMInstructionSet.prototype.RSCS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.TSTS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise AND:
 	var result = operand1 & operand2;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
@@ -323,7 +323,7 @@ ARMInstructionSet.prototype.TSTS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.TEQS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise EOR:
 	var result = operand1 ^ operand2;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
@@ -331,7 +331,7 @@ ARMInstructionSet.prototype.TEQS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.CMPS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
 	var dirtyResult = operand1 - operand2;
 	var result = dirtyResult | 0;
@@ -342,7 +342,7 @@ ARMInstructionSet.prototype.CMPS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.CMNS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition:
 	var dirtyResult = operand1 + operand2 + ((parentObj.CPUCore.CPSRCarry) ? 1 : 0);
 	var result = dirtyResult | 0;
@@ -353,14 +353,14 @@ ARMInstructionSet.prototype.CMNS = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.ORR = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise OR:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 | operand2);
 }
 ARMInstructionSet.prototype.ORRS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise OR:
 	var result = operand1 | operand2;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
@@ -371,10 +371,10 @@ ARMInstructionSet.prototype.ORRS = function (parentObj, operand2OP) {
 ARMInstructionSet.prototype.MOV = function (parentObj, operand2OP) {
 	//Perform move:
 	//Update destination register:
-	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand2OP(parentObj.execute));
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand2OP(parentObj, parentObj.execute));
 }
 ARMInstructionSet.prototype.MOVS = function (parentObj, operand2OP) {
-	var operand2 = operand2OP(parentObj.execute);
+	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform move:
 	parentObj.CPUCore.CPSRNegative = (operand2 < 0);
 	parentObj.CPUCore.CPSRZero = (operand2 == 0);
@@ -384,7 +384,7 @@ ARMInstructionSet.prototype.MOVS = function (parentObj, operand2OP) {
 ARMInstructionSet.prototype.BIC = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	//NOT operand 2:
-	var operand2 = ~operand2OP(parentObj.execute);
+	var operand2 = ~operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise AND:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 & operand2);
@@ -392,7 +392,7 @@ ARMInstructionSet.prototype.BIC = function (parentObj, operand2OP) {
 ARMInstructionSet.prototype.BICS = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	//NOT operand 2:
-	var operand2 = ~operand2OP(parentObj.execute);
+	var operand2 = ~operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise AND:
 	var result = operand1 & operand2;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
@@ -403,10 +403,10 @@ ARMInstructionSet.prototype.BICS = function (parentObj, operand2OP) {
 ARMInstructionSet.prototype.MVN = function (parentObj, operand2OP) {
 	//Perform move negative:
 	//Update destination register:
-	parentObj.guardRegisterWrite(parentObj.execute >> 12, ~operand2OP(parentObj.execute));
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, ~operand2OP(parentObj, parentObj.execute));
 }
 ARMInstructionSet.prototype.MVNS = function (parentObj, operand2OP) {
-	var operand2 = ~operand2OP(parentObj.execute);
+	var operand2 = ~operand2OP(parentObj, parentObj.execute);
 	//Perform move negative:
 	parentObj.CPUCore.CPSRNegative = (operand2 < 0);
 	parentObj.CPUCore.CPSRZero = (operand2 == 0);
@@ -428,228 +428,228 @@ ARMInstructionSet.prototype.MULS = function (parentObj, operand2OP) {
 	//Update destination register and guard CPSR for PC:
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 16, result);
 }
-ARMInstructionSet.prototype.lli = function (operand) {
+ARMInstructionSet.prototype.lli = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data left:
 	var shifter = (operand >> 7) & 0xFF;
 	return (shifter < 0x20) ? (register << shifter) : 0;
 }
-ARMInstructionSet.prototype.llis = function (operand) {
+ARMInstructionSet.prototype.llis = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
 	var shifter = ((operand >> 7) & 0xFF);
 	//Check to see if we need to update CPSR:
 	if (shifter >= 32) {
-		this.CPUCore.CPSRCarry = (shifter == 32 && (register & 0x1) == 0x1); 
+		parentObj.CPUCore.CPSRCarry = (shifter == 32 && (register & 0x1) == 0x1); 
 		return 0;
 	}
 	else if (shifter > 0) {
-		this.CPUCore.CPSRCarry = ((register << (shifter - 1)) < 0); 
+		parentObj.CPUCore.CPSRCarry = ((register << (shifter - 1)) < 0); 
 	}
 	//Shift the register data left:
 	return register << shifter;
 }
-ARMInstructionSet.prototype.llr = function (operand) {
+ARMInstructionSet.prototype.llr = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data left:
-	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	var shifter = parentObj.registers[(operand >> 8) & 0xF] & 0xFF;
 	return (shifter < 0x20) ? (register << shifter) : 0;
 }
-ARMInstructionSet.prototype.llrs = function (operand) {
+ARMInstructionSet.prototype.llrs = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
-	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	var shifter = parentObj.registers[(operand >> 8) & 0xF] & 0xFF;
 	//Check to see if we need to update CPSR:
 	if (shifter >= 32) {
-		this.CPUCore.CPSRCarry = (shifter == 32 && (register & 0x1) == 0x1); 
+		parentObj.CPUCore.CPSRCarry = (shifter == 32 && (register & 0x1) == 0x1); 
 		return 0;
 	}
 	else if (shifter > 0) {
-		this.CPUCore.CPSRCarry = ((register << (shifter - 1)) < 0); 
+		parentObj.CPUCore.CPSRCarry = ((register << (shifter - 1)) < 0); 
 	}
 	//Shift the register data left:
 	return register << shifter;
 }
-ARMInstructionSet.prototype.lri = function (operand) {
+ARMInstructionSet.prototype.lri = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data right logically:
 	var shifter = (operand >> 7) & 0xFF;
 	return (shifter < 0x20) ? ((register >>> shifter) | 0) : 0;
 }
-ARMInstructionSet.prototype.lris = function (operand) {
+ARMInstructionSet.prototype.lris = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
 	var shifter = ((operand >> 7) & 0xFF);
 	//Check to see if we need to update CPSR:
 	if (shifter >= 32) {
-		this.CPUCore.CPSRCarry = (shifter == 32 && register < 0); 
+		parentObj.CPUCore.CPSRCarry = (shifter == 32 && register < 0); 
 		return 0;
 	}
 	else if (shifter > 0) {
-		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
+		parentObj.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
 	}
 	//Shift the register data right logically:
 	return (register >>> shifter) | 0;
 }
-ARMInstructionSet.prototype.lrr = function (operand) {
+ARMInstructionSet.prototype.lrr = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data right logically:
-	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	var shifter = parentObj.registers[(operand >> 8) & 0xF] & 0xFF;
 	return (shifter < 0x20) ? ((register >>> shifter) | 0) : 0;
 }
-ARMInstructionSet.prototype.lrrs = function (operand) {
+ARMInstructionSet.prototype.lrrs = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
-	var shifter = this.registers[(operand >> 8) & 0xF] & 0xFF;
+	var shifter = parentObj.registers[(operand >> 8) & 0xF] & 0xFF;
 	//Check to see if we need to update CPSR:
 	if (shifter >= 32) {
-		this.CPUCore.CPSRCarry = (shifter == 32 && register < 0); 
+		parentObj.CPUCore.CPSRCarry = (shifter == 32 && register < 0); 
 		return 0;
 	}
 	else if (shifter > 0) {
-		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
+		parentObj.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
 	}
 	//Shift the register data right logically:
 	return (register >>> shifter) | 0;
 }
-ARMInstructionSet.prototype.ari = function (operand) {
+ARMInstructionSet.prototype.ari = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data right:
 	return register >> Math.min((operand >> 7) & 0xFF, 0x1F);
 }
-ARMInstructionSet.prototype.aris = function (operand) {
+ARMInstructionSet.prototype.aris = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
 	var shifter = Math.min((operand >> 7) & 0xFF, 0x1F);
 	//Check to see if we need to update CPSR:
 	if (shifter > 0) {
-		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
+		parentObj.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
 	}
 	//Shift the register data right:
 	return register >> shifter;
 }
-ARMInstructionSet.prototype.arr = function (operand) {
+ARMInstructionSet.prototype.arr = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data right:
-	return register >> Math.min(this.registers[(operand >> 8) & 0xF] & 0xFF, 0x1F);
+	return register >> Math.min(parentObj.registers[(operand >> 8) & 0xF] & 0xFF, 0x1F);
 }
-ARMInstructionSet.prototype.arrs = function (operand) {
+ARMInstructionSet.prototype.arrs = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
-	var shifter = Math.min(this.registers[(operand >> 8) & 0xF] & 0xFF, 0x1F);
+	var shifter = Math.min(parentObj.registers[(operand >> 8) & 0xF] & 0xFF, 0x1F);
 	//Check to see if we need to update CPSR:
 	if (shifter > 0) {
-		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
+		parentObj.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1); 
 	}
 	//Shift the register data right:
 	return register >> shifter;
 }
-ARMInstructionSet.prototype.rri = function (operand) {
+ARMInstructionSet.prototype.rri = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Rotate the register right:
 	var offset = (operand >> 7) & 0x1F;
 	if (offset > 0) {
@@ -658,75 +658,75 @@ ARMInstructionSet.prototype.rri = function (operand) {
 	}
 	else {
 		//RRX
-		return ((this.CPUCore.CPSRCarry) ? 0x80000000 : 0) | (register >>> offset);
+		return ((parentObj.CPUCore.CPSRCarry) ? 0x80000000 : 0) | (register >>> offset);
 	}
 }
-ARMInstructionSet.prototype.rrr = function (operand) {
+ARMInstructionSet.prototype.rrr = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Rotate the register right:
-	var offset = this.registers[(operand >> 8) & 0xF] & 0x1F;
+	var offset = parentObj.registers[(operand >> 8) & 0xF] & 0x1F;
 	if (offset > 0) {
 		//ROR
 		return (register << (0x20 - offset)) | (register >>> offset);
 	}
 	else {
 		//RRX
-		return ((this.CPUCore.CPSRCarry) ? 0x80000000 : 0) | (register >>> offset);
+		return ((parentObj.CPUCore.CPSRCarry) ? 0x80000000 : 0) | (register >>> offset);
 	}
 }
-ARMInstructionSet.prototype.rris = function (operand) {
+ARMInstructionSet.prototype.rris = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Rotate the register right:
 	var shifter = (operand >> 7) & 0x1F;
 	if (shifter > 0) {
 		//ROR
-		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1);
+		parentObj.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1);
 		return (register << (0x20 - shifter)) | (register >>> shifter);
 	}
 	else {
 		//RRX
-		var oldCarry = (this.CPUCore.CPSRCarry) ? 0x80000000 : 0;
-		this.CPUCore.CPSRCarry = ((register & 0x1) == 0x1);
+		var oldCarry = (parentObj.CPUCore.CPSRCarry) ? 0x80000000 : 0;
+		parentObj.CPUCore.CPSRCarry = ((register & 0x1) == 0x1);
 		return oldCarry | (register >>> 1);
 	}
 }
-ARMInstructionSet.prototype.rrrs = function (operand) {
+ARMInstructionSet.prototype.rrrs = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = this.registers[registerSelected];
+	var register = parentObj.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
 	}
 	//Clock a cycle for the shift delaying the CPU:
-	this.wait.CPUInternalCyclePrefetch(this.fetch, 1);
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Rotate the register right:
-	var shifter = this.registers[(operand >> 8) & 0xF] & 0x1F;
+	var shifter = parentObj.registers[(operand >> 8) & 0xF] & 0x1F;
 	if (shifter > 0) {
 		//ROR
-		this.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1);
+		parentObj.CPUCore.CPSRCarry = (((register >>> (shifter - 1)) & 0x1) == 0x1);
 		return (register << (0x20 - shifter)) | (register >>> shifter);
 	}
 	else {
 		//RRX
-		var oldCarry = (this.CPUCore.CPSRCarry) ? 0x80000000 : 0;
-		this.CPUCore.CPSRCarry = ((register & 0x1) == 0x1);
+		var oldCarry = (parentObj.CPUCore.CPSRCarry) ? 0x80000000 : 0;
+		parentObj.CPUCore.CPSRCarry = ((register & 0x1) == 0x1);
 		return oldCarry | (register >>> 1);
 	}
 }
