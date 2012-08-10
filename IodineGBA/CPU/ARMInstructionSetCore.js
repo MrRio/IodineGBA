@@ -874,16 +874,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ptrm
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.AND,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ptrm
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//1
@@ -1008,16 +1008,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ptrm
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.EOR,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ptrm
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//3
@@ -1142,16 +1142,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ptim
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.SUB,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ptim
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//5
@@ -1276,16 +1276,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ptim
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.RSB,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ptim
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//7
@@ -1410,16 +1410,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ptrp
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.ADD,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ptrp
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//9
@@ -1544,16 +1544,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ptrp
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.ADC,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ptrp
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//B
@@ -1678,16 +1678,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ptip
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.SBC,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ptip
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//D
@@ -1812,16 +1812,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ptip
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.RSC,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ptip
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//F
@@ -1914,10 +1914,6 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.QADD,
-				this.NOP
-			],
-			[
 				this.UNDEFINED,
 				this.NOP
 			],
@@ -1926,7 +1922,11 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.SMLABB,
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
@@ -1934,7 +1934,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.SMLATB,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
@@ -1942,20 +1942,20 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ofrm
 			],
 			[
-				this.SMLABT,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.LDRD,
-				this.ofrm
-			],
-			[
-				this.SMLATT,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.STRD,
-				this.ofrm
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//11
@@ -2048,7 +2048,11 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.QSUB,
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
@@ -2060,15 +2064,11 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.SMLAWB,
-				this.NOP
-			],
-			[
 				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.SMULWB,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
@@ -2076,20 +2076,20 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.pprm
 			],
 			[
-				this.SMLAWT,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.LDRD,
-				this.prrm
-			],
-			[
-				this.SMULWT,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.STRD,
-				this.prrm
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//13
@@ -2182,10 +2182,6 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.QDADD,
-				this.NOP
-			],
-			[
 				this.UNDEFINED,
 				this.NOP
 			],
@@ -2194,7 +2190,11 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.SMLALBB,
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
@@ -2202,7 +2202,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.SMLALTB,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
@@ -2210,20 +2210,20 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ofim
 			],
 			[
-				this.SMLALBT,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.LDRD,
-				this.ofim
-			],
-			[
-				this.SMLALTT,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.STRD,
-				this.ofim
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//15
@@ -2316,7 +2316,11 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.QDSUB,
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
@@ -2328,15 +2332,11 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.NOP
 			],
 			[
-				this.SMULBB,
-				this.NOP
-			],
-			[
 				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.SMULTB,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
@@ -2344,20 +2344,20 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.prim
 			],
 			[
-				this.SMULBT,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.LDRD,
-				this.prim
-			],
-			[
-				this.SMULTT,
+				this.UNDEFINED,
 				this.NOP
 			],
 			[
-				this.STRD,
-				this.prim
+				this.UNDEFINED,
+				this.NOP
+			],
+			[
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//17
@@ -2482,16 +2482,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ofrp
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.ORR,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ofrp
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//19
@@ -2616,16 +2616,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.prrp
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.MOV,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.prrp
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//1B
@@ -2750,16 +2750,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.ofip
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.BIC,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.ofip
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//1D
@@ -2884,16 +2884,16 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 				this.ari
 			],
 			[
-				this.LDRD,
-				this.prip
+				this.UNDEFINED,
+				this.NOP
 			],
 			[
 				this.MVN,
 				this.rri
 			],
 			[
-				this.STRD,
-				this.prip
+				this.UNDEFINED,
+				this.NOP
 			]
 		],
 		//1F
