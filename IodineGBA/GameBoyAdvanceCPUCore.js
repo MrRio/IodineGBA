@@ -241,16 +241,16 @@ GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd, MLAClocks) {
 GameBoyAdvanceCPU.prototype.performMUL64 = function (rs, rd) {
 	//Predict the internal cycle time:
 	if ((rd >>> 8) == 0 || (rd >>> 8) == 0xFFFFFF) {
-		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 1);
-	}
-	else if ((rd >>> 16) == 0 || (rd >>> 16) == 0xFFFF) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 2);
 	}
-	else if ((rd >>> 24) == 0 || (rd >>> 24) == 0xFF) {
+	else if ((rd >>> 16) == 0 || (rd >>> 16) == 0xFFFF) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 3);
 	}
-	else {
+	else if ((rd >>> 24) == 0 || (rd >>> 24) == 0xFF) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 4);
+	}
+	else {
+		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 5);
 	}
 	//Solve for the high word (Do FPU double divide to bring down high word into the low word):
 	this.mul64ResultHigh = ((rs * rd) / 0x100000000) | 0;
@@ -268,16 +268,16 @@ GameBoyAdvanceCPU.prototype.performMUL64 = function (rs, rd) {
 GameBoyAdvanceCPU.prototype.performMLA64 = function (rs, rd, mlaHigh, mlaLow) {
 	//Predict the internal cycle time:
 	if ((rd >>> 8) == 0 || (rd >>> 8) == 0xFFFFFF) {
-		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 2);
-	}
-	else if ((rd >>> 16) == 0 || (rd >>> 16) == 0xFFFF) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 3);
 	}
-	else if ((rd >>> 24) == 0 || (rd >>> 24) == 0xFF) {
+	else if ((rd >>> 16) == 0 || (rd >>> 16) == 0xFFFF) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 4);
 	}
-	else {
+	else if ((rd >>> 24) == 0 || (rd >>> 24) == 0xFF) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 5);
+	}
+	else {
+		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 6);
 	}
 	//Solve for the high word (Do FPU double divide to bring down high word into the low word):
 	this.mul64ResultHigh = ((((rs * rd) + mlaLow) / 0x100000000) + mlaHigh) | 0;
@@ -295,16 +295,16 @@ GameBoyAdvanceCPU.prototype.performMLA64 = function (rs, rd, mlaHigh, mlaLow) {
 GameBoyAdvanceCPU.prototype.performUMUL64 = function (rs, rd) {
 	//Predict the internal cycle time:
 	if ((rd >>> 8) == 0) {
-		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 1);
-	}
-	else if ((rd >>> 16) == 0) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 2);
 	}
-	else if ((rd >>> 24) == 0) {
+	else if ((rd >>> 16) == 0) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 3);
 	}
-	else {
+	else if ((rd >>> 24) == 0) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 4);
+	}
+	else {
+		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 5);
 	}
 	//Type convert to uint32:
 	rs >>>= 0;
@@ -325,16 +325,16 @@ GameBoyAdvanceCPU.prototype.performUMUL64 = function (rs, rd) {
 GameBoyAdvanceCPU.prototype.performUMLA64 = function (rs, rd, mlaHigh, mlaLow) {
 	//Predict the internal cycle time:
 	if ((rd >>> 8) == 0) {
-		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 2);
-	}
-	else if ((rd >>> 16) == 0) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 3);
 	}
-	else if ((rd >>> 24) == 0) {
+	else if ((rd >>> 16) == 0) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 4);
 	}
-	else {
+	else if ((rd >>> 24) == 0) {
 		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 5);
+	}
+	else {
+		this.IOCore.wait.CPUInternalCyclePrefetch(this.instructionHandle.fetch, 6);
 	}
 	//Type convert to uint32:
 	rs >>>= 0;
