@@ -400,7 +400,7 @@ THUMBInstructionSet.prototype.MUL = function (parentObj) {
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform MUL32:
-	var result = parentObj.CPUCore.performMUL32(source, destination);
+	var result = parentObj.CPUCore.performMUL32(source, destination, 0);
 	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
