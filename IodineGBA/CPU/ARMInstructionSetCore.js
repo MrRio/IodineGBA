@@ -159,6 +159,15 @@ ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
 	//Guard high register writing, as it may cause a branch:
 	this.registers[address] = data;
 }
+ARMInstructionSet.prototype.getDelayedRegisterRead = function (registerSelected) {
+	//Get the register data (After PC is updated during function execution):
+	var register = parentObj.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	return register;
+}
 ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
@@ -515,14 +524,16 @@ ARMInstructionSet.prototype.SMLALS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 16, parentObj.CPUCore.mul64ResultHigh);
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, parentObj.CPUCore.mul64ResultLow);
 }
+ARMInstructionSet.prototype.STRH = function (parentObj, operand2OP) {
+	//Perform halfword store calculations:
+	var address = operand2OP(parentObj, parentObj.execute);
+	//Write to memory location:
+	parentObj.CPUCore.write16(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
+}
 ARMInstructionSet.prototype.lli = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data left:
@@ -532,11 +543,7 @@ ARMInstructionSet.prototype.lli = function (parentObj, operand) {
 ARMInstructionSet.prototype.llis = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
@@ -555,11 +562,7 @@ ARMInstructionSet.prototype.llis = function (parentObj, operand) {
 ARMInstructionSet.prototype.llr = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data left:
@@ -569,11 +572,7 @@ ARMInstructionSet.prototype.llr = function (parentObj, operand) {
 ARMInstructionSet.prototype.llrs = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
@@ -592,11 +591,7 @@ ARMInstructionSet.prototype.llrs = function (parentObj, operand) {
 ARMInstructionSet.prototype.lri = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data right logically:
@@ -606,11 +601,7 @@ ARMInstructionSet.prototype.lri = function (parentObj, operand) {
 ARMInstructionSet.prototype.lris = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
@@ -629,11 +620,7 @@ ARMInstructionSet.prototype.lris = function (parentObj, operand) {
 ARMInstructionSet.prototype.lrr = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data right logically:
@@ -643,11 +630,7 @@ ARMInstructionSet.prototype.lrr = function (parentObj, operand) {
 ARMInstructionSet.prototype.lrrs = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
@@ -666,11 +649,7 @@ ARMInstructionSet.prototype.lrrs = function (parentObj, operand) {
 ARMInstructionSet.prototype.ari = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data right:
@@ -679,11 +658,7 @@ ARMInstructionSet.prototype.ari = function (parentObj, operand) {
 ARMInstructionSet.prototype.aris = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
@@ -698,11 +673,7 @@ ARMInstructionSet.prototype.aris = function (parentObj, operand) {
 ARMInstructionSet.prototype.arr = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Shift the register data right:
@@ -711,11 +682,7 @@ ARMInstructionSet.prototype.arr = function (parentObj, operand) {
 ARMInstructionSet.prototype.arrs = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Get the shift amount:
@@ -730,11 +697,7 @@ ARMInstructionSet.prototype.arrs = function (parentObj, operand) {
 ARMInstructionSet.prototype.rri = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Rotate the register right:
@@ -751,11 +714,7 @@ ARMInstructionSet.prototype.rri = function (parentObj, operand) {
 ARMInstructionSet.prototype.rrr = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Rotate the register right:
@@ -772,11 +731,7 @@ ARMInstructionSet.prototype.rrr = function (parentObj, operand) {
 ARMInstructionSet.prototype.rris = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Rotate the register right:
@@ -796,11 +751,7 @@ ARMInstructionSet.prototype.rris = function (parentObj, operand) {
 ARMInstructionSet.prototype.rrrs = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
-	var register = parentObj.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
+	var register = parentObj.getDelayedRegisterRead(registerSelected);
 	//Clock a cycle for the shift delaying the CPU:
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	//Rotate the register right:
@@ -828,6 +779,73 @@ ARMInstructionSet.prototype.imm = function (parentObj, operand) {
 	else {
 		return immediate;
 	}
+}
+ARMInstructionSet.prototype.ptrm = function (parentObj, operand) {
+	var offset = parentObj.registers[operand & 0xF];
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWrite((operand >> 16) & 0xF, (base - offset) | 0);
+	return base;
+}
+ARMInstructionSet.prototype.ptim = function (parentObj, operand) {
+	var offset = ((operand & 0xF00) >> 4) | (operand & 0xF);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWrite((operand >> 16) & 0xF, (base - offset) | 0);
+	return base;
+}
+ARMInstructionSet.prototype.ptrp = function (parentObj, operand) {
+	var offset = parentObj.registers[operand & 0xF];
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWrite((operand >> 16) & 0xF, (base + offset) | 0);
+	return base;
+}
+ARMInstructionSet.prototype.ptip = function (parentObj, operand) {
+	var offset = ((operand & 0xF00) >> 4) | (operand & 0xF);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWrite((operand >> 16) & 0xF, (base + offset) | 0);
+	return base;
+}
+ARMInstructionSet.prototype.ofrm = function (parentObj, operand) {
+	var offset = parentObj.registers[operand & 0xF];
+	return (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+}
+ARMInstructionSet.prototype.prrm = function (parentObj, operand) {
+	var offset = parentObj.registers[operand & 0xF];
+	var base = (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+	parentObj.guardRegisterWrite((operand >> 16) & 0xF, base);
+	return base;
+}
+ARMInstructionSet.prototype.ofim = function (parentObj, operand) {
+	var offset = ((operand & 0xF00) >> 4) | (operand & 0xF);
+	return (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+}
+ARMInstructionSet.prototype.prim = function (parentObj, operand) {
+	var offset = ((operand & 0xF00) >> 4) | (operand & 0xF);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+	parentObj.guardRegisterWrite((operand >> 16) & 0xF, base);
+	return base;
+}
+ARMInstructionSet.prototype.ofrp = function (parentObj, operand) {
+	var offset = parentObj.registers[operand & 0xF];
+	return (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+}
+ARMInstructionSet.prototype.prrp = function (parentObj, operand) {
+	var offset = parentObj.registers[operand & 0xF];
+	var base = (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+	parentObj.guardRegisterWrite((operand >> 16) & 0xF, base);
+	return base;
+}
+ARMInstructionSet.prototype.ofip = function (parentObj, operand) {
+	var offset = ((operand & 0xF00) >> 4) | (operand & 0xF);
+	return (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+}
+ARMInstructionSet.prototype.prip = function (parentObj, operand) {
+	var offset = ((operand & 0xF00) >> 4) | (operand & 0xF);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+	parentObj.guardRegisterWrite((operand >> 16) & 0xF, base);
+	return base;
+}
+ARMInstructionSet.prototype.NOP = function (parentObj, operand) {
+	//nothing...
 }
 ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [
