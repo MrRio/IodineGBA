@@ -25,34 +25,38 @@ THUMBInstructionSet.prototype.initialize = function () {
 	this.fetch = 0;
 	this.decode = 0;
 	this.execute = 0;
-	this.resetPipeline();
+	this.pipelineInvalid = 0x3;
 	this.compileInstructionMap();
 }
 THUMBInstructionSet.prototype.resetPipeline = function () {
 	this.pipelineInvalid = 0x3;
 	//Next PC fetch has to update the address bus:
 	this.wait.NonSequentialBroadcast();
+	//Make sure we don't increment before our fetch:
+	this.registers[15] = (this.registers[15] - 2) | 0;
 }
 THUMBInstructionSet.prototype.guardHighRegisterWrite = function (data) {
 	var address = 0x8 | (this.execute & 0x7);
+	//Guard high register writing, as it may cause a branch:
+	this.registers[address] = data;
 	if (address == 15) {
 		//We performed a branch:
 		this.resetPipeline();
 	}
-	//Guard high register writing, as it may cause a branch:
-	this.registers[address] = data;
 }
 THUMBInstructionSet.prototype.writePC = function (data) {
 	//We performed a branch:
-	this.resetPipeline();
 	//Update the program counter to branch address:
 	this.registers[15] = data & -2;
+	//Flush Pipeline & Block PC Increment:
+	this.resetPipeline();
 }
 THUMBInstructionSet.prototype.offsetPC = function (data) {
 	//We performed a branch:
-	this.resetPipeline();
 	//Update the program counter to branch address:
 	this.registers[15] = (this.registers[15] + ((data << 24) >> 23)) | 0;
+	//Flush Pipeline & Block PC Increment:
+	this.resetPipeline();
 }
 THUMBInstructionSet.prototype.getIRQLR = function () {
 	return (this.registers[15] - 4) | 0;
@@ -516,30 +520,32 @@ THUMBInstructionSet.prototype.BX_L = function (parentObj) {
 	var address = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	if ((address & 0x1) == 0) {
 		//Enter ARM mode:
-		parentObj.CPUCore.enterARM();
 		address &= -4;
+		parentObj.registers[15] = (address + 2) | 0;
+		parentObj.CPUCore.enterARM();
 	}
 	else {
 		//Stay in THUMB mode:
-		parentObj.resetPipeline();
 		address &= -2;
+		parentObj.registers[15] = address;
+		parentObj.resetPipeline();
 	}
-	parentObj.registers[15] = address;
 }
 THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 	//Branch & eXchange:
 	var address = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 	if ((address & 0x1) == 0) {
 		//Enter ARM mode:
-		parentObj.CPUCore.enterARM();
 		address &= -4;
+		parentObj.registers[15] = (address + 2) | 0;
+		parentObj.CPUCore.enterARM();
 	}
 	else {
 		//Stay in THUMB mode:
-		parentObj.resetPipeline();
 		address &= -2;
+		parentObj.registers[15] = address;
+		parentObj.resetPipeline();
 	}
-	parentObj.registers[15] = address;
 }
 THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
 	//PC-Relative Load
@@ -822,24 +828,26 @@ THUMBInstructionSet.prototype.SWI = function (parentObj) {
 }
 THUMBInstructionSet.prototype.B = function (parentObj) {
 	//Unconditional Branch:
-	parentObj.resetPipeline();
 	//Update the program counter to branch address:
 	parentObj.registers[15] = (parentObj.registers[15] + ((parentObj.execute << 21) >> 20)) | 0;
+	//Flush Pipeline & Block PC Increment:
+	parentObj.resetPipeline();
 }
 THUMBInstructionSet.prototype.BLsetup = function (parentObj) {
 	//Brank with Link (High offset)
 	//Update the link register to branch address:
-	this.registers[14] = (this.registers[15] + ((parentObj.execute & 0x7FF) << 12)) | 0;
+	parentObj.registers[14] = (parentObj.registers[15] + ((parentObj.execute & 0x7FF) << 12)) | 0;
 }
 THUMBInstructionSet.prototype.BLoff = function (parentObj) {
 	//Brank with Link (High offset)
-	this.resetPipeline();
 	//Update the link register to branch address:
-	this.registers[14] = (this.registers[15] + ((parentObj.execute & 0x7FF) << 1)) | 0;
+	parentObj.registers[14] = (parentObj.registers[15] + ((parentObj.execute & 0x7FF) << 1)) | 0;
 	//Copy LR to PC:
-	this.registers[15] = this.registers[14];
+	parentObj.registers[15] = parentObj.registers[14];
+	//Flush Pipeline & Block PC Increment:
+	parentObj.resetPipeline();
 	//Set bit 0 of LR high:
-	this.registers[14] |= 0x1;
+	parentObj.registers[14] |= 0x1;
 }
 THUMBInstructionSet.prototype.UNDEFINED = function (parentObj) {
 	//Undefined Exception:

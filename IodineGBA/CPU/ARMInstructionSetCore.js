@@ -25,13 +25,15 @@ ARMInstructionSet.prototype.initialize = function () {
 	this.fetch = 0;
 	this.decode = 0;
 	this.execute = 0;
-	this.resetPipeline();
+	this.pipelineInvalid = 0x3;
 	this.compileInstructionMap();
 }
 ARMInstructionSet.prototype.resetPipeline = function () {
 	this.pipelineInvalid = 0x3;
 	//Next PC fetch has to update the address bus:
 	this.wait.NonSequentialBroadcast();
+	//Make sure we don't increment before our fetch:
+	this.registers[15] = (this.registers[15] - 4) | 0;
 }
 THUMBInstructionSet.prototype.getIRQLR = function () {
 	return (this.registers[15] - 8) | 0;
@@ -141,23 +143,23 @@ ARMInstructionSet.prototype.conditionCodeTest = function () {
 }
 ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
 	address &= 0xF;
+	//Guard high register writing, as it may cause a branch:
+	this.registers[address] = data;
 	if (address == 15) {
 		//We performed a branch:
 		this.resetPipeline();
 	}
-	//Guard high register writing, as it may cause a branch:
-	this.registers[address] = data;
 }
 ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
 	address &= 0xF;
+	//Guard high register writing, as it may cause a branch:
+	this.registers[address] = data;
 	if (address == 15) {
 		//We performed a branch:
 		this.resetPipeline();
 		//Restore SPSR to CPSR:
 		this.CPUCore.SPSRtoCPSR();
 	}
-	//Guard high register writing, as it may cause a branch:
-	this.registers[address] = data;
 }
 ARMInstructionSet.prototype.getDelayedRegisterRead = function (registerSelected) {
 	//Get the register data (After PC is updated during function execution):
