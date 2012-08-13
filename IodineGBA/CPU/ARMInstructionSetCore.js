@@ -150,6 +150,23 @@ ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
 		this.resetPipeline();
 	}
 }
+ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data) {
+	address &= 0xF;
+	switch (this.MODEBits) {
+		case 0x10:
+		case 0x1F:
+			//Guard high register writing, as it may cause a branch:
+			this.registers[address] = data;
+			if (address == 15) {
+				//We performed a branch:
+				this.resetPipeline();
+			}
+			break;
+		default:
+			//User-Mode Register Write Inside Non-User-Mode:
+			this.CPUCore.registersUSR[address] = data;
+	}
+}
 ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
 	address &= 0xF;
 	//Guard high register writing, as it may cause a branch:
@@ -532,6 +549,72 @@ ARMInstructionSet.prototype.STRH = function (parentObj, operand2OP) {
 	//Write to memory location:
 	parentObj.CPUCore.write16(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
 }
+ARMInstructionSet.prototype.LDRH = function (parentObj, operand2OP) {
+	//Perform word store calculations:
+	var address = operand2OP(parentObj, parentObj.execute);
+	//Read from memory location:
+	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read16(address));
+}
+ARMInstructionSet.prototype.LDRSH = function (parentObj, operand2OP) {
+	//Perform word store calculations:
+	var address = operand2OP(parentObj, parentObj.execute);
+	//Read from memory location:
+	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, (parentObj.CPUCore.read16(address) << 16) >> 16);
+}
+ARMInstructionSet.prototype.LDRSB = function (parentObj, operand2OP) {
+	//Perform word store calculations:
+	var address = operand2OP(parentObj, parentObj.execute);
+	//Read from memory location:
+	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, (parentObj.CPUCore.read8(address) << 24) >> 24);
+}
+ARMInstructionSet.prototype.STR = function (parentObj, operand2OP) {
+	//Perform word store calculations:
+	var address = operand2OP(parentObj, parentObj.execute, false);
+	//Write to memory location:
+	parentObj.CPUCore.write32(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
+}
+ARMInstructionSet.prototype.LDR = function (parentObj, operand2OP) {
+	//Perform word store calculations:
+	var address = operand2OP(parentObj, parentObj.execute, false);
+	//Read from memory location:
+	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read32(address));
+}
+ARMInstructionSet.prototype.STRB = function (parentObj, operand2OP) {
+	//Perform byte store calculations:
+	var address = operand2OP(parentObj, parentObj.execute, false);
+	//Write to memory location:
+	parentObj.CPUCore.write8(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
+}
+ARMInstructionSet.prototype.LDRB = function (parentObj, operand2OP) {
+	//Perform word store calculations:
+	var address = operand2OP(parentObj, parentObj.execute, false);
+	//Read from memory location:
+	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read8(address));
+}
+ARMInstructionSet.prototype.STRT = function (parentObj, operand2OP) {
+	//Perform word store calculations:
+	var address = operand2OP(parentObj, parentObj.execute, true);
+	//Write to memory location:
+	parentObj.CPUCore.write32(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
+}
+ARMInstructionSet.prototype.LDRT = function (parentObj, operand2OP) {
+	//Perform word store calculations:
+	var address = operand2OP(parentObj, parentObj.execute, true);
+	//Read from memory location:
+	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read32(address));
+}
+ARMInstructionSet.prototype.STRBT = function (parentObj, operand2OP) {
+	//Perform byte store calculations:
+	var address = operand2OP(parentObj, parentObj.execute, true);
+	//Write to memory location:
+	parentObj.CPUCore.write8(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
+}
+ARMInstructionSet.prototype.LDRBT = function (parentObj, operand2OP) {
+	//Perform word store calculations:
+	var address = operand2OP(parentObj, parentObj.execute, true);
+	//Read from memory location:
+	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read8(address));
+}
 ARMInstructionSet.prototype.lli = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
@@ -844,6 +927,166 @@ ARMInstructionSet.prototype.prip = function (parentObj, operand) {
 	var offset = ((operand & 0xF00) >> 4) | (operand & 0xF);
 	var base = (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
 	parentObj.guardRegisterWrite((operand >> 16) & 0xF, base);
+	return base;
+}
+ARMInstructionSet.prototype.ptrmll = function (parentObj, operand, userMode) {
+	var offset = parentObj.llr(parentObj, operand);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.ptrmlr = function (parentObj, operand, userMode) {
+	var offset = parentObj.lrr(parentObj, operand);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.ptrmar = function (parentObj, operand, userMode) {
+	var offset = parentObj.arr(parentObj, operand);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.ptrmrr = function (parentObj, operand, userMode) {
+	var offset = parentObj.rrr(parentObj, operand);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.sptim = function (parentObj, operand, userMode) {
+	var offset = operand & 0xFFF;
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.ptrpll = function (parentObj, operand, userMode) {
+	var offset = parentObj.llr(parentObj, operand);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, (base + offset) | 0, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.ptrplr = function (parentObj, operand, userMode) {
+	var offset = parentObj.lrr(parentObj, operand);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, (base + offset) | 0, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.ptrpar = function (parentObj, operand, userMode) {
+	var offset = parentObj.arr(parentObj, operand);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, (base + offset) | 0, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.ptrprr = function (parentObj, operand, userMode) {
+	var offset = parentObj.rrr(parentObj, operand);
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, (base + offset) | 0, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.sptip = function (parentObj, operand, userMode) {
+	var offset = operand & 0xFFF;
+	var base = parentObj.registers[(operand >> 16) & 0xF];
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, (base + offset) | 0, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.ofrmll = function (parentObj, operand, userMode) {
+	var offset = parentObj.llr(parentObj, operand);
+	return (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+}
+ARMInstructionSet.prototype.ofrmlr = function (parentObj, operand, userMode) {
+	var offset = parentObj.lrr(parentObj, operand);
+	return (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+}
+ARMInstructionSet.prototype.ofrmar = function (parentObj, operand, userMode) {
+	var offset = parentObj.arr(parentObj, operand);
+	return (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+}
+ARMInstructionSet.prototype.ofrmrr = function (parentObj, operand, userMode) {
+	var offset = parentObj.rrr(parentObj, operand);
+	return (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+}
+ARMInstructionSet.prototype.prrmll = function (parentObj, operand, userMode) {
+	var offset = parentObj.llr(parentObj, operand);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.prrmlr = function (parentObj, operand, userMode) {
+	var offset = parentObj.lrr(parentObj, operand);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.prrmar = function (parentObj, operand, userMode) {
+	var offset = parentObj.arr(parentObj, operand);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.prrmrr = function (parentObj, operand, userMode) {
+	var offset = parentObj.rrr(parentObj, operand);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.sofim = function (parentObj, operand, userMode) {
+	var offset = operand & 0xFFF;
+	return (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+}
+ARMInstructionSet.prototype.sprim = function (parentObj, operand, userMode) {
+	var offset = operand & 0xFFF;
+	var base = (parentObj.registers[(operand >> 16) & 0xF] - offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.ofrpll = function (parentObj, operand, userMode) {
+	var offset = parentObj.llr(parentObj, operand);
+	return (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+}
+ARMInstructionSet.prototype.ofrplr = function (parentObj, operand, userMode) {
+	var offset = parentObj.lrr(parentObj, operand);
+	return (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+}
+ARMInstructionSet.prototype.ofrpar = function (parentObj, operand, userMode) {
+	var offset = parentObj.arr(parentObj, operand);
+	return (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+}
+ARMInstructionSet.prototype.ofrprr = function (parentObj, operand, userMode) {
+	var offset = parentObj.rrr(parentObj, operand);
+	return (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+}
+ARMInstructionSet.prototype.prrpll = function (parentObj, operand, userMode) {
+	var offset = parentObj.llr(parentObj, operand);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.prrplr = function (parentObj, operand, userMode) {
+	var offset = parentObj.lrr(parentObj, operand);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.prrpar = function (parentObj, operand, userMode) {
+	var offset = parentObj.arr(parentObj, operand);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.prrprr = function (parentObj, operand, userMode) {
+	var offset = parentObj.rrr(parentObj, operand);
+	var base = (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
+	return base;
+}
+ARMInstructionSet.prototype.sofip = function (parentObj, operand, userMode) {
+	var offset = operand & 0xFFF;
+	return (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+}
+ARMInstructionSet.prototype.sprip = function (parentObj, operand, userMode) {
+	var offset = operand & 0xFFF;
+	var base = (parentObj.registers[(operand >> 16) & 0xF] + offset) | 0;
+	parentObj.guardRegisterWriteSpecial((operand >> 16) & 0xF, base, userMode);
 	return base;
 }
 ARMInstructionSet.prototype.NOP = function (parentObj, operand) {
@@ -3060,69 +3303,69 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		//3F
 		this.generateLowMap(this.MVNS, this.imm),
 		//40
-		this.generateLowMap(this.STR, this.ptim),
+		this.generateLowMap(this.STR, this.sptim),
 		//41
-		this.generateLowMap(this.LDR, this.ptim),
+		this.generateLowMap(this.LDR, this.sptim),
 		//42
-		this.generateLowMap(this.STRT, this.ptim),
+		this.generateLowMap(this.STRT, this.sptim),
 		//43
-		this.generateLowMap(this.LDRT, this.ptim),
+		this.generateLowMap(this.LDRT, this.sptim),
 		//44
-		this.generateLowMap(this.STRB, this.ptim),
+		this.generateLowMap(this.STRB, this.sptim),
 		//45
-		this.generateLowMap(this.LDRB, this.ptim),
+		this.generateLowMap(this.LDRB, this.sptim),
 		//46
-		this.generateLowMap(this.STRBT, this.ptim),
+		this.generateLowMap(this.STRBT, this.sptim),
 		//47
-		this.generateLowMap(this.LDRBT, this.ptim),
+		this.generateLowMap(this.LDRBT, this.sptim),
 		//48
-		this.generateLowMap(this.STR, this.ptip),
+		this.generateLowMap(this.STR, this.sptip),
 		//49
-		this.generateLowMap(this.LDR, this.ptip),
+		this.generateLowMap(this.LDR, this.sptip),
 		//4A
-		this.generateLowMap(this.STRT, this.ptip),
+		this.generateLowMap(this.STRT, this.sptip),
 		//4B
-		this.generateLowMap(this.LDRT, this.ptip),
+		this.generateLowMap(this.LDRT, this.sptip),
 		//4C
-		this.generateLowMap(this.STRB, this.ptip),
+		this.generateLowMap(this.STRB, this.sptip),
 		//4D
-		this.generateLowMap(this.LDRB, this.ptip),
+		this.generateLowMap(this.LDRB, this.sptip),
 		//4E
-		this.generateLowMap(this.STRBT, this.ptip),
+		this.generateLowMap(this.STRBT, this.sptip),
 		//4F
-		this.generateLowMap(this.LDRBT, this.ptip),
+		this.generateLowMap(this.LDRBT, this.sptip),
 		//50
-		this.generateLowMap(this.STR, this.ofim),
+		this.generateLowMap(this.STR, this.sofim),
 		//51
-		this.generateLowMap(this.LDR, this.ofim),
+		this.generateLowMap(this.LDR, this.sofim),
 		//52
-		this.generateLowMap(this.STR, this.prim),
+		this.generateLowMap(this.STR, this.sprim),
 		//53
-		this.generateLowMap(this.LDR, this.prim),
+		this.generateLowMap(this.LDR, this.sprim),
 		//54
-		this.generateLowMap(this.STRB, this.ofim),
+		this.generateLowMap(this.STRB, this.sofim),
 		//55
-		this.generateLowMap(this.LDRB, this.ofim),
+		this.generateLowMap(this.LDRB, this.sofim),
 		//56
-		this.generateLowMap(this.STRB, this.prim),
+		this.generateLowMap(this.STRB, this.sprim),
 		//57
-		this.generateLowMap(this.LDRB, this.prim),
+		this.generateLowMap(this.LDRB, this.sprim),
 		//58
-		this.generateLowMap(this.STR, this.ofip),
+		this.generateLowMap(this.STR, this.sofip),
 		//59
-		this.generateLowMap(this.LDR, this.ofip),
+		this.generateLowMap(this.LDR, this.sofip),
 		//5A
-		this.generateLowMap(this.STR, this.prip),
+		this.generateLowMap(this.STR, this.sprip),
 		//5B
-		this.generateLowMap(this.LDR, this.prip),
+		this.generateLowMap(this.LDR, this.sprip),
 		//5C
-		this.generateLowMap(this.STRB, this.ofip),
+		this.generateLowMap(this.STRB, this.sofip),
 		//5D
-		this.generateLowMap(this.LDRB, this.ofip),
+		this.generateLowMap(this.LDRB, this.sofip),
 		//5E
-		this.generateLowMap(this.STRB, this.prip),
+		this.generateLowMap(this.STRB, this.sprip),
 		//5F
-		this.generateLowMap(this.LDRB, this.prip),
+		this.generateLowMap(this.LDRB, this.sprip),
 	];
 	//60-6F
 	this.generateStoreLoadInstructionSector1();
