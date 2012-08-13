@@ -93,6 +93,8 @@ GameBoyAdvanceCPU.prototype.FIQ = function (LR) {
 	if (!this.FIQDisabled) {
 		//Exception always enter ARM mode:
 		this.enterARM();
+		//Switch Register Banks:
+		this.switchRegisterBank(0x11);
 		//Save link register:
 		this.registers[14] = LR;
 		//FIQ exception vector:
@@ -111,6 +113,8 @@ GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
 	if (!this.IRQDisabled) {
 		//Exception always enter ARM mode:
 		this.enterARM();
+		//Switch Register Banks:
+		this.switchRegisterBank(0x12);
 		//Save link register:
 		this.registers[14] = LR;
 		//IRQ exception vector:
@@ -126,6 +130,8 @@ GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
 GameBoyAdvanceCPU.prototype.SWI = function (LR) {
 	//Exception always enter ARM mode:
 	this.enterARM();
+	//Switch Register Banks:
+	this.switchRegisterBank(0x13);
 	//Save link register:
 	this.registers[14] = LR;
 	//SWI enters the SVC vector:
@@ -140,6 +146,8 @@ GameBoyAdvanceCPU.prototype.SWI = function (LR) {
 GameBoyAdvanceCPU.prototype.UNDEFINED = function (LR) {
 	//Exception always enter ARM mode:
 	this.enterARM();
+	//Switch Register Banks:
+	this.switchRegisterBank(0x1B);
 	//Save link register:
 	this.registers[14] = LR;
 	//Undefined exception vector:
@@ -212,6 +220,70 @@ GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function (newMode) {
 		this.InTHUMB,
 		this.MODEBits
 	];
+}
+GameBoyAdvanceCPU.prototype.switchRegisterBank = function (newMode) {
+	switch (this.MODEBits) {
+		case 0x10:
+		case 0x1F:
+			this.registersUSR[13] = this.registers[13];
+			this.registersUSR[14] = this.registers[14];
+			break;
+		case 0x11:
+			this.registersFIQ[8] = this.registers[8];
+			this.registersFIQ[9] = this.registers[9];
+			this.registersFIQ[10] = this.registers[10];
+			this.registersFIQ[11] = this.registers[11];
+			this.registersFIQ[12] = this.registers[12];
+			this.registersFIQ[13] = this.registers[13];
+			this.registersFIQ[14] = this.registers[14];
+			break;
+		case 0x12:
+			this.registersIRQ[13] = this.registers[13];
+			this.registersIRQ[14] = this.registers[14];
+			break;
+		case 0x13:
+			this.registersSVC[13] = this.registers[13];
+			this.registersSVC[14] = this.registers[14];
+			break;
+		case 0x17:
+			this.registersABT[13] = this.registers[13];
+			this.registersABT[14] = this.registers[14];
+			break;
+		case 0x1B:
+			this.registersUND[13] = this.registers[13];
+			this.registersUND[14] = this.registers[14];
+	}
+	switch (newMode) {
+		case 0x10:
+		case 0x1F:
+			this.registers[13] = this.registersUSR[13];
+			this.registers[14] = this.registersUSR[14];
+			break;
+		case 0x11:
+			this.registers[8] = this.registersFIQ[8];
+			this.registers[9] = this.registersFIQ[9];
+			this.registers[10] = this.registersFIQ[10];
+			this.registers[11] = this.registersFIQ[11];
+			this.registers[12] = this.registersFIQ[12];
+			this.registers[13] = this.registersFIQ[13];
+			this.registers[14] = this.registersFIQ[14];
+			break;
+		case 0x12:
+			this.registers[13] = this.registersIRQ[13];
+			this.registers[14] = this.registersIRQ[14];
+			break;
+		case 0x13:
+			this.registers[13] = this.registersSVC[13];
+			this.registers[14] = this.registersSVC[14];
+			break;
+		case 0x17:
+			this.registers[13] = this.registersABT[13];
+			this.registers[14] = this.registersABT[14];
+			break;
+		case 0x1B:
+			this.registers[13] = this.registersUND[13];
+			this.registers[14] = this.registersUND[14];
+	}
 }
 GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd, MLAClocks) {
 	//Predict the internal cycle time:

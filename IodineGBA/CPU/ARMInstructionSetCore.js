@@ -155,16 +155,25 @@ ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data)
 	switch (this.MODEBits) {
 		case 0x10:
 		case 0x1F:
-			//Guard high register writing, as it may cause a branch:
-			this.registers[address] = data;
-			if (address == 15) {
-				//We performed a branch:
-				this.resetPipeline();
+			this.guardRegisterWrite(address, data);
+			break;
+		case 0x11:
+			if (address < 7 || address == 15) {
+				this.guardRegisterWrite(address, data);
+			}
+			else {
+				//User-Mode Register Write Inside Non-User-Mode:
+				this.CPUCore.registersUSR[address] = data;
 			}
 			break;
 		default:
-			//User-Mode Register Write Inside Non-User-Mode:
-			this.CPUCore.registersUSR[address] = data;
+			if (address < 13 || address == 15) {
+				this.guardRegisterWrite(address, data);
+			}
+			else {
+				//User-Mode Register Write Inside Non-User-Mode:
+				this.CPUCore.registersUSR[address] = data;
+			}
 	}
 }
 ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
