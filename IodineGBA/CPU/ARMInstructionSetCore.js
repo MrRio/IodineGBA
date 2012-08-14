@@ -62,7 +62,7 @@ ARMInstructionSet.prototype.executeARM = function (instruction) {
 	}
 }
 ARMInstructionSet.prototype.conditionCodeTest = function () {
-	switch (this.execute >> 28) {
+	switch (this.execute >>> 28) {
 		case 0xE:		//AL (always)
 						//Put this case first, since it's the most common!
 			return true;
