@@ -228,64 +228,64 @@ GameBoyAdvanceCPU.prototype.switchRegisterBank = function (newMode) {
 	switch (this.MODEBits) {
 		case 0x10:
 		case 0x1F:
-			this.registersUSR[13] = this.registers[13];
-			this.registersUSR[14] = this.registers[14];
+			this.registersUSR[0] = this.registers[13];
+			this.registersUSR[1] = this.registers[14];
 			break;
 		case 0x11:
-			this.registersFIQ[8] = this.registers[8];
-			this.registersFIQ[9] = this.registers[9];
-			this.registersFIQ[10] = this.registers[10];
-			this.registersFIQ[11] = this.registers[11];
-			this.registersFIQ[12] = this.registers[12];
-			this.registersFIQ[13] = this.registers[13];
-			this.registersFIQ[14] = this.registers[14];
+			this.registersFIQ[0] = this.registers[8];
+			this.registersFIQ[1] = this.registers[9];
+			this.registersFIQ[2] = this.registers[10];
+			this.registersFIQ[3] = this.registers[11];
+			this.registersFIQ[4] = this.registers[12];
+			this.registersFIQ[5] = this.registers[13];
+			this.registersFIQ[6] = this.registers[14];
 			break;
 		case 0x12:
-			this.registersIRQ[13] = this.registers[13];
-			this.registersIRQ[14] = this.registers[14];
+			this.registersIRQ[0] = this.registers[13];
+			this.registersIRQ[1] = this.registers[14];
 			break;
 		case 0x13:
-			this.registersSVC[13] = this.registers[13];
-			this.registersSVC[14] = this.registers[14];
+			this.registersSVC[0] = this.registers[13];
+			this.registersSVC[1] = this.registers[14];
 			break;
 		case 0x17:
-			this.registersABT[13] = this.registers[13];
-			this.registersABT[14] = this.registers[14];
+			this.registersABT[0] = this.registers[13];
+			this.registersABT[1] = this.registers[14];
 			break;
 		case 0x1B:
-			this.registersUND[13] = this.registers[13];
-			this.registersUND[14] = this.registers[14];
+			this.registersUND[0] = this.registers[13];
+			this.registersUND[1] = this.registers[14];
 	}
 	switch (newMode) {
 		case 0x10:
 		case 0x1F:
-			this.registers[13] = this.registersUSR[13];
-			this.registers[14] = this.registersUSR[14];
+			this.registers[13] = this.registersUSR[0];
+			this.registers[14] = this.registersUSR[1];
 			break;
 		case 0x11:
-			this.registers[8] = this.registersFIQ[8];
-			this.registers[9] = this.registersFIQ[9];
-			this.registers[10] = this.registersFIQ[10];
-			this.registers[11] = this.registersFIQ[11];
-			this.registers[12] = this.registersFIQ[12];
-			this.registers[13] = this.registersFIQ[13];
-			this.registers[14] = this.registersFIQ[14];
+			this.registers[8] = this.registersFIQ[0];
+			this.registers[9] = this.registersFIQ[1];
+			this.registers[10] = this.registersFIQ[2];
+			this.registers[11] = this.registersFIQ[3];
+			this.registers[12] = this.registersFIQ[4];
+			this.registers[13] = this.registersFIQ[5];
+			this.registers[14] = this.registersFIQ[6];
 			break;
 		case 0x12:
-			this.registers[13] = this.registersIRQ[13];
-			this.registers[14] = this.registersIRQ[14];
+			this.registers[13] = this.registersIRQ[0];
+			this.registers[14] = this.registersIRQ[1];
 			break;
 		case 0x13:
-			this.registers[13] = this.registersSVC[13];
-			this.registers[14] = this.registersSVC[14];
+			this.registers[13] = this.registersSVC[0];
+			this.registers[14] = this.registersSVC[1];
 			break;
 		case 0x17:
-			this.registers[13] = this.registersABT[13];
-			this.registers[14] = this.registersABT[14];
+			this.registers[13] = this.registersABT[0];
+			this.registers[14] = this.registersABT[1];
 			break;
 		case 0x1B:
-			this.registers[13] = this.registersUND[13];
-			this.registers[14] = this.registersUND[14];
+			this.registers[13] = this.registersUND[0];
+			this.registers[14] = this.registersUND[1];
 	}
 }
 GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd, MLAClocks) {
