@@ -257,6 +257,22 @@ ARMInstructionSet.prototype.getDelayedRegisterRead = function (registerSelected)
 	}
 	return register;
 }
+THUMBInstructionSet.prototype.BX = function (parentObj) {
+	//Branch & eXchange:
+	var address = parentObj.registers[parentObj.execute & 0xF];
+	if ((address & 0x1) == 0) {
+		//Stay in ARM mode:
+		address &= -4;
+		parentObj.registers[15] = address;
+		parentObj.resetPipeline();
+	}
+	else {
+		//Enter THUMB mode:
+		address &= -2;
+		parentObj.registers[15] = (address - 2) | 0;
+		parentObj.CPUCore.enterTHUMB();
+	}
+}
 ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
@@ -1020,6 +1036,34 @@ ARMInstructionSet.prototype.SWPB = function (parentObj, operand2OP) {
 	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	parentObj.CPUCore.write8(base, parentObj.registers[parentObj.execute & 0xF]);
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, data);
+}
+ARMInstructionSet.prototype.SWI = function (parentObj, operand2OP) {
+	//Software Interrupt:
+	parentObj.CPUCore.SWI((parentObj.registers[15] - 4) | 0);
+}
+ARMInstructionSet.prototype.CDP = function (parentObj, operand2OP) {
+	//No co-processor on GBA, but we really should do the bail properly:
+	parentObj.UNDEFINED();
+}
+ARMInstructionSet.prototype.LDC = function (parentObj), operand2OP {
+	//No co-processor on GBA, but we really should do the bail properly:
+	parentObj.UNDEFINED();
+}
+ARMInstructionSet.prototype.STC = function (parentObj, operand2OP) {
+	//No co-processor on GBA, but we really should do the bail properly:
+	parentObj.UNDEFINED();
+}
+ARMInstructionSet.prototype.MRC = function (parentObj), operand2OP {
+	//No co-processor on GBA, but we really should do the bail properly:
+	parentObj.UNDEFINED();
+}
+ARMInstructionSet.prototype.MCR = function (parentObj, operand2OP) {
+	//No co-processor on GBA, but we really should do the bail properly:
+	parentObj.UNDEFINED();
+}
+ARMInstructionSet.prototype.UNDEFINED = function (parentObj) {
+	//Undefined Exception:
+	parentObj.CPUCore.UNDEFINED((parentObj.registers[15] - 4) | 0);
 }
 ARMInstructionSet.prototype.lli = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
