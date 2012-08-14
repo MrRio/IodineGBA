@@ -208,3 +208,7 @@ GameBoyAdvanceCartridge.prototype.loadExisting = function () {
 		this.sram.load(data);
 	}
 }
+GameBoyAdvanceCartridge.prototype.nextIRQEventTime = function () {
+	//Nothing yet implement that would fire an IRQ:
+	return -1;
+}

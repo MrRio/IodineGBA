@@ -110,6 +110,14 @@ GameBoyAdvanceEmulator.prototype.attachBIOS = function (BIOS) {
 	}
 	this.biosFound = true;
 }
+GameBoyAdvanceEmulator.prototype.decodeROM = function (ROM) {
+	if (typeof ROM == "object" && ROM && ROM.length > 0) {
+		return ROM;
+	}
+	else {
+		throw(new Error("Loaded an invalid type."));
+	}
+}
 GameBoyAdvanceEmulator.prototype.setSpeed = function (speed) {
 	this.emulatorSpeed = Math.min(Math.max(parseFloat(speed), 0.01), 10);
 	this.calculateTimings();
