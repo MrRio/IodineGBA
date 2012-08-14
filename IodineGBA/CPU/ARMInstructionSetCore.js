@@ -632,7 +632,7 @@ ARMInstructionSet.prototype.LDRBT = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.STMIA = function (parentObj, operand2OP) {
 	//Only initialize the STMIA sequence if the register list is non-empty:
-	if ((parentObj.execute & 0xFF) > 0) {
+	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
 		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
 		//Updating the address bus away from PC fetch:
@@ -651,7 +651,7 @@ ARMInstructionSet.prototype.STMIA = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.STMIAW = function (parentObj) {
 	//Only initialize the STMIA sequence if the register list is non-empty:
-	if ((parentObj.execute & 0xFF) > 0) {
+	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
 		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
 		//Updating the address bus away from PC fetch:
@@ -672,7 +672,7 @@ ARMInstructionSet.prototype.STMIAW = function (parentObj) {
 }
 ARMInstructionSet.prototype.STMDA = function (parentObj, operand2OP) {
 	//Only initialize the STMIA sequence if the register list is non-empty:
-	if ((parentObj.execute & 0xFF) > 0) {
+	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
 		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
 		//Updating the address bus away from PC fetch:
@@ -691,7 +691,7 @@ ARMInstructionSet.prototype.STMDA = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.STMDAW = function (parentObj) {
 	//Only initialize the STMIA sequence if the register list is non-empty:
-	if ((parentObj.execute & 0xFF) > 0) {
+	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
 		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
 		//Updating the address bus away from PC fetch:
@@ -712,7 +712,7 @@ ARMInstructionSet.prototype.STMDAW = function (parentObj) {
 }
 ARMInstructionSet.prototype.STMIB = function (parentObj, operand2OP) {
 	//Only initialize the STMIA sequence if the register list is non-empty:
-	if ((parentObj.execute & 0xFF) > 0) {
+	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
 		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
 		//Updating the address bus away from PC fetch:
@@ -731,7 +731,7 @@ ARMInstructionSet.prototype.STMIB = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.STMIBW = function (parentObj) {
 	//Only initialize the STMIA sequence if the register list is non-empty:
-	if ((parentObj.execute & 0xFF) > 0) {
+	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
 		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
 		//Updating the address bus away from PC fetch:
@@ -745,14 +745,14 @@ ARMInstructionSet.prototype.STMIBW = function (parentObj) {
 			}
 		}
 		//Store the updated base address back into register:
-		operand2OP(parentObj, (parentObj.execute >> 16) & 0x7, (currentAddress + 4) | 0);
+		operand2OP(parentObj, (parentObj.execute >> 16) & 0x7, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 ARMInstructionSet.prototype.STMDB = function (parentObj, operand2OP) {
 	//Only initialize the STMIA sequence if the register list is non-empty:
-	if ((parentObj.execute & 0xFF) > 0) {
+	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
 		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
 		//Updating the address bus away from PC fetch:
@@ -771,7 +771,7 @@ ARMInstructionSet.prototype.STMDB = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.STMDBW = function (parentObj) {
 	//Only initialize the STMIA sequence if the register list is non-empty:
-	if ((parentObj.execute & 0xFF) > 0) {
+	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
 		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
 		//Updating the address bus away from PC fetch:
@@ -785,7 +785,7 @@ ARMInstructionSet.prototype.STMDBW = function (parentObj) {
 			}
 		}
 		//Store the updated base address back into register:
-		operand2OP(parentObj, (parentObj.execute >> 16) & 0x7, (currentAddress - 4) | 0);
+		operand2OP(parentObj, (parentObj.execute >> 16) & 0x7, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
