@@ -75,7 +75,7 @@ THUMBInstructionSet.prototype.executeIteration = function () {
 THUMBInstructionSet.prototype.executeTHUMB = function () {
 	if (this.pipelineInvalid == 0) {
 		//No condition code:
-		this.instructionMap[this.execute >> 10](this);
+		this.instructionMap[this.execute >> 6](this);
 	}
 	else {
 		//Tick the pipeline invalidation:
