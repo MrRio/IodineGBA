@@ -21,6 +21,7 @@ function GameBoyAdvanceCPU(IOCore) {
 	this.initialize();
 }
 GameBoyAdvanceCPU.prototype.initialize = function () {
+	this.initializeRegisters();
 	this.ARM = new ARMInstructionSet(this);
 	this.THUMB = new THUMBInstructionSet(this);
 	this.instructionHandle = this.ARM;

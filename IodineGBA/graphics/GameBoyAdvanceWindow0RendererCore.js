@@ -14,11 +14,11 @@
  * GNU General Public License for more details.
  *
  */
-function GameBoyAdvanceOBJWindowRenderer(gfx) {
+function GameBoyAdvanceWindow0Renderer(gfx) {
 	this.gfx = gfx;
 	this.preprocess();
 }
-GameBoyAdvanceOBJWindowRenderer.prototype.renderNormalScanLine = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
+GameBoyAdvanceWindow0Renderer.prototype.renderNormalScanLine = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
 	OBJBuffer = (this.gfx.WIN0OBJ) ? OBJBuffer : null;
 	BG0Buffer = (this.gfx.WIN0BG0) ? BG0Buffer : null;
@@ -60,7 +60,7 @@ GameBoyAdvanceOBJWindowRenderer.prototype.renderNormalScanLine = function (line,
 		}
 	}
 }
-GameBoyAdvanceOBJWindowRenderer.prototype.renderScanLineWithEffects = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
+GameBoyAdvanceWindow0Renderer.prototype.renderScanLineWithEffects = function (line, lineBuffer, OBJBuffer, BG0Buffer, BG1Buffer, BG2Buffer, BG3Buffer) {
 	//Arrange our layer stack so we can remove disabled and order for correct edge case priority:
 	OBJBuffer = (this.gfx.WIN0OBJ) ? OBJBuffer : null;
 	BG0Buffer = (this.gfx.WIN0BG0) ? BG0Buffer : null;
@@ -103,6 +103,6 @@ GameBoyAdvanceOBJWindowRenderer.prototype.renderScanLineWithEffects = function (
 		}
 	}
 }
-GameBoyAdvanceOBJWindowRenderer.prototype.preprocess = function () {
+GameBoyAdvanceWindow0Renderer.prototype.preprocess = function () {
 	this.renderScanLine = (this.gfx.WIN0Effects) ? this.renderScanLineWithEffects : this.renderNormalScanLine;
 }

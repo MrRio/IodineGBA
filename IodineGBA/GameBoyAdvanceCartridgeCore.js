@@ -117,14 +117,14 @@ GameBoyAdvanceCartridge.prototype.IDLookup = function () {
 	var length = this.ROM.length - 6;
 	for (var index = 0; index < length; ++index) {
 		switch (this.ROM[index]) {
-			case 0x45:	//E
+			/*case 0x45:	//E
 				if (this.isEEPROMCart(index)) {
 					found |= 2;
 					if (found == 3) {
 						return;
 					}
 				}
-				break;
+				break;*/
 			case 0x46:	//F
 				if (this.isFLASHCart(index)) {
 					found |= 2;

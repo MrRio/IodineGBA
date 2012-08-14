@@ -25,18 +25,21 @@ function GameBoyAdvanceIO(emulatorCore) {
 	this.cyclesIteratedPreviously = 0;
 	this.lastBIOSREAD = [0, 0, 0, 0];		//BIOS read bus last.
 	//Initialize the various handler objects:
+	this.dma = new GameBoyAdvanceDMA(this);
 	this.gfx = new GameBoyAdvanceGraphics(this);
 	this.sound = new GameBoyAdvanceSound(this);
 	this.timer = new GameBoyAdvanceTimer(this);
-	this.dma = new GameBoyAdvanceDMA(this);
 	this.irq = new GameBoyAdvanceIRQ(this);
 	this.serial = new GameBoyAdvanceSerial(this);
 	this.joypad = new GameBoyAdvanceJoyPad(this);
-	this.cartridge = new GameBoyAdvanceCartridge(this, ROM);
+	this.cartridge = new GameBoyAdvanceCartridge(this);
 	this.wait = new GameBoyAdvanceWait(this);
 	this.cpu = new GameBoyAdvanceCPU(this);
 	//After all sub-objects initialized, initialize dispatches:
 	this.compileMemoryDispatches();
+	//Initialize Some RAM:
+	this.externalRAM = getUint8Array(0x40000);
+	this.internalRAM = getUint8Array(0x8000);
 }
 GameBoyAdvanceIO.prototype.memoryWrite8 = function (address, data) {
 	//Byte Write:
@@ -298,7 +301,6 @@ GameBoyAdvanceIO.prototype.compileMemoryDispatches = function () {
 	];
 	this.compileIOWriteDispatch();
 	this.compileIOReadDispatch();
-	this.compileMemoryAccessPostProcessDispatch();
 }
 GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO = [];
@@ -2003,9 +2005,9 @@ GameBoyAdvanceIO.prototype.remapWRAM = function (data) {
 GameBoyAdvanceIO.prototype.readBIOS = function (parentObj, address, busReqNumber) {
 	parentObj.wait.FASTAccess();
 	if (address < 0x4000) {
-		if (parentObj.cpu.register[0x15] < 0x4000) {
+		if (parentObj.cpu.registers[15] < 0x4000) {
 			//If reading from BIOS while executing it:
-			parentObj.lastBIOSREAD[address & 0x3] = parentObj.cpu.registers[0x15];
+			parentObj.lastBIOSREAD[address & 0x3] = parentObj.cpu.registers[15];
 			return parentObj.BIOS[address];
 		}
 		else {

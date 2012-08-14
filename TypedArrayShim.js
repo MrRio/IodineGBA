@@ -16,7 +16,7 @@
  */
 function getInt32Array(size_t) {
 	try {
-		return Int32Array(size_t);
+		return new Int32Array(size_t);
 	}
 	catch (error) {
 		return getArray(size_t);
@@ -24,7 +24,7 @@ function getInt32Array(size_t) {
 }
 function getUint8Array(size_t) {
 	try {
-		return Uint8Array(size_t);
+		return new Uint8Array(size_t);
 	}
 	catch (error) {
 		return getArray(size_t);
@@ -32,7 +32,23 @@ function getUint8Array(size_t) {
 }
 function getInt16Array(size_t) {
 	try {
-		return Int16Array(size_t);
+		return new Int16Array(size_t);
+	}
+	catch (error) {
+		return getArray(size_t);
+	}
+}
+function getInt8Array(size_t) {
+	try {
+		return new Int8Array(size_t);
+	}
+	catch (error) {
+		return getArray(size_t);
+	}
+}
+function getFloat32Array(size_t) {
+	try {
+		return new Float32Array(size_t);
 	}
 	catch (error) {
 		return getArray(size_t);

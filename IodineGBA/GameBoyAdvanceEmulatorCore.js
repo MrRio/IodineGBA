@@ -58,6 +58,10 @@ GameBoyAdvanceEmulator.prototype.stop = function () {
 	this.romFound = false;
 	this.pause();
 }
+GameBoyAdvanceEmulator.prototype.statusClear = function () {
+	this.faultFound = false;
+	this.pause();
+}
 GameBoyAdvanceEmulator.prototype.restart = function () {
 	this.faultFound = false;
 	this.save();
@@ -96,27 +100,22 @@ GameBoyAdvanceEmulator.prototype.iterationEndSequence = function () {
 }
 GameBoyAdvanceEmulator.prototype.attachROM = function (ROM) {
 	this.stop();
-	this.ROM = this.decodeROM(ROM);
+	this.ROM = ROM;
 	if (this.biosFound) {
 		this.initializeCore();
 	}
 	this.romFound = true;
 }
 GameBoyAdvanceEmulator.prototype.attachBIOS = function (BIOS) {
-	this.stop();
-	this.BIOS = this.decodeROM(BIOS);
+	this.statusClear();
+	this.BIOS = BIOS;
 	if (this.romFound) {
 		this.initializeCore();
 	}
 	this.biosFound = true;
 }
-GameBoyAdvanceEmulator.prototype.decodeROM = function (ROM) {
-	if (typeof ROM == "object" && ROM && ROM.length > 0) {
-		return ROM;
-	}
-	else {
-		throw(new Error("Loaded an invalid type."));
-	}
+GameBoyAdvanceEmulator.prototype.save = function () {
+	//Nothing yet...
 }
 GameBoyAdvanceEmulator.prototype.setSpeed = function (speed) {
 	this.emulatorSpeed = Math.min(Math.max(parseFloat(speed), 0.01), 10);
@@ -283,7 +282,7 @@ GameBoyAdvanceEmulator.prototype.disableAudio = function () {
 }
 GameBoyAdvanceEmulator.prototype.initializeAudioBuffering = function () {
 	this.audioDestinationPosition = 0;
-	this.audioBufferContainAmount = Math.max(this.CPUCyclesPerIteration * audioBufferUnderrunLimit / this.audioResamplerFirstPassFactor, 4096) << 1;
+	this.audioBufferContainAmount = Math.max(this.CPUCyclesPerIteration * this.audioBufferUnderrunLimit / this.audioResamplerFirstPassFactor, 4096) << 1;
 	this.audioNumSamplesTotal = (this.CPUCyclesPerIteration / this.audioResamplerFirstPassFactor) << 1;
 	this.audioBuffer = getFloat32Array(this.audioNumSamplesTotal);
 }

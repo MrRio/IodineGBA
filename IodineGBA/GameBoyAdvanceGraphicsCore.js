@@ -161,8 +161,8 @@ GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.initializeMatrixStorage();
 	this.initializePaletteStorage();
 	this.initializeOAMTable();
-	this.bg0Renderer = new GameBoyAdvanceBG0Renderer(this);
-	this.bg1Renderer = new GameBoyAdvanceBG1Renderer(this);
+	this.bg0Renderer = new GameBoyAdvanceBG0TEXTRenderer(this);
+	this.bg1Renderer = new GameBoyAdvanceBG1TEXTRenderer(this);
 	this.bg2TextRenderer = new GameBoyAdvanceBG2TEXTRenderer(this);
 	this.bg3TextRenderer = new GameBoyAdvanceBG3TEXTRenderer(this);
 	this.bg2MatrixRenderer = new GameBoyAdvanceBG2MatrixRenderer(this);
@@ -180,7 +180,7 @@ GameBoyAdvanceGraphics.prototype.initializeRenderer = function () {
 	this.mode3Renderer = new GameBoyAdvanceMode3Renderer(this);
 	this.mode4Renderer = new GameBoyAdvanceMode4Renderer(this);
 	this.mode5Renderer = new GameBoyAdvanceMode5Renderer(this);
-	this.renderer = this.mode0Renderer();
+	this.renderer = this.mode0Renderer;
 	this.compositorPreprocess();
 }
 GameBoyAdvanceGraphics.prototype.initializeMatrixStorage = function () {
@@ -203,6 +203,7 @@ GameBoyAdvanceGraphics.prototype.initializePaletteStorage = function () {
 	}
 }
 GameBoyAdvanceGraphics.prototype.initializeOAMTable = function () {
+	this.OAMTable = [];
 	for (var spriteNumber = 0; spriteNumber < 128; ++spriteNumber) {
 		OAMTable = {};
 		OAMTable.ycoord = 0;
@@ -223,7 +224,7 @@ GameBoyAdvanceGraphics.prototype.initializeOAMTable = function () {
 		this.OAMTable[spriteNumber] = OAMTable;
 	}
 }
-GameBoyAdvanceGraphics.prototype.updateCore = function (clocks) {
+GameBoyAdvanceGraphics.prototype.addClocks = function (clocks) {
 	//Call this when clocking the state some more:
 	this.LCDTicks += clocks;
 	this.clockLCDState();
