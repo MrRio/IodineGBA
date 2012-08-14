@@ -405,7 +405,7 @@ GameBoyAdvanceSerial.prototype.writeJOYBUS_SEND3 = function (data) {
 	this.JOYBUS_SEND3 = data;
 	this.JOYBUS_STAT |= 0x2;
 }
-GameBoyAdvanceSerial.prototype.readJOYBUS_SEND0 = function () {
+GameBoyAdvanceSerial.prototype.readJOYBUS_SEND3 = function () {
 	return this.JOYBUS_SEND3;
 }
 GameBoyAdvanceSerial.prototype.writeJOYBUS_STAT = function (data) {
