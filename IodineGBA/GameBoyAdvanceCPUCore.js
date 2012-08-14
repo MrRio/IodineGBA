@@ -37,7 +37,7 @@ GameBoyAdvanceCPU.prototype.initializeRegisters = function () {
 		SPSR is the saved program status register.
 	*/
 	//Normal R0-R15 Registers:
-	this.registers = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	this.registers = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 	//Used to copy back the R8-R14 state for normal operations:
 	this.registersUSR = [0,0,0,0,0,0,0];
 	//Fast IRQ mode registers (R8-R14):

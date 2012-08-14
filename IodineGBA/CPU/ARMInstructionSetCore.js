@@ -251,7 +251,7 @@ ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
 }
 ARMInstructionSet.prototype.getDelayedRegisterRead = function (registerSelected) {
 	//Get the register data (After PC is updated during function execution):
-	var register = parentObj.registers[registerSelected];
+	var register = this.registers[registerSelected];
 	if (registerSelected == 15) {
 		//Adjust PC for it being incremented before end of instr:
 		register = (register + 4) | 0;
@@ -276,13 +276,13 @@ ARMInstructionSet.prototype.BX = function (parentObj) {
 }
 ARMInstructionSet.prototype.B = function (parentObj) {
 	//Branch:
-	parentObj.registers[15] = (parentObj.execute << 8) >> 6;
+	parentObj.registers[15] += (parentObj.execute << 8) >> 6;
 	parentObj.resetPipeline();
 }
 ARMInstructionSet.prototype.BL = function (parentObj) {
 	//Branch with Link:
 	parentObj.registers[14] = (parentObj.registers[14] - 4) & -4;
-	parentObj.registers[15] = (parentObj.execute << 8) >> 6;
+	parentObj.registers[15] += (parentObj.execute << 8) >> 6;
 	parentObj.resetPipeline();
 }
 ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
