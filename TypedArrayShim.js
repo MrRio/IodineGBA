@@ -38,3 +38,9 @@ function getInt16Array(size_t) {
 		return getArray(size_t);
 	}
 }
+function getArray(size_t) {
+	var genericArray = [];
+	for (var size_index = 0; size_index < size_t; ++size_index) {
+		genericArray[size_index] = 0;
+	}
+}
