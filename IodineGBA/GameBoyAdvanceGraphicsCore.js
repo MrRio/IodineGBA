@@ -483,7 +483,6 @@ GameBoyAdvanceGraphics.prototype.compositeLayersWithEffects = function (OBJBuffe
 				currentPixel = workingPixel;
 			}
 		}
-		this.lineBuffer[pixelPosition] = ;
 		if ((currentPixel & 0x200000) == 0) {
 			//Normal Pixel:
 			//Pass the highest two pixels to be arbitrated in the color effects processing:

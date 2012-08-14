@@ -25,7 +25,7 @@ GameBoyAdvanceCPU.prototype.initialize = function () {
 	this.THUMB = new THUMBInstructionSet(this);
 	this.instructionHandle = this.ARM;
 }
-ARM7TDMI.prototype.initializeRegisters = function () {
+GameBoyAdvanceCPU.prototype.initializeRegisters = function () {
 	/*
 		R0-R7 Are known as the low registers.
 		R8-R12 Are the high registers.

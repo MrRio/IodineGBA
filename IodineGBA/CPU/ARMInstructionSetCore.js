@@ -35,7 +35,7 @@ ARMInstructionSet.prototype.resetPipeline = function () {
 	//Make sure we don't increment before our fetch:
 	this.registers[15] = (this.registers[15] - 4) | 0;
 }
-THUMBInstructionSet.prototype.getIRQLR = function () {
+ARMInstructionSet.prototype.getIRQLR = function () {
 	return (this.registers[15] - 8) | 0;
 }
 ARMInstructionSet.prototype.executeIteration = function () {
@@ -1064,7 +1064,7 @@ ARMInstructionSet.prototype.CDP = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
 	parentObj.UNDEFINED();
 }
-ARMInstructionSet.prototype.LDC = function (parentObj), operand2OP {
+ARMInstructionSet.prototype.LDC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
 	parentObj.UNDEFINED();
 }
@@ -1072,7 +1072,7 @@ ARMInstructionSet.prototype.STC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
 	parentObj.UNDEFINED();
 }
-ARMInstructionSet.prototype.MRC = function (parentObj), operand2OP {
+ARMInstructionSet.prototype.MRC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
 	parentObj.UNDEFINED();
 }
