@@ -703,7 +703,7 @@ THUMBInstructionSet.prototype.STMIA = function (parentObj) {
 		var currentAddress = parentObj.registers[(parentObj.execute >> 8) & 0x7];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
-		//Push registers(s) into memory:
+		//Push register(s) into memory:
 		for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Push a register into memory:
@@ -724,7 +724,7 @@ THUMBInstructionSet.prototype.LDMIA = function (parentObj) {
 		var currentAddress = parentObj.registers[(parentObj.execute >> 8) & 0x7];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
-		//Load  registers(s) from memory:
+		//Load  register(s) from memory:
 		for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Load a register from memory:
