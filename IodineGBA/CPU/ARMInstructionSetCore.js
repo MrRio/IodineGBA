@@ -1005,6 +1005,18 @@ ARMInstructionSet.prototype.LDMDBW = function (parentObj, operand2OP) {
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
+ARMInstructionSet.prototype.SWP = function (parentObj, operand2OP) {
+	var base = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var data = parentObj.CPUCore.read32(base);
+	parentObj.CPUCore.write32(base, parentObj.registers[parentObj.execute & 0xF]);
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, data);
+}
+ARMInstructionSet.prototype.SWPB = function (parentObj, operand2OP) {
+	var base = parentObj.registers[(parentObj.execute >> 16) & 0xF];
+	var data = parentObj.CPUCore.read8(base);
+	parentObj.CPUCore.write8(base, parentObj.registers[parentObj.execute & 0xF]);
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, data);
+}
 ARMInstructionSet.prototype.lli = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
 	//Get the register data to be shifted:
