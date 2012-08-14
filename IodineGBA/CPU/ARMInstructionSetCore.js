@@ -1008,12 +1008,16 @@ ARMInstructionSet.prototype.LDMDBW = function (parentObj, operand2OP) {
 ARMInstructionSet.prototype.SWP = function (parentObj, operand2OP) {
 	var base = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var data = parentObj.CPUCore.read32(base);
+	//Clock a cycle for the processing delaying the CPU:
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	parentObj.CPUCore.write32(base, parentObj.registers[parentObj.execute & 0xF]);
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, data);
 }
 ARMInstructionSet.prototype.SWPB = function (parentObj, operand2OP) {
 	var base = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var data = parentObj.CPUCore.read8(base);
+	//Clock a cycle for the processing delaying the CPU:
+	parentObj.wait.CPUInternalCyclePrefetch(parentObj.fetch, 1);
 	parentObj.CPUCore.write8(base, parentObj.registers[parentObj.execute & 0xF]);
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, data);
 }
