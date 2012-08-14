@@ -257,7 +257,7 @@ ARMInstructionSet.prototype.getDelayedRegisterRead = function (registerSelected)
 	}
 	return register;
 }
-THUMBInstructionSet.prototype.BX = function (parentObj) {
+ARMInstructionSet.prototype.BX = function (parentObj) {
 	//Branch & eXchange:
 	var address = parentObj.registers[parentObj.execute & 0xF];
 	if ((address & 0x1) == 0) {
@@ -273,12 +273,12 @@ THUMBInstructionSet.prototype.BX = function (parentObj) {
 		parentObj.CPUCore.enterTHUMB();
 	}
 }
-THUMBInstructionSet.prototype.B = function (parentObj) {
+ARMInstructionSet.prototype.B = function (parentObj) {
 	//Branch:
 	parentObj.registers[15] = (parentObj.execute << 8) >> 6;
 	parentObj.resetPipeline();
 }
-THUMBInstructionSet.prototype.BL = function (parentObj) {
+ARMInstructionSet.prototype.BL = function (parentObj) {
 	//Branch with Link:
 	parentObj.registers[14] = (parentObj.registers[14] - 4) & -4;
 	parentObj.registers[15] = (parentObj.execute << 8) >> 6;
@@ -537,6 +537,14 @@ ARMInstructionSet.prototype.MVNS = function (parentObj, operand2OP) {
 	parentObj.CPUCore.CPSRZero = (operand2 == 0);
 	//Update destination register and guard CPSR for PC:
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, operand2);
+}
+ARMInstructionSet.prototype.MRS = function (parentObj, operand2OP) {
+	//Transfer PSR to Register
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand2OP(parentObj));
+}
+ARMInstructionSet.prototype.MSR = function (parentObj, operand2OP) {
+	//Transfer Register/Immediate to PSR:
+	operand2OP(parentObj, parentObj.execute);
 }
 ARMInstructionSet.prototype.MUL = function (parentObj, operand2OP) {
 	//Perform multiplication:
@@ -1325,6 +1333,132 @@ ARMInstructionSet.prototype.imm = function (parentObj, operand) {
 	else {
 		return immediate;
 	}
+}
+ARMInstructionSet.prototype.rc = function (parentObj) {
+	return (
+		((parentObj.CPUCore.CPSRNegative) ? 0x80000000 : 0) |
+		((parentObj.CPUCore.CPSRZero) ? 0x40000000 : 0) |
+		((parentObj.CPUCore.CPSRCarry) ? 0x20000000 : 0) |
+		((parentObj.CPUCore.CPSROverflow) ? 0x10000000 : 0) |
+		((parentObj.CPUCore.IRQDisabled) ? 0x80 : 0) |
+		((parentObj.CPUCore.FIQDisabled) ? 0x40 : 0) |
+		((parentObj.CPUCore.InTHUMB) ? 0x20 : 0) |
+		parentObj.CPUCore.MODEBits
+	);
+}
+ARMInstructionSet.prototype.rcs = function (parentObj, operand) {
+	operand = parentObj.registers[operand & 0xF];
+	parentObj.CPUCore.CPSRNegative = (operand < 0);
+	parentObj.CPUCore.CPSRZero = ((operand & 0x40000000) != 0);
+	parentObj.CPUCore.CPSRCarry = ((operand & 0x20000000) != 0);
+	parentObj.CPUCore.CPSROverflow = ((operand & 0x10000000) != 0);
+	parentObj.CPUCore.IRQDisabled = ((operand & 0x80) != 0);
+	parentObj.CPUCore.FIQDisabled = ((operand & 0x40) != 0);
+	parentObj.CPUCore.InTHUMB = ((operand & 0x20) != 0);
+	parentObj.CPUCore.MODEBits = operand & 0x1F;
+}
+ARMInstructionSet.prototype.rs = function (parentObj) {
+	switch (parentObj.MODEBits) {
+		case 0x11:	//FIQ
+			var spsr = parentObj.SPSRFIQ;
+			break;
+		case 0x12:	//IRQ
+			var spsr = parentObj.SPSRIRQ;
+			break;
+		case 0x13:	//Supervisor
+			var spsr = parentObj.SPSRSVC;
+			break;
+		case 0x17:	//Abort
+			var spsr = parentObj.SPSRABT;
+			break;
+		case 0x1B:	//Undefined
+			var spsr = parentObj.SPSRUND;
+			break;
+		default:
+			//Instruction hit an invalid SPSR request:
+			return parentObj.rc(parentObj);
+	}
+	return (
+		((spsr[0]) ? 0x80000000 : 0) |
+		((spsr[1]) ? 0x40000000 : 0) |
+		((spsr[2]) ? 0x20000000 : 0) |
+		((spsr[3]) ? 0x10000000 : 0) |
+		((spsr[4]) ? 0x80 : 0) |
+		((spsr[5]) ? 0x40 : 0) |
+		((spsr[6]) ? 0x20 : 0) |
+		spsr[7]
+	);
+}
+ARMInstructionSet.prototype.rss = function (parentObj, operand) {
+	operand = parentObj.registers[operand & 0xF];
+	switch (parentObj.MODEBits) {
+		case 0x11:	//FIQ
+			var spsr = parentObj.SPSRFIQ;
+			break;
+		case 0x12:	//IRQ
+			var spsr = parentObj.SPSRIRQ;
+			break;
+		case 0x13:	//Supervisor
+			var spsr = parentObj.SPSRSVC;
+			break;
+		case 0x17:	//Abort
+			var spsr = parentObj.SPSRABT;
+			break;
+		case 0x1B:	//Undefined
+			var spsr = parentObj.SPSRUND;
+			break;
+		default:
+			return;
+	}
+	spsr[0] = (operand < 0);
+	spsr[1] = ((operand & 0x40000000) != 0);
+	spsr[2] = ((operand & 0x20000000) != 0);
+	spsr[3] = ((operand & 0x10000000) != 0);
+	spsr[4] = ((operand & 0x80) != 0);
+	spsr[5] = ((operand & 0x40) != 0);
+	spsr[6] = ((operand & 0x20) != 0);
+	spsr[7] = operand & 0x1F;
+}
+ARMInstructionSet.prototype.ic = function (parentObj, operand) {
+	operand = parentObj.imm(parentObj, operand);
+	parentObj.CPUCore.CPSRNegative = (operand < 0);
+	parentObj.CPUCore.CPSRZero = ((operand & 0x40000000) != 0);
+	parentObj.CPUCore.CPSRCarry = ((operand & 0x20000000) != 0);
+	parentObj.CPUCore.CPSROverflow = ((operand & 0x10000000) != 0);
+	parentObj.CPUCore.IRQDisabled = ((operand & 0x80) != 0);
+	parentObj.CPUCore.FIQDisabled = ((operand & 0x40) != 0);
+	parentObj.CPUCore.InTHUMB = ((operand & 0x20) != 0);
+	parentObj.CPUCore.MODEBits = operand & 0x1F;
+}
+ARMInstructionSet.prototype.is = function (parentObj, operand) {
+	operand = parentObj.imm(parentObj, operand);
+	switch (parentObj.MODEBits) {
+		case 0x11:	//FIQ
+			var spsr = parentObj.SPSRFIQ;
+			break;
+		case 0x12:	//IRQ
+			var spsr = parentObj.SPSRIRQ;
+			break;
+		case 0x13:	//Supervisor
+			var spsr = parentObj.SPSRSVC;
+			break;
+		case 0x17:	//Abort
+			var spsr = parentObj.SPSRABT;
+			break;
+		case 0x1B:	//Undefined
+			var spsr = parentObj.SPSRUND;
+			break;
+		default:
+			return;
+	}
+	spsr[0] = (operand < 0);
+	spsr[1] = ((operand & 0x40000000) != 0);
+	spsr[2] = ((operand & 0x20000000) != 0);
+	spsr[3] = ((operand & 0x10000000) != 0);
+	spsr[4] = ((operand & 0x80) != 0);
+	spsr[5] = ((operand & 0x40) != 0);
+	spsr[6] = ((operand & 0x20) != 0);
+	spsr[7] = operand & 0x1F;
 }
 ARMInstructionSet.prototype.ptrm = function (parentObj, operand) {
 	var offset = parentObj.registers[operand & 0xF];
@@ -2765,7 +2899,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.MSR,
-				this.rc
+				this.rcs
 			],
 			[
 				this.BX,
@@ -3033,7 +3167,7 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 		[
 			[
 				this.MSR,
-				this.rs
+				this.rss
 			],
 			[
 				this.UNDEFINED,

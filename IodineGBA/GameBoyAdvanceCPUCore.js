@@ -84,10 +84,12 @@ GameBoyAdvanceCPU.prototype.getCurrentFetchValue = function () {
 GameBoyAdvanceCPU.prototype.enterARM = function () {
 	this.instructionHandle = this.ARM;
 	this.instructionHandle.resetPipeline();
+	this.inTHUMB = false;
 }
 GameBoyAdvanceCPU.prototype.enterTHUMB = function () {
 	this.instructionHandle = this.THUMB;
 	this.instructionHandle.resetPipeline();
+	this.inTHUMB = true;
 }
 GameBoyAdvanceCPU.prototype.FIQ = function (LR) {
 	if (!this.FIQDisabled) {
@@ -166,19 +168,19 @@ GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 		case 0x1F:	//System
 			return;
 		case 0x11:	//FIQ
-			var spsr = this.SPSRFIQ[0];
+			var spsr = this.SPSRFIQ;
 			break;
 		case 0x12:	//IRQ
-			var spsr = this.SPSRIRQ[1];
+			var spsr = this.SPSRIRQ;
 			break;
 		case 0x13:	//Supervisor
-			var spsr = this.SPSRSVC[2];
+			var spsr = this.SPSRSVC;
 			break;
 		case 0x17:	//Abort
-			var spsr = this.SPSRABT[3];
+			var spsr = this.SPSRABT;
 			break;
 		case 0x1B:	//Undefined
-			var spsr = this.SPSRUND[4];
+			var spsr = this.SPSRUND;
 	}
 	this.CPSRNegative = spsr[0];
 	this.CPSRZero = spsr[1];
@@ -196,19 +198,19 @@ GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function (newMode) {
 		case 0x1F:	//System
 			return;
 		case 0x11:	//FIQ
-			var spsr = this.SPSRFIQ[0];
+			var spsr = this.SPSRFIQ;
 			break;
 		case 0x12:	//IRQ
-			var spsr = this.SPSRIRQ[1];
+			var spsr = this.SPSRIRQ;
 			break;
 		case 0x13:	//Supervisor
-			var spsr = this.SPSRSVC[2];
+			var spsr = this.SPSRSVC;
 			break;
 		case 0x17:	//Abort
-			var spsr = this.SPSRABT[3];
+			var spsr = this.SPSRABT;
 			break;
 		case 0x1B:	//Undefined
-			var spsr = this.SPSRUND[4];
+			var spsr = this.SPSRUND;
 	}
 	spsr = [
 		this.CPSRNegative,
