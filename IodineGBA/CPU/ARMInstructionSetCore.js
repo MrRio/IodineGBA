@@ -273,6 +273,17 @@ THUMBInstructionSet.prototype.BX = function (parentObj) {
 		parentObj.CPUCore.enterTHUMB();
 	}
 }
+THUMBInstructionSet.prototype.B = function (parentObj) {
+	//Branch:
+	parentObj.registers[15] = (parentObj.execute << 8) >> 6;
+	parentObj.resetPipeline();
+}
+THUMBInstructionSet.prototype.BL = function (parentObj) {
+	//Branch with Link:
+	parentObj.registers[14] = (parentObj.registers[14] - 4) & -4;
+	parentObj.registers[15] = (parentObj.execute << 8) >> 6;
+	parentObj.resetPipeline();
+}
 ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
