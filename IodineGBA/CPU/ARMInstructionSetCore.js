@@ -276,13 +276,13 @@ ARMInstructionSet.prototype.BX = function (parentObj) {
 }
 ARMInstructionSet.prototype.B = function (parentObj) {
 	//Branch:
-	parentObj.registers[15] += (parentObj.execute << 8) >> 6;
+	parentObj.registers[15] = (parentObj.registers[15] + ((parentObj.execute << 8) >> 6)) | 0;
 	parentObj.resetPipeline();
 }
 ARMInstructionSet.prototype.BL = function (parentObj) {
 	//Branch with Link:
-	parentObj.registers[14] = (parentObj.registers[14] - 4) & -4;
-	parentObj.registers[15] += (parentObj.execute << 8) >> 6;
+	parentObj.registers[14] = (parentObj.registers[15] - 4) & -4;
+	parentObj.registers[15] = (parentObj.registers[15] + ((parentObj.execute << 8) >> 6)) | 0;
 	parentObj.resetPipeline();
 }
 ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
