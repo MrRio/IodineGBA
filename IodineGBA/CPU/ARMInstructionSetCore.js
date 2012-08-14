@@ -150,6 +150,9 @@ ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
 		this.resetPipeline();
 	}
 }
+ARMInstructionSet.prototype.guardMultiRegisterWrite = function (parentObj, address, data) {
+	parentObj.guardRegisterWrite(address, data);
+}
 ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data) {
 	address &= 0xF;
 	switch (this.MODEBits) {
@@ -175,6 +178,9 @@ ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data)
 				this.CPUCore.registersUSR[address] = data;
 			}
 	}
+}
+ARMInstructionSet.prototype.guardMultiRegisterWriteSpecial = function (parentObj, address, data) {
+	parentObj.guardRegisterWriteSpecial(address, data);
 }
 ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
 	address &= 0xF;
@@ -623,6 +629,166 @@ ARMInstructionSet.prototype.LDRBT = function (parentObj, operand2OP) {
 	var address = operand2OP(parentObj, parentObj.execute, true);
 	//Read from memory location:
 	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read8(address));
+}
+ARMInstructionSet.prototype.STMIA = function (parentObj, operand2OP) {
+	//Only initialize the STMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push registers(s) into memory:
+		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push a register into memory:
+				parentObj.IOCore.memoryWrite32(currentAddress, parentObj.registers[rListPosition]);
+				currentAddress = (currentAddress + 4) | 0;
+			}
+		}
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+	}
+}
+ARMInstructionSet.prototype.STMIAW = function (parentObj) {
+	//Only initialize the STMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push registers(s) into memory:
+		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push a register into memory:
+				parentObj.IOCore.memoryWrite32(currentAddress, parentObj.registers[rListPosition]);
+				currentAddress = (currentAddress + 4) | 0;
+			}
+		}
+		//Store the updated base address back into register:
+		operand2OP(parentObj, (parentObj.execute >> 16) & 0x7, currentAddress);
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+	}
+}
+ARMInstructionSet.prototype.STMDA = function (parentObj, operand2OP) {
+	//Only initialize the STMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push registers(s) into memory:
+		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push a register into memory:
+				parentObj.IOCore.memoryWrite32(currentAddress, parentObj.registers[rListPosition]);
+				currentAddress = (currentAddress - 4) | 0;
+			}
+		}
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+	}
+}
+ARMInstructionSet.prototype.STMDAW = function (parentObj) {
+	//Only initialize the STMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push registers(s) into memory:
+		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push a register into memory:
+				parentObj.IOCore.memoryWrite32(currentAddress, parentObj.registers[rListPosition]);
+				currentAddress = (currentAddress - 4) | 0;
+			}
+		}
+		//Store the updated base address back into register:
+		operand2OP(parentObj, (parentObj.execute >> 16) & 0x7, currentAddress);
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+	}
+}
+ARMInstructionSet.prototype.STMIB = function (parentObj, operand2OP) {
+	//Only initialize the STMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push registers(s) into memory:
+		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push a register into memory:
+				currentAddress = (currentAddress + 4) | 0;
+				parentObj.IOCore.memoryWrite32(currentAddress, parentObj.registers[rListPosition]);
+			}
+		}
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+	}
+}
+ARMInstructionSet.prototype.STMIBW = function (parentObj) {
+	//Only initialize the STMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push registers(s) into memory:
+		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push a register into memory:
+				currentAddress = (currentAddress + 4) | 0;
+				parentObj.IOCore.memoryWrite32(currentAddress, parentObj.registers[rListPosition]);
+			}
+		}
+		//Store the updated base address back into register:
+		operand2OP(parentObj, (parentObj.execute >> 16) & 0x7, (currentAddress + 4) | 0);
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+	}
+}
+ARMInstructionSet.prototype.STMDB = function (parentObj, operand2OP) {
+	//Only initialize the STMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push registers(s) into memory:
+		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push a register into memory:
+				currentAddress = (currentAddress - 4) | 0;
+				parentObj.IOCore.memoryWrite32(currentAddress, parentObj.registers[rListPosition]);
+			}
+		}
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+	}
+}
+ARMInstructionSet.prototype.STMDBW = function (parentObj) {
+	//Only initialize the STMIA sequence if the register list is non-empty:
+	if ((parentObj.execute & 0xFF) > 0) {
+		//Get the base address:
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		//Updating the address bus away from PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+		//Push registers(s) into memory:
+		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+			if ((parentObj.execute & (1 << rListPosition)) != 0) {
+				//Push a register into memory:
+				currentAddress = (currentAddress - 4) | 0;
+				parentObj.IOCore.memoryWrite32(currentAddress, parentObj.registers[rListPosition]);
+			}
+		}
+		//Store the updated base address back into register:
+		operand2OP(parentObj, (parentObj.execute >> 16) & 0x7, (currentAddress - 4) | 0);
+		//Updating the address bus back to PC fetch:
+		parentObj.wait.NonSequentialBroadcast();
+	}
 }
 ARMInstructionSet.prototype.lli = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
@@ -3382,69 +3548,69 @@ ARMInstructionSet.prototype.compileInstructionMap = function () {
 	this.generateStoreLoadInstructionSector2();
 	this.instructionMap = this.instructionMap.concat([
 		//80
-		this.generateLowMap(this.STMDA, this.NOP),
+		this.generateLowMap(this.STMDA, this.guardMultiRegisterWrite),
 		//81
-		this.generateLowMap(this.LDMDA, this.NOP),
+		this.generateLowMap(this.LDMDA, this.guardMultiRegisterWrite),
 		//82
-		this.generateLowMap(this.STMDA, this.w),
+		this.generateLowMap(this.STMDAW, this.guardMultiRegisterWrite),
 		//83
-		this.generateLowMap(this.LDMDA, this.w),
+		this.generateLowMap(this.LDMDAW, this.guardMultiRegisterWrite),
 		//84
-		this.generateLowMap(this.STMDA, this.u),
+		this.generateLowMap(this.STMDA, this.guardMultiRegisterWriteSpecial),
 		//85
-		this.generateLowMap(this.LDMDA, this.u),
+		this.generateLowMap(this.LDMDA, this.guardMultiRegisterWriteSpecial),
 		//86
-		this.generateLowMap(this.STMDA, this.u | this.w),
+		this.generateLowMap(this.STMDAW, this.guardMultiRegisterWriteSpecial),
 		//87
-		this.generateLowMap(this.LDMDA, this.u | this.w),
+		this.generateLowMap(this.LDMDAW, this.guardMultiRegisterWriteSpecial),
 		//88
-		this.generateLowMap(this.STMIA, this.NOP),
+		this.generateLowMap(this.STMIA, this.guardMultiRegisterWrite),
 		//89
-		this.generateLowMap(this.LDMIA, this.NOP),
+		this.generateLowMap(this.LDMIA, this.guardMultiRegisterWrite),
 		//8A
-		this.generateLowMap(this.STMIA, this.w),
+		this.generateLowMap(this.STMIAW, this.guardMultiRegisterWrite),
 		//8B
-		this.generateLowMap(this.LDMIA, this.w),
+		this.generateLowMap(this.LDMIAW, this.guardMultiRegisterWrite),
 		//8C
-		this.generateLowMap(this.STMIA, this.u),
+		this.generateLowMap(this.STMIA, this.guardMultiRegisterWriteSpecial),
 		//8D
-		this.generateLowMap(this.LDMIA, this.u),
+		this.generateLowMap(this.LDMIA, this.guardMultiRegisterWriteSpecial),
 		//8E
-		this.generateLowMap(this.STMIA, this.u | this.w),
+		this.generateLowMap(this.STMIAW, this.guardMultiRegisterWriteSpecial),
 		//8F
-		this.generateLowMap(this.LDMIA, this.u | this.w),
+		this.generateLowMap(this.LDMIAW, this.guardMultiRegisterWriteSpecial),
 		//90
-		this.generateLowMap(this.STMDB, this.NOP),
+		this.generateLowMap(this.STMDB, this.guardMultiRegisterWrite),
 		//91
-		this.generateLowMap(this.LDMDB, this.NOP),
+		this.generateLowMap(this.LDMDB, this.guardMultiRegisterWrite),
 		//92
-		this.generateLowMap(this.STMDB, this.w),
+		this.generateLowMap(this.STMDBW, this.guardMultiRegisterWrite),
 		//93
-		this.generateLowMap(this.LDMDB, this.w),
+		this.generateLowMap(this.LDMDBW, this.guardMultiRegisterWrite),
 		//94
-		this.generateLowMap(this.STMDB, this.u),
+		this.generateLowMap(this.STMDB, this.guardMultiRegisterWriteSpecial),
 		//95
-		this.generateLowMap(this.LDMDB, this.u),
+		this.generateLowMap(this.LDMDB, this.guardMultiRegisterWriteSpecial),
 		//96
-		this.generateLowMap(this.STMDB, this.u | this.w),
+		this.generateLowMap(this.STMDBW, this.guardMultiRegisterWriteSpecial),
 		//97
-		this.generateLowMap(this.LDMDB, this.u | this.w),
+		this.generateLowMap(this.LDMDBW, this.guardMultiRegisterWriteSpecial),
 		//98
-		this.generateLowMap(this.STMIB, this.NOP),
+		this.generateLowMap(this.STMIB, this.guardMultiRegisterWrite),
 		//99
-		this.generateLowMap(this.LDMIB, this.NOP),
+		this.generateLowMap(this.LDMIB, this.guardMultiRegisterWrite),
 		//9A
-		this.generateLowMap(this.STMIB, this.w),
+		this.generateLowMap(this.STMIBW, this.guardMultiRegisterWrite),
 		//9B
-		this.generateLowMap(this.LDMIB, this.w),
+		this.generateLowMap(this.LDMIBW, this.guardMultiRegisterWrite),
 		//9C
-		this.generateLowMap(this.STMIB, this.u),
+		this.generateLowMap(this.STMIB, this.guardMultiRegisterWriteSpecial),
 		//9D
-		this.generateLowMap(this.LDMIB, this.u),
+		this.generateLowMap(this.LDMIB, this.guardMultiRegisterWriteSpecial),
 		//9E
-		this.generateLowMap(this.STMIB, this.u | this.w),
+		this.generateLowMap(this.STMIBW, this.guardMultiRegisterWriteSpecial),
 		//9F
-		this.generateLowMap(this.LDMIB, this.u | this.w),
+		this.generateLowMap(this.LDMIBW, this.guardMultiRegisterWriteSpecial),
 		//A0
 		this.generateLowMap(this.B, this.NOP),
 		//A1
