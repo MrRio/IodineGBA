@@ -156,34 +156,61 @@ ARMInstructionSet.prototype.guardMultiRegisterWrite = function (parentObj, addre
 ARMInstructionSet.prototype.guardMultiRegisterRead = function (parentObj, address) {
 	return parentObj.registers[address];
 }
-ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data) {
+ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data, userMode) {
 	address &= 0xF;
-	switch (this.MODEBits) {
+	if (userMode) {
+		this.guardRegisterWrite(address, data);
+	}
+	else {
+		switch (this.MODEBits) {
+			case 0x10:
+			case 0x1F:
+				this.guardRegisterWrite(address, data);
+				break;
+			case 0x11:
+				if (address < 7 || address == 15) {
+					this.guardRegisterWrite(address, data);
+				}
+				else {
+					//User-Mode Register Write Inside Non-User-Mode:
+					this.CPUCore.registersUSR[address] = data;
+				}
+				break;
+			default:
+				if (address < 13 || address == 15) {
+					this.guardRegisterWrite(address, data);
+				}
+				else {
+					//User-Mode Register Write Inside Non-User-Mode:
+					this.CPUCore.registersUSR[address] = data;
+				}
+		}
+	}
+}
+ARMInstructionSet.prototype.guardMultiRegisterWriteSpecial = function (parentObj, address, data) {
+	switch (parentObj.MODEBits) {
 		case 0x10:
 		case 0x1F:
-			this.guardRegisterWrite(address, data);
+			parentObj.guardRegisterWriteCPSR(address, data);
 			break;
 		case 0x11:
 			if (address < 7 || address == 15) {
-				this.guardRegisterWrite(address, data);
+				parentObj.guardRegisterWriteCPSR(address, data);
 			}
 			else {
 				//User-Mode Register Write Inside Non-User-Mode:
-				this.CPUCore.registersUSR[address] = data;
+				parentObj.CPUCore.registersUSR[address] = data;
 			}
 			break;
 		default:
 			if (address < 13 || address == 15) {
-				this.guardRegisterWrite(address, data);
+				parentObj.guardRegisterWriteCPSR(address, data);
 			}
 			else {
 				//User-Mode Register Write Inside Non-User-Mode:
-				this.CPUCore.registersUSR[address] = data;
+				parentObj.CPUCore.registersUSR[address] = data;
 			}
 	}
-}
-ARMInstructionSet.prototype.guardMultiRegisterWriteSpecial = function (parentObj, address, data) {
-	parentObj.guardRegisterWriteSpecial(address, data);
 }
 ARMInstructionSet.prototype.guardMultiRegisterReadSpecial = function (parentObj, address) {
 	address &= 0xF;
