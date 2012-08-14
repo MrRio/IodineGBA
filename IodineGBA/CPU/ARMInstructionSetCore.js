@@ -140,6 +140,7 @@ ARMInstructionSet.prototype.conditionCodeTest = function () {
 		default:
 			return false;
 	}
+	return true;
 }
 ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
 	address &= 0xF;
