@@ -445,6 +445,8 @@ GameBoyAdvanceCPU.prototype.write8 = function (address, data) {
 	//Updating the address bus away from PC fetch:
 	this.IOCore.wait.NonSequentialBroadcast();
 	this.IOCore.memoryWrite8(address, data);
+	//Updating the address bus back to PC fetch:
+	this.IOCore.wait.NonSequentialBroadcast();
 }
 GameBoyAdvanceCPU.prototype.read32 = function (address) {
 	//Updating the address bus away from PC fetch:
