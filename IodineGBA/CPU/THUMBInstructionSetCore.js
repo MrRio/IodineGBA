@@ -841,12 +841,12 @@ THUMBInstructionSet.prototype.B = function (parentObj) {
 THUMBInstructionSet.prototype.BLsetup = function (parentObj) {
 	//Brank with Link (High offset)
 	//Update the link register to branch address:
-	parentObj.registers[14] = (parentObj.registers[15] + ((parentObj.execute & 0x7FF) << 12)) | 0;
+	parentObj.registers[14] = (parentObj.registers[15] + (((parentObj.execute & 0x7FF) << 21) >> 9)) | 0;
 }
 THUMBInstructionSet.prototype.BLoff = function (parentObj) {
-	//Brank with Link (High offset)
+	//Brank with Link (Low offset)
 	//Update the link register to branch address:
-	parentObj.registers[14] = (parentObj.registers[15] + ((parentObj.execute & 0x7FF) << 1)) | 0;
+	parentObj.registers[14] = (parentObj.registers[14] + ((parentObj.execute & 0x7FF) << 1)) | 0;
 	//Copy LR to PC:
 	parentObj.registers[15] = parentObj.registers[14];
 	//Flush Pipeline & Block PC Increment:
