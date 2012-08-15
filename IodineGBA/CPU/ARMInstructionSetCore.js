@@ -67,80 +67,37 @@ ARMInstructionSet.prototype.conditionCodeTest = function () {
 						//Put this case first, since it's the most common!
 			return true;
 		case 0x0:		//EQ (equal)
-			if (!this.CPUCore.CPSRZero) {
-				return false;
-			}
-			break;
+			return this.CPUCore.CPSRZero;
 		case 0x1:		//NE (not equal)
-			if (this.CPUCore.CPSRZero) {
-				return false;
-			}
-			break;
+			return !this.CPUCore.CPSRZero;
 		case 0x2:		//CS (unsigned higher or same)
-			if (!this.CPUCore.CPSRCarry) {
-				return false;
-			}
-			break;
+			return this.CPUCore.CPSRCarry;
 		case 0x3:		//CC (unsigned lower)
-			if (this.CPUCore.CPSRCarry) {
-				return false;
-			}
-			break;
+			return !this.CPUCore.CPSRCarry;
 		case 0x4:		//MI (negative)
-			if (!this.CPUCore.CPSRNegative) {
-				return false;
-			}
-			break;
+			return this.CPUCore.CPSRNegative;
 		case 0x5:		//PL (positive or zero)
-			if (this.CPUCore.CPSRNegative) {
-				return false;
-			}
-			break;
+			return !this.CPUCore.CPSRNegative;
 		case 0x6:		//VS (overflow)
-			if (!this.CPUCore.CPSROverflow) {
-				return false;
-			}
-			break;
+			return this.CPUCore.CPSROverflow;
 		case 0x7:		//VC (no overflow)
-			if (this.CPUCore.CPSROverflow) {
-				return false;
-			}
-			break;
+			return !this.CPUCore.CPSROverflow;
 		case 0x8:		//HI (unsigned higher)
-			if (!this.CPUCore.CPSRCarry || this.CPUCore.CPSRZero) {
-				return false;
-			}
-			break;
+			return this.CPUCore.CPSRCarry && !this.CPUCore.CPSRZero;
 		case 0x9:		//LS (unsigned lower or same)
-			if (this.CPUCore.CPSRCarry && !this.CPUCore.CPSRZero) {
-				return false;
-			}
-			break;
+			return !this.CPUCore.CPSRCarry || this.CPUCore.CPSRZero;
 		case 0xA:		//GE (greater or equal)
-			if (this.CPUCore.CPSRNegative != this.CPUCore.CPSROverflow) {
-				return false;
-			}
-			break;
+			return this.CPUCore.CPSRNegative == this.CPUCore.CPSROverflow;
 		case 0xB:		//LT (less than)
-			if (this.CPUCore.CPSRNegative == this.CPUCore.CPSROverflow) {
-				return false;
-			}
-			break;
+			return this.CPUCore.CPSRNegative != this.CPUCore.CPSROverflow;
 		case 0xC:		//GT (greater than)
-			if (this.CPUCore.CPSRZero || this.CPUCore.CPSRNegative != this.CPUCore.CPSROverflow) {
-				return false;
-			}
-			break;
+			return !this.CPUCore.CPSRZero && this.CPUCore.CPSRNegative == this.CPUCore.CPSROverflow;
 		case 0xD:		//LE (less than or equal)
-			if (!this.CPUCore.CPSRZero && this.CPUCore.CPSRNegative == this.CPUCore.CPSROverflow) {
-				return false;
-			}
-			break;
+			return this.CPUCore.CPSRZero || this.CPUCore.CPSRNegative != this.CPUCore.CPSROverflow;
 		//case 0xF:		//Reserved (Never Execute)
 		default:
 			return false;
 	}
-	return true;
 }
 ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
 	address &= 0xF;
