@@ -626,7 +626,12 @@ THUMBInstructionSet.prototype.ADDSP = function (parentObj) {
 }
 THUMBInstructionSet.prototype.ADDSPimm7 = function (parentObj) {
 	//Add Signed Offset Into SP
-	parentObj.registers[13] = ((((parentObj.execute & 0xFF) << 24) >> 22) + parentObj.registers[13]) | 0;
+	if ((parentObj.execute & 0x80) != 0) {
+		parentObj.registers[13] = (parentObj.registers[13] - ((parentObj.execute & 0x7F) << 2)) | 0;
+	}
+	else {
+		parentObj.registers[13] = (parentObj.registers[13] + ((parentObj.execute & 0x7F) << 2)) | 0;
+	}
 }
 THUMBInstructionSet.prototype.PUSH = function (parentObj) {
 	//Only initialize the PUSH sequence if the register list is non-empty:
