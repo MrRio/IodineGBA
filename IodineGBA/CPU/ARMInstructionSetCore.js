@@ -44,7 +44,8 @@ ARMInstructionSet.prototype.executeIteration = function () {
 	this.fetch = this.wait.CPUGetOpcode32(this.registers[15]);
 	//Execute Conditional Instruction:
 	debug_pc(this.registers[15]);
-	debug_sp(this.registers[14]);
+	debug_lr(this.registers[14]);
+	debug_sp(this.registers[13]);
 	this.executeARM(this.instructionMap[(this.execute >> 20) & 0xFF][(this.execute >> 4) & 0xF]);
 	//Increment The Program Counter:
 	this.registers[15] = (this.registers[15] + 4) | 0;
@@ -1324,7 +1325,7 @@ ARMInstructionSet.prototype.rcs = function (parentObj, operand) {
 			parentObj.CPUCore.InTHUMB = ((operand & 0x20) != 0);
 			parentObj.CPUCore.switchRegisterBank(operand & 0x1F);
 			parentObj.CPUCore.MODEBits = operand & 0x1F;
-			debug_exception(parentObj.CPUCore.MODEBits);
+			debug_mode(parentObj.CPUCore.MODEBits);
 	}
 }
 ARMInstructionSet.prototype.rs = function (parentObj) {
@@ -1405,7 +1406,7 @@ ARMInstructionSet.prototype.ic = function (parentObj, operand) {
 			parentObj.CPUCore.InTHUMB = ((operand & 0x20) != 0);
 			parentObj.CPUCore.switchRegisterBank(operand & 0x1F);
 			parentObj.CPUCore.MODEBits = operand & 0x1F;
-			debug_exception(parentObj.CPUCore.MODEBits);
+			debug_mode(parentObj.CPUCore.MODEBits);
 	}
 }
 ARMInstructionSet.prototype.is = function (parentObj, operand) {

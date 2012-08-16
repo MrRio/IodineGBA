@@ -34,6 +34,11 @@ div.branch {
 	font-size: 18px;
 	color: red;
 }
+div.mode {
+	background-color: rgb(90, 50, 50);
+	font-size: 18px;
+	color: blue;
+}
 div.exception {
 	background-color: rgb(50, 50, 90);
 	font-size: 18px;

@@ -118,6 +118,10 @@ function registerGUIEvents() {
 	addEvent("click", document.getElementById("record_pc"), function () {
 		debugging_pc = this.checked;
 	});
+	document.getElementById("record_lr").checked = true;
+	addEvent("click", document.getElementById("record_lr"), function () {
+		debugging_lr = this.checked;
+	});
 	document.getElementById("record_sp").checked = true;
 	addEvent("click", document.getElementById("record_sp"), function () {
 		debugging_sp = this.checked;
@@ -125,6 +129,10 @@ function registerGUIEvents() {
 	document.getElementById("record_exception").checked = true;
 	addEvent("click", document.getElementById("record_exception"), function () {
 		debugging_exception = this.checked;
+	});
+	document.getElementById("record_mode").checked = true;
+	addEvent("click", document.getElementById("record_mode"), function () {
+		debugging_mode = this.checked;
 	});
 	addEvent("click", document.getElementById("record_first"), function (event) {
 		update_log_start();

@@ -68,7 +68,8 @@ THUMBInstructionSet.prototype.executeIteration = function () {
 	this.fetch = this.wait.CPUGetOpcode16(this.registers[15]);
 	//Execute Instruction:
 	debug_pc(this.registers[15]);
-	debug_sp(this.registers[14]);
+	debug_lr(this.registers[14]);
+	debug_sp(this.registers[13]);
 	this.executeTHUMB();
 	//Increment The Program Counter:
 	this.registers[15] = (this.registers[15] + 2) | 0;

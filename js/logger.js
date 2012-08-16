@@ -7,8 +7,10 @@ var debugging_memoryWrite = true;
 var debugging_pipeline = true;
 var debugging_branch = true;
 var debugging_pc = true;
+var debugging_lr = true;
 var debugging_sp = true;
 var debugging_exception = true;
+var debugging_mode = true;
 function update_log_start() {
 	var length = Math.min(logged.length, display_amount);
 	var log_handle = document.getElementById("debug_log");
@@ -75,6 +77,11 @@ function debug_pc(data) {
 		current_unit[1].push(["register", "PC= " + data.toString(16)]);
 	}
 }
+function debug_lr(data) {
+	if (debugging_enabled && debugging_lr) {
+		current_unit[1].push(["register", "LR= " + data.toString(16)]);
+	}
+}
 function debug_sp(data) {
 	if (debugging_enabled && debugging_sp) {
 		current_unit[1].push(["register", "SP= " + data.toString(16)]);
@@ -93,6 +100,11 @@ function debug_register(register, data) {
 function debug_exception(newMode) {
 	if (debugging_enabled && debugging_exception) {
 		current_unit[1].push(["exception", "Exception into mode " + newMode.toString(16)]);
+	}
+}
+function debug_mode(newMode) {
+	if (debugging_enabled && debugging_mode) {
+		current_unit[1].push(["mode", "Entering mode " + newMode.toString(16)]);
 	}
 }
 function debug_end_unit() {
