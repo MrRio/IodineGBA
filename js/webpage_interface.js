@@ -152,11 +152,11 @@ function attachROM(ROM) {
 }
 function lowerVolume() {
 	emuVolume = Math.max(emuVolume - 0.04, 0);
-	gameboy.changeVolume(emuVolume);
+	Iodine.changeVolume(emuVolume);
 }
 function raiseVolume() {
 	emuVolume = Math.min(emuVolume + 0.04, 1);
-	gameboy.changeVolume(emuVolume);
+	Iodine.changeVolume(emuVolume);
 }
 function keyDown(event) {
 	var keyCode = event.keyCode;
