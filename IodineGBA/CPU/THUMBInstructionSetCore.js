@@ -42,6 +42,7 @@ THUMBInstructionSet.prototype.guardHighRegisterWrite = function (data) {
 	if (address == 15) {
 		//We performed a branch:
 		this.resetPipeline();
+		debug_pipeline();
 	}
 }
 THUMBInstructionSet.prototype.writePC = function (data) {
@@ -63,8 +64,11 @@ THUMBInstructionSet.prototype.getIRQLR = function () {
 }
 THUMBInstructionSet.prototype.executeIteration = function () {
 	//Push the new fetch access:
+	debug_start_unit("THUMB");
 	this.fetch = this.wait.CPUGetOpcode16(this.registers[15]);
 	//Execute Instruction:
+	debug_pc(this.registers[15]);
+	debug_sp(this.registers[14]);
 	this.executeTHUMB();
 	//Increment The Program Counter:
 	this.registers[15] = (this.registers[15] + 2) | 0;
@@ -80,6 +84,7 @@ THUMBInstructionSet.prototype.executeTHUMB = function () {
 	else {
 		//Tick the pipeline invalidation:
 		this.pipelineInvalid >>= 1;
+		debug_pipeline();
 	}
 }
 THUMBInstructionSet.prototype.LSLimm = function (parentObj) {

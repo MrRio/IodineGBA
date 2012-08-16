@@ -42,40 +42,66 @@
 		<script src="IodineGBA/graphics/GameBoyAdvanceOBJWindowRendererCore.js"></script>
 		<script src="IodineGBA/graphics/GameBoyAdvanceWindow0RendererCore.js"></script>
 		<script src="IodineGBA/graphics/GameBoyAdvanceWindow1RendererCore.js"></script>
-		<script src="js/BIOS.js"></script>
+		<script src="js/logger.js"></script>
 		<script src="js/webpage_interface.js"></script>
-		<style>
-			html, body {
-				margin: 0;
-				padding: 0;
-			}
-			canvas {
-				position: absolute;
-				width: 100%;
-				height: 100%;
-				top: 0;
-				left: 0;
-				margin: 0;
-				padding: 0;
-			}
-			input {
-				position: absolute;
-				top: 45%;
-				left: 45%;
-			}
-			div#debug_log {
-				position: absolute;
-				left: 0;
-				top: 0;
-				bottom: 0;
-				width: 100%;
-				overflow: scroll;
-				opacity: 0.8;
-			}
-		</style>
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/log.css">
 	</head>
 	<body>
-		<canvas id="emulator_target" width="240px" height="160px"></canvas>
-		<input type="file" id="local_file_open">
+		<div id="control_panel">
+			<div id="load_panel">
+				<form>
+					<fieldset>
+						<legend>Load ROM:</legend>
+						<label>BIOS: </label><input type="file" id="bios_load">
+						<label>Game:</label><input type="file" id="rom_load">
+					</fieldset>
+				</form>
+			</div>
+			<div id="play_controls">
+				<form>
+					<fieldset>
+						<legend>Controls: </legend>
+						<button id="play">Play</button>
+						<button id="pause">Pause</button>
+						<button id="restart">Restart</button>
+						<label>Sound: </label><input type="checkbox" id="sound">
+					</fieldset>
+				</form>
+			</div>
+			<div id="debugger">
+				<form>
+					<fieldset>
+						<legend>Debugging: </legend>
+						<label>Enable: </label><input type="checkbox" checked="checked" id="record_enable">
+						<label>Record Memory Reads: </label><input type="checkbox" checked="checked" id="record_memoryRead">
+						<label>Record Memory Writes: </label><input type="checkbox" checked="checked" id="record_memoryWrite">
+						<label>Record Branches: </label><input type="checkbox" checked="checked" id="record_branch">
+						<label>Record Pipeline Flushes: </label><input type="checkbox" checked="checked" id="record_pipeline">
+						<label>Record Exceptions: </label><input type="checkbox" checked="checked" id="record_exception">
+						<label>Record Mode Switches: </label><input type="checkbox" checked="checked" id="record_mode">
+						<label>Record PC: </label><input type="checkbox" checked="checked" id="record_pc">
+						<label>Record SP: </label><input type="checkbox" checked="checked" id="record_sp">
+						<select id="display_amount">
+							<option value="100">100</option>
+							<option value="150">150</option>
+							<option value="200">200</option>
+							<option value="500">500</option>
+							<option value="1000">1000</option>
+							<option value="1500">1500</option>
+							<option value="2000">2000</option>
+							<option value="5000">5000</option>
+						</select>
+						<button id="record_first">Show Log From Start</button>
+						<button id="record_end">Show Log From End</button>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+		<div id="main">
+			<canvas id="emulator_target" width="240px" height="160px"></canvas>
+			<div id="debug_log">
+			</div>
+		</div>
 	</body>
 </html>

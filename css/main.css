@@ -1,0 +1,44 @@
+html, body {
+	margin: 0;
+	padding: 0;
+}
+label {
+	float: left;
+	clear: left;
+}
+input {
+	float: right;
+	clear: right;
+}
+#pause {
+	display: none;
+}
+button, select {
+	float: left;
+	clear: both;
+}
+div#control_panel {
+	position: absolute;
+	left: 0px;
+	width: 30%;
+	bottom: 0px;
+	top: 0px;
+	background-color: rgb(220, 220, 220);
+	padding: 5px 3px;
+}
+div#main {
+	top: 0px;
+	bottom: 0px;
+	position: absolute;
+	width: 70%;
+	right: 0px;
+	background-color: rgb(200, 200, 200);
+}
+div#main canvas {
+	position: absolute;
+	top: 10px;
+	left: 25%;
+	width: 480px;
+	height: 320px;
+	background-color: black;
+}

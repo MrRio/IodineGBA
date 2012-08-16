@@ -75,6 +75,7 @@ GameBoyAdvanceCPU.prototype.executeIteration = function () {
 	}
 	//Tick the pipeline of the selected instruction set:
 	this.instructionHandle.executeIteration();
+	debug_end_unit();
 }
 GameBoyAdvanceCPU.prototype.triggerIRQ = function () {
 	this.triggeredIRQ = !this.IRQDisabled;
@@ -110,6 +111,7 @@ GameBoyAdvanceCPU.prototype.FIQ = function (LR) {
 		this.IRQDisabled = true;
 		//Disable FIQ:
 		this.FIQDisabled = true;
+		debug_exception(this.MODEBits);
 	}
 }
 GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
@@ -128,6 +130,7 @@ GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
 		this.MODEBits = 0x12;
 		//Disable IRQ:
 		this.IRQDisabled = true;
+		debug_exception(this.MODEBits);
 	}
 }
 GameBoyAdvanceCPU.prototype.SWI = function (LR) {
@@ -145,6 +148,7 @@ GameBoyAdvanceCPU.prototype.SWI = function (LR) {
 	this.MODEBits = 0x13;
 	//Disable IRQ:
 	this.IRQDisabled = true;
+	debug_exception(this.MODEBits);
 }
 GameBoyAdvanceCPU.prototype.UNDEFINED = function (LR) {
 	//Exception always enter ARM mode:
@@ -161,6 +165,7 @@ GameBoyAdvanceCPU.prototype.UNDEFINED = function (LR) {
 	this.MODEBits = 0x1B;
 	//Disable IRQ:
 	this.IRQDisabled = true;
+	debug_exception(this.MODEBits);
 }
 GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	//Used for leaving an exception and returning to the previous state:
@@ -191,6 +196,7 @@ GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	this.FIQDisabled = spsr[5];
 	this.InTHUMB = spsr[6];
 	this.MODEBits = spsr[7];
+	debug_exception(this.MODEBits);
 }
 GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function () {
 	//Used for leaving an exception and returning to the previous state:
@@ -433,6 +439,7 @@ GameBoyAdvanceCPU.prototype.write32 = function (address, data) {
 	this.IOCore.memoryWrite32(address, data);
 	//Updating the address bus back to PC fetch:
 	this.IOCore.wait.NonSequentialBroadcast();
+	debug_memoryWrite(address, data, 32);
 }
 GameBoyAdvanceCPU.prototype.write16 = function (address, data) {
 	//Updating the address bus away from PC fetch:
@@ -440,6 +447,7 @@ GameBoyAdvanceCPU.prototype.write16 = function (address, data) {
 	this.IOCore.memoryWrite16(address, data);
 	//Updating the address bus back to PC fetch:
 	this.IOCore.wait.NonSequentialBroadcast();
+	debug_memoryWrite(address, data, 16);
 }
 GameBoyAdvanceCPU.prototype.write8 = function (address, data) {
 	//Updating the address bus away from PC fetch:
@@ -447,6 +455,7 @@ GameBoyAdvanceCPU.prototype.write8 = function (address, data) {
 	this.IOCore.memoryWrite8(address, data);
 	//Updating the address bus back to PC fetch:
 	this.IOCore.wait.NonSequentialBroadcast();
+	debug_memoryWrite(address, data, 8);
 }
 GameBoyAdvanceCPU.prototype.read32 = function (address) {
 	//Updating the address bus away from PC fetch:
@@ -454,6 +463,7 @@ GameBoyAdvanceCPU.prototype.read32 = function (address) {
 	var data = this.IOCore.memoryRead32(address);
 	//Updating the address bus back to PC fetch:
 	this.IOCore.wait.NonSequentialBroadcast();
+	debug_memoryRead(address, data, 32);
 	return data;
 }
 GameBoyAdvanceCPU.prototype.read16 = function (address) {
@@ -462,6 +472,7 @@ GameBoyAdvanceCPU.prototype.read16 = function (address) {
 	var data = this.IOCore.memoryRead16(address);
 	//Updating the address bus back to PC fetch:
 	this.IOCore.wait.NonSequentialBroadcast();
+	debug_memoryRead(address, data, 16);
 	return data;
 }
 GameBoyAdvanceCPU.prototype.read8 = function (address) {
@@ -470,5 +481,6 @@ GameBoyAdvanceCPU.prototype.read8 = function (address) {
 	var data = this.IOCore.memoryRead8(address);
 	//Updating the address bus back to PC fetch:
 	this.IOCore.wait.NonSequentialBroadcast();
+	debug_memoryRead(address, data, 8);
 	return data;
 }

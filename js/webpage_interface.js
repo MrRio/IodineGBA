@@ -14,14 +14,9 @@ var Iodine = null;
 window.onload = function () {
 	//Initialize Iodine:
 	Iodine = new GameBoyAdvanceEmulator();
+	Iodine.attachCanvas(document.getElementById("emulator_target"));
 	//Hook the GUI controls.
 	registerGUIEvents();
-}
-function load_bios() {
-	attachBIOS(window.atob(BIOSROM));
-	Iodine.enableAudio();
-	Iodine.attachCanvas(document.getElementById("emulator_target"));
-	Iodine.play();
 }
 function registerGUIEvents() {
 	addEvent("keydown", document, keyDown);
@@ -46,30 +41,105 @@ function registerGUIEvents() {
 				keyUp(event);
 		}
 	});
-	addEvent("change", document.getElementById("local_file_open"), function () {
+	addEvent("change", document.getElementById("rom_load"), function () {
 		if (typeof this.files != "undefined") {
 			if (this.files.length >= 1) {
 				//Gecko 1.9.2+ (Standard Method)
 				var binaryHandle = new FileReader();
 				binaryHandle.onloadend = function () {
 					attachROM(this.result);
-					document.getElementById("local_file_open").style.display = "none";
 				}
 				binaryHandle.readAsArrayBuffer(this.files[this.files.length - 1]);
 			}
 		}
 	});
+	addEvent("change", document.getElementById("bios_load"), function () {
+		if (typeof this.files != "undefined") {
+			if (this.files.length >= 1) {
+				//Gecko 1.9.2+ (Standard Method)
+				var binaryHandle = new FileReader();
+				binaryHandle.onloadend = function () {
+					attachBIOS(this.result);
+				}
+				binaryHandle.readAsArrayBuffer(this.files[this.files.length - 1]);
+			}
+		}
+	});
+	addEvent("click", document.getElementById("play"), function (event) {
+		Iodine.play();
+		this.style.display = "none";
+		document.getElementById("pause").style.display = "inline";
+		event.preventDefault();
+	});
+	addEvent("click", document.getElementById("pause"), function (event) {
+		Iodine.pause();
+		this.style.display = "none";
+		document.getElementById("play").style.display = "inline";
+		event.preventDefault();
+	});
+	addEvent("click", document.getElementById("restart"), function (event) {
+		Iodine.restart();
+		event.preventDefault();
+	});
+	document.getElementById("sound").checked = false;
+	addEvent("click", document.getElementById("sound"), function () {
+		if (this.checked) {
+			Iodine.enableAudio();
+		}
+		else {
+			Iodine.disableAudio();
+		}
+	});
+	document.getElementById("display_amount").value = "1000";
+	addEvent("change", document.getElementById("display_amount"), function () {
+		display_amount = this.value;
+	});
+	document.getElementById("record_enable").checked = true;
+	addEvent("click", document.getElementById("record_enable"), function () {
+		debugging_enabled = this.checked;
+	});
+	document.getElementById("record_memoryRead").checked = true;
+	addEvent("click", document.getElementById("record_memoryRead"), function () {
+		debugging_memoryRead = this.checked;
+	});
+	document.getElementById("record_memoryWrite").checked = true;
+	addEvent("click", document.getElementById("record_memoryWrite"), function () {
+		debugging_memoryWrite = this.checked;
+	});
+	document.getElementById("record_pipeline").checked = true;
+	addEvent("click", document.getElementById("record_pipeline"), function () {
+		debugging_pipeline = this.checked;
+	});
+	document.getElementById("record_branch").checked = true;
+	addEvent("click", document.getElementById("record_branch"), function () {
+		debugging_branch = this.checked;
+	});
+	document.getElementById("record_pc").checked = true;
+	addEvent("click", document.getElementById("record_pc"), function () {
+		debugging_pc = this.checked;
+	});
+	document.getElementById("record_sp").checked = true;
+	addEvent("click", document.getElementById("record_sp"), function () {
+		debugging_sp = this.checked;
+	});
+	document.getElementById("record_exception").checked = true;
+	addEvent("click", document.getElementById("record_exception"), function () {
+		debugging_exception = this.checked;
+	});
+	addEvent("click", document.getElementById("record_first"), function (event) {
+		update_log_start();
+		event.preventDefault();
+	});
+	addEvent("click", document.getElementById("record_end"), function (event) {
+		update_log_end();
+		event.preventDefault();
+	});
 }
 function attachBIOS(BIOS) {
-	var ROMArray = getUint8Array(BIOS.length);
-	for (var index = 0; index < BIOS.length; ++index) {
-		ROMArray[index] = BIOS.charCodeAt(index);
-	}
-	Iodine.attachBIOS(ROMArray);
+	Iodine.attachBIOS(new Uint8Array(BIOS));
 }
 function attachROM(ROM) {
 	Iodine.attachROM(new Uint8Array(ROM));
-	load_bios();
 }
 function lowerVolume() {
 	emuVolume = Math.max(emuVolume - 0.04, 0);
