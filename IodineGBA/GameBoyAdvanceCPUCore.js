@@ -103,7 +103,7 @@ GameBoyAdvanceCPU.prototype.FIQ = function (LR) {
 		//FIQ exception vector:
 		this.registers[15] = 0x1C;
 		//Protect the CPSR:
-		this.CPSRtoSPSR(0x11);
+		this.CPSRtoSPSR();
 		//Mode bits are set to FIQ:
 		this.MODEBits = 0x11;
 		//Disable IRQ:
@@ -123,7 +123,7 @@ GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
 		//IRQ exception vector:
 		this.registers[15] = 0x18;
 		//Protect the CPSR:
-		this.CPSRtoSPSR(0x12);
+		this.CPSRtoSPSR();
 		//Mode bits are set to IRQ:
 		this.MODEBits = 0x12;
 		//Disable IRQ:
@@ -141,7 +141,7 @@ GameBoyAdvanceCPU.prototype.SWI = function (LR) {
 	this.registers[15] = 0x8;
 	//Mode bits are set to SVC:
 	//Protect the CPSR:
-	this.CPSRtoSPSR(0x13);
+	this.CPSRtoSPSR();
 	this.MODEBits = 0x13;
 	//Disable IRQ:
 	this.IRQDisabled = true;
@@ -156,7 +156,7 @@ GameBoyAdvanceCPU.prototype.UNDEFINED = function (LR) {
 	//Undefined exception vector:
 	this.registers[15] = 0x4;
 	//Protect the CPSR:
-	this.CPSRtoSPSR(0x1B);
+	this.CPSRtoSPSR();
 	//Mode bits are set to UNDEFINED:
 	this.MODEBits = 0x1B;
 	//Disable IRQ:
@@ -192,9 +192,9 @@ GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	this.InTHUMB = spsr[6];
 	this.MODEBits = spsr[7];
 }
-GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function (newMode) {
+GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function () {
 	//Used for leaving an exception and returning to the previous state:
-	switch (newMode) {
+	switch (this.MODEBits) {
 		case 0x10:	//User
 		case 0x1F:	//System
 			return;

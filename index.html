@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>IodineGBA</title>
+		<meta charset="UTF-8"> 
+		<script src="TypedArrayShim.js"></script>
+		<script src="XAudioJS/swfobject.js"></script>
+		<script src="XAudioJS/resampler.js"></script>
+		<script src="XAudioJS/XAudioServer.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceCartridgeCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceDMACore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceEmulatorCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceGraphicsCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceIOCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceIRQCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceJoyPadCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceSerialCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceSoundCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceTimerCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceWaitCore.js"></script>
+		<script src="IodineGBA/GameBoyAdvanceCPUCore.js"></script>
+		<script src="IodineGBA/cartridge/GameBoyAdvanceFLASHCore.js"></script>
+		<script src="IodineGBA/cartridge/GameBoyAdvanceSRAMCore.js"></script>
+		<script src="IodineGBA/CPU/ARMInstructionSetCore.js"></script>
+		<script src="IodineGBA/CPU/THUMBInstructionSetCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceBG0TEXTRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceBG1TEXTRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceBG2FrameBufferRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceBG2MatrixRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceBG2TEXTRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceBG3MatrixRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceBG3TEXTRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceColorEffectsRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceMode0RendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceMode1RendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceMode2RendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceMode3RendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceMode4RendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceMode5RendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceMosaicRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceOBJRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceOBJWindowRendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceWindow0RendererCore.js"></script>
+		<script src="IodineGBA/graphics/GameBoyAdvanceWindow1RendererCore.js"></script>
+		<script src="js/BIOS.js"></script>
+		<script src="js/webpage_interface.js"></script>
+		<style>
+			html, body {
+				margin: 0;
+				padding: 0;
+			}
+			canvas {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				margin: 0;
+				padding: 0;
+			}
+			input {
+				position: absolute;
+				top: 45%;
+				left: 45%;
+			}
+			div#debug_log {
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				width: 100%;
+				overflow: scroll;
+				opacity: 0.8;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="emulator_target" width="240px" height="160px"></canvas>
+		<input type="file" id="local_file_open">
+	</body>
+</html>
