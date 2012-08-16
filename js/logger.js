@@ -58,55 +58,55 @@ function debug_start_unit(unitName) {
 	current_unit = [unitName, []];
 }
 function debug_memoryRead(address, data, type) {
-	if (debugging_enabled && debugging_memoryRead) {
+	if (debugging_memoryRead) {
 		current_unit[1].push(["memoryRead", "read data " + data.toString(16) + " (" + type + ")@" + address.toString(16)]);
 	}
 }
 function debug_memoryWrite(address, data, type) {
-	if (debugging_enabled && debugging_memoryWrite) {
+	if (debugging_memoryWrite) {
 		current_unit[1].push(["memoryWrite", "wrote data " + data.toString(16) + " (" + type + ")@" + address.toString(16)]);
 	}
 }
 function debug_branch(address) {
-	if (debugging_enabled && debugging_branch) {
+	if (debugging_branch) {
 		current_unit[1].push(["branch", "branch to " + address.toString(16)]);
 	}
 }
 function debug_pc(data) {
-	if (debugging_enabled && debugging_pc) {
+	if (debugging_pc) {
 		current_unit[1].push(["register", "PC= " + data.toString(16)]);
 	}
 }
 function debug_lr(data) {
-	if (debugging_enabled && debugging_lr) {
+	if (debugging_lr) {
 		current_unit[1].push(["register", "LR= " + data.toString(16)]);
 	}
 }
 function debug_sp(data) {
-	if (debugging_enabled && debugging_sp) {
+	if (debugging_sp) {
 		current_unit[1].push(["register", "SP= " + data.toString(16)]);
 	}
 }
 function debug_pipeline() {
-	if (debugging_enabled && debugging_pipeline) {
+	if (debugging_pipeline) {
 		current_unit[1].push(["pipeline", "Pipeline Flush"]);
 	}
 }
 function debug_register(register, data) {
-	if (debugging_enabled) {
-		current_unit[1].push(["register", "r[" + register.toString(16) + "]= " + data.toString(16)]);
-	}
+	current_unit[1].push(["register", "r[" + register.toString(16) + "]= " + data.toString(16)]);
 }
 function debug_exception(newMode) {
-	if (debugging_enabled && debugging_exception) {
+	if (debugging_exception) {
 		current_unit[1].push(["exception", "Exception into mode " + newMode.toString(16)]);
 	}
 }
 function debug_mode(newMode) {
-	if (debugging_enabled && debugging_mode) {
+	if (debugging_mode) {
 		current_unit[1].push(["mode", "Entering mode " + newMode.toString(16)]);
 	}
 }
 function debug_end_unit() {
-	logged.push(current_unit);
+	if (debugging_enabled) {
+		logged.push(current_unit);
+	}
 }
