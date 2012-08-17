@@ -645,7 +645,7 @@ THUMBInstructionSet.prototype.PUSH = function (parentObj) {
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Push register(s) onto the stack:
-		for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
+		for (var rListPosition = 7; rListPosition > -1; --rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Push register onto the stack:
 				parentObj.registers[13] = (parentObj.registers[13] - 4) | 0;
@@ -660,7 +660,7 @@ THUMBInstructionSet.prototype.PUSHlr = function (parentObj) {
 	//Updating the address bus away from PC fetch:
 	parentObj.wait.NonSequentialBroadcast();
 	//Push register(s) onto the stack:
-	for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
+	for (var rListPosition = 7; rListPosition > -1; --rListPosition) {
 		if ((parentObj.execute & (1 << rListPosition)) != 0) {
 			//Push register onto the stack:
 			parentObj.registers[13] = (parentObj.registers[13] - 4) | 0;
