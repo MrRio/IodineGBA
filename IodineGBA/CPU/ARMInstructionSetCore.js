@@ -63,6 +63,7 @@ ARMInstructionSet.prototype.executeARM = function (instruction) {
 	else {
 		//Tick the pipeline invalidation:
 		this.pipelineInvalid >>= 1;
+		debug_opcode("PIPELINE STALL");
 		debug_pipeline();
 	}
 }
@@ -222,6 +223,7 @@ ARMInstructionSet.prototype.getDelayedRegisterRead = function (registerSelected)
 }
 ARMInstructionSet.prototype.BX = function (parentObj) {
 	//Branch & eXchange:
+	debug_opcode("BX");
 	var address = parentObj.registers[parentObj.execute & 0xF];
 	if ((address & 0x1) == 0) {
 		//Stay in ARM mode:
@@ -238,16 +240,19 @@ ARMInstructionSet.prototype.BX = function (parentObj) {
 }
 ARMInstructionSet.prototype.B = function (parentObj) {
 	//Branch:
+	debug_opcode("B");
 	parentObj.registers[15] = (parentObj.registers[15] + ((parentObj.execute << 8) >> 6)) | 0;
 	parentObj.resetPipeline();
 }
 ARMInstructionSet.prototype.BL = function (parentObj) {
 	//Branch with Link:
+	debug_opcode("BL");
 	parentObj.registers[14] = (parentObj.registers[15] - 4) & -4;
 	parentObj.registers[15] = (parentObj.registers[15] + ((parentObj.execute << 8) >> 6)) | 0;
 	parentObj.resetPipeline();
 }
 ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
+	debug_opcode("AND");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise AND:
@@ -255,6 +260,7 @@ ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 & operand2);
 }
 ARMInstructionSet.prototype.ANDS = function (parentObj, operand2OP) {
+	debug_opcode("ANDS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise AND:
@@ -265,6 +271,7 @@ ARMInstructionSet.prototype.ANDS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.EOR = function (parentObj, operand2OP) {
+	debug_opcode("EOR");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise EOR:
@@ -272,6 +279,7 @@ ARMInstructionSet.prototype.EOR = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 ^ operand2);
 }
 ARMInstructionSet.prototype.EORS = function (parentObj, operand2OP) {
+	debug_opcode("EORS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise EOR:
@@ -282,6 +290,7 @@ ARMInstructionSet.prototype.EORS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.SUB = function (parentObj, operand2OP) {
+	debug_opcode("SUB");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
@@ -289,6 +298,7 @@ ARMInstructionSet.prototype.SUB = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2) | 0);
 }
 ARMInstructionSet.prototype.SUBS = function (parentObj, operand2OP) {
+	debug_opcode("SUBS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
@@ -302,13 +312,15 @@ ARMInstructionSet.prototype.SUBS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.RSB = function (parentObj, operand2OP) {
+	debug_opcode("RSB");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
 	//Update destination register:
-	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2) | 0);
+	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand2 - operand1) | 0);
 }
 ARMInstructionSet.prototype.RSBS = function (parentObj, operand2OP) {
+	debug_opcode("RSBS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
@@ -322,6 +334,7 @@ ARMInstructionSet.prototype.RSBS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.ADD = function (parentObj, operand2OP) {
+	debug_opcode("ADD");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition:
@@ -329,6 +342,7 @@ ARMInstructionSet.prototype.ADD = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 + operand2) | 0);
 }
 ARMInstructionSet.prototype.ADDS = function (parentObj, operand2OP) {
+	debug_opcode("ADDS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition:
@@ -342,6 +356,7 @@ ARMInstructionSet.prototype.ADDS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.ADC = function (parentObj, operand2OP) {
+	debug_opcode("ADC");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition w/ Carry:
@@ -349,6 +364,7 @@ ARMInstructionSet.prototype.ADC = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 + operand2) | 0);
 }
 ARMInstructionSet.prototype.ADCS = function (parentObj, operand2OP) {
+	debug_opcode("ADCS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition w/ Carry:
@@ -362,6 +378,7 @@ ARMInstructionSet.prototype.ADCS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.SBC = function (parentObj, operand2OP) {
+	debug_opcode("SBC");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction w/ Carry:
@@ -369,6 +386,7 @@ ARMInstructionSet.prototype.SBC = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2 - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1)) | 0);
 }
 ARMInstructionSet.prototype.SBCS = function (parentObj, operand2OP) {
+	debug_opcode("SBCS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction w/ Carry:
@@ -382,6 +400,7 @@ ARMInstructionSet.prototype.SBCS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.RSC = function (parentObj, operand2OP) {
+	debug_opcode("RSC");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Reverse Subtraction w/ Carry:
@@ -389,6 +408,7 @@ ARMInstructionSet.prototype.RSC = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, (operand1 - operand2 - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1)) | 0);
 }
 ARMInstructionSet.prototype.RSCS = function (parentObj, operand2OP) {
+	debug_opcode("RSCS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Reverse Subtraction w/ Carry:
@@ -402,6 +422,7 @@ ARMInstructionSet.prototype.RSCS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.TSTS = function (parentObj, operand2OP) {
+	debug_opcode("TSTS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise AND:
@@ -410,6 +431,7 @@ ARMInstructionSet.prototype.TSTS = function (parentObj, operand2OP) {
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 ARMInstructionSet.prototype.TEQS = function (parentObj, operand2OP) {
+	debug_opcode("TEQS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise EOR:
@@ -418,6 +440,7 @@ ARMInstructionSet.prototype.TEQS = function (parentObj, operand2OP) {
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 ARMInstructionSet.prototype.CMPS = function (parentObj, operand2OP) {
+	debug_opcode("CMPS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Subtraction:
@@ -429,6 +452,7 @@ ARMInstructionSet.prototype.CMPS = function (parentObj, operand2OP) {
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 ARMInstructionSet.prototype.CMNS = function (parentObj, operand2OP) {
+	debug_opcode("CMNS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform Addition:
@@ -440,6 +464,7 @@ ARMInstructionSet.prototype.CMNS = function (parentObj, operand2OP) {
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 ARMInstructionSet.prototype.ORR = function (parentObj, operand2OP) {
+	debug_opcode("ORR");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise OR:
@@ -447,6 +472,7 @@ ARMInstructionSet.prototype.ORR = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 | operand2);
 }
 ARMInstructionSet.prototype.ORRS = function (parentObj, operand2OP) {
+	debug_opcode("ORRS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform bitwise OR:
@@ -457,11 +483,13 @@ ARMInstructionSet.prototype.ORRS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.MOV = function (parentObj, operand2OP) {
+	debug_opcode("MOV");
 	//Perform move:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand2OP(parentObj, parentObj.execute));
 }
 ARMInstructionSet.prototype.MOVS = function (parentObj, operand2OP) {
+	debug_opcode("MOVS");
 	var operand2 = operand2OP(parentObj, parentObj.execute);
 	//Perform move:
 	parentObj.CPUCore.CPSRNegative = (operand2 < 0);
@@ -470,6 +498,7 @@ ARMInstructionSet.prototype.MOVS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, operand2);
 }
 ARMInstructionSet.prototype.BIC = function (parentObj, operand2OP) {
+	debug_opcode("BIC");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	//NOT operand 2:
 	var operand2 = ~operand2OP(parentObj, parentObj.execute);
@@ -478,6 +507,7 @@ ARMInstructionSet.prototype.BIC = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand1 & operand2);
 }
 ARMInstructionSet.prototype.BICS = function (parentObj, operand2OP) {
+	debug_opcode("BICS");
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	//NOT operand 2:
 	var operand2 = ~operand2OP(parentObj, parentObj.execute);
@@ -489,11 +519,13 @@ ARMInstructionSet.prototype.BICS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, result);
 }
 ARMInstructionSet.prototype.MVN = function (parentObj, operand2OP) {
+	debug_opcode("MVN");
 	//Perform move negative:
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, ~operand2OP(parentObj, parentObj.execute));
 }
 ARMInstructionSet.prototype.MVNS = function (parentObj, operand2OP) {
+	debug_opcode("MVNS");
 	var operand2 = ~operand2OP(parentObj, parentObj.execute);
 	//Perform move negative:
 	parentObj.CPUCore.CPSRNegative = (operand2 < 0);
@@ -502,20 +534,24 @@ ARMInstructionSet.prototype.MVNS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, operand2);
 }
 ARMInstructionSet.prototype.MRS = function (parentObj, operand2OP) {
+	debug_opcode("MRS");
 	//Transfer PSR to Register
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, operand2OP(parentObj));
 }
 ARMInstructionSet.prototype.MSR = function (parentObj, operand2OP) {
+	debug_opcode("MSR");
 	//Transfer Register/Immediate to PSR:
 	operand2OP(parentObj, parentObj.execute);
 }
 ARMInstructionSet.prototype.MUL = function (parentObj, operand2OP) {
+	debug_opcode("MUL");
 	//Perform multiplication:
 	var result = parentObj.CPUCore.performMUL32(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF], 0);
 	//Update destination register:
 	parentObj.guardRegisterWrite(parentObj.execute >> 16, result);
 }
 ARMInstructionSet.prototype.MULS = function (parentObj, operand2OP) {
+	debug_opcode("MULS");
 	//Perform multiplication:
 	var result = parentObj.CPUCore.performMUL32(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF], 0);
 	parentObj.CPUCore.CPSRCarry = false;
@@ -525,6 +561,7 @@ ARMInstructionSet.prototype.MULS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 16, result);
 }
 ARMInstructionSet.prototype.MLA = function (parentObj, operand2OP) {
+	debug_opcode("MLA");
 	//Perform multiplication:
 	var result = parentObj.CPUCore.performMUL32(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF], 1);
 	//Perform addition:
@@ -533,6 +570,7 @@ ARMInstructionSet.prototype.MLA = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 16, result);
 }
 ARMInstructionSet.prototype.MLAS = function (parentObj, operand2OP) {
+	debug_opcode("MLAS");
 	//Perform multiplication:
 	var result = parentObj.CPUCore.performMUL32(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF], 1);
 	//Perform addition:
@@ -544,6 +582,7 @@ ARMInstructionSet.prototype.MLAS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 16, result);
 }
 ARMInstructionSet.prototype.UMULL = function (parentObj, operand2OP) {
+	debug_opcode("UMULL");
 	//Perform multiplication:
 	parentObj.CPUCore.performUMUL64(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF]);
 	//Update destination register:
@@ -551,6 +590,7 @@ ARMInstructionSet.prototype.UMULL = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, parentObj.CPUCore.mul64ResultLow);
 }
 ARMInstructionSet.prototype.UMULLS = function (parentObj, operand2OP) {
+	debug_opcode("UMULLS");
 	//Perform multiplication:
 	parentObj.CPUCore.performUMUL64(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF]);
 	parentObj.CPUCore.CPSRCarry = false;
@@ -561,6 +601,7 @@ ARMInstructionSet.prototype.UMULLS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, parentObj.CPUCore.mul64ResultLow);
 }
 ARMInstructionSet.prototype.UMLAL = function (parentObj, operand2OP) {
+	debug_opcode("UMLAL");
 	//Perform multiplication:
 	parentObj.CPUCore.performUMLA64(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF], parentObj.registers[(parentObj.execute >> 16) & 0xF], parentObj.registers[(parentObj.execute >> 12) & 0xF]);
 	//Update destination register:
@@ -568,6 +609,7 @@ ARMInstructionSet.prototype.UMLAL = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, parentObj.CPUCore.mul64ResultLow);
 }
 ARMInstructionSet.prototype.UMLALS = function (parentObj, operand2OP) {
+	debug_opcode("UMLALS");
 	//Perform multiplication:
 	parentObj.CPUCore.performUMLA64(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF], parentObj.registers[(parentObj.execute >> 16) & 0xF], parentObj.registers[(parentObj.execute >> 12) & 0xF]);
 	parentObj.CPUCore.CPSRCarry = false;
@@ -578,6 +620,7 @@ ARMInstructionSet.prototype.UMLALS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, parentObj.CPUCore.mul64ResultLow);
 }
 ARMInstructionSet.prototype.SMULL = function (parentObj, operand2OP) {
+	debug_opcode("SMULL");
 	//Perform multiplication:
 	parentObj.CPUCore.performMUL64(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF]);
 	//Update destination register:
@@ -585,6 +628,7 @@ ARMInstructionSet.prototype.SMULL = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, parentObj.CPUCore.mul64ResultLow);
 }
 ARMInstructionSet.prototype.SMULLS = function (parentObj, operand2OP) {
+	debug_opcode("SMULLS");
 	//Perform multiplication:
 	parentObj.CPUCore.performMUL64(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF]);
 	parentObj.CPUCore.CPSRCarry = false;
@@ -595,6 +639,7 @@ ARMInstructionSet.prototype.SMULLS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, parentObj.CPUCore.mul64ResultLow);
 }
 ARMInstructionSet.prototype.SMLAL = function (parentObj, operand2OP) {
+	debug_opcode("SMLAL");
 	//Perform multiplication:
 	parentObj.CPUCore.performMLA64(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF], parentObj.registers[(parentObj.execute >> 16) & 0xF], parentObj.registers[(parentObj.execute >> 12) & 0xF]);
 	//Update destination register:
@@ -602,6 +647,7 @@ ARMInstructionSet.prototype.SMLAL = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, parentObj.CPUCore.mul64ResultLow);
 }
 ARMInstructionSet.prototype.SMLALS = function (parentObj, operand2OP) {
+	debug_opcode("SMLALS");
 	//Perform multiplication:
 	parentObj.CPUCore.performMLA64(parentObj.registers[parentObj.execute & 0xF], parentObj.registers[(parentObj.execute >> 8) & 0xF], parentObj.registers[(parentObj.execute >> 16) & 0xF], parentObj.registers[(parentObj.execute >> 12) & 0xF]);
 	parentObj.CPUCore.CPSRCarry = false;
@@ -612,78 +658,91 @@ ARMInstructionSet.prototype.SMLALS = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWriteCPSR(parentObj.execute >> 12, parentObj.CPUCore.mul64ResultLow);
 }
 ARMInstructionSet.prototype.STRH = function (parentObj, operand2OP) {
+	debug_opcode("STRH");
 	//Perform halfword store calculations:
 	var address = operand2OP(parentObj, parentObj.execute);
 	//Write to memory location:
 	parentObj.CPUCore.write16(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
 }
 ARMInstructionSet.prototype.LDRH = function (parentObj, operand2OP) {
+	debug_opcode("LDRH");
 	//Perform word store calculations:
 	var address = operand2OP(parentObj, parentObj.execute);
 	//Read from memory location:
 	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read16(address));
 }
 ARMInstructionSet.prototype.LDRSH = function (parentObj, operand2OP) {
+	debug_opcode("LDRSH");
 	//Perform word store calculations:
 	var address = operand2OP(parentObj, parentObj.execute);
 	//Read from memory location:
 	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, (parentObj.CPUCore.read16(address) << 16) >> 16);
 }
 ARMInstructionSet.prototype.LDRSB = function (parentObj, operand2OP) {
+	debug_opcode("LDRSB");
 	//Perform word store calculations:
 	var address = operand2OP(parentObj, parentObj.execute);
 	//Read from memory location:
 	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, (parentObj.CPUCore.read8(address) << 24) >> 24);
 }
 ARMInstructionSet.prototype.STR = function (parentObj, operand2OP) {
+	debug_opcode("STR");
 	//Perform word store calculations:
 	var address = operand2OP(parentObj, parentObj.execute, false);
 	//Write to memory location:
 	parentObj.CPUCore.write32(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
 }
 ARMInstructionSet.prototype.LDR = function (parentObj, operand2OP) {
+	debug_opcode("LDR");
 	//Perform word store calculations:
 	var address = operand2OP(parentObj, parentObj.execute, false);
 	//Read from memory location:
 	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read32(address));
 }
 ARMInstructionSet.prototype.STRB = function (parentObj, operand2OP) {
+	debug_opcode("STRB");
 	//Perform byte store calculations:
 	var address = operand2OP(parentObj, parentObj.execute, false);
 	//Write to memory location:
 	parentObj.CPUCore.write8(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
 }
 ARMInstructionSet.prototype.LDRB = function (parentObj, operand2OP) {
+	debug_opcode("LDRB");
 	//Perform word store calculations:
 	var address = operand2OP(parentObj, parentObj.execute, false);
 	//Read from memory location:
 	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read8(address));
 }
 ARMInstructionSet.prototype.STRT = function (parentObj, operand2OP) {
+	debug_opcode("STRT");
 	//Perform word store calculations:
 	var address = operand2OP(parentObj, parentObj.execute, true);
 	//Write to memory location:
 	parentObj.CPUCore.write32(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
 }
 ARMInstructionSet.prototype.LDRT = function (parentObj, operand2OP) {
+	debug_opcode("LDRT");
 	//Perform word store calculations:
 	var address = operand2OP(parentObj, parentObj.execute, true);
 	//Read from memory location:
 	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read32(address));
 }
 ARMInstructionSet.prototype.STRBT = function (parentObj, operand2OP) {
+	debug_opcode("STRBT");
 	//Perform byte store calculations:
 	var address = operand2OP(parentObj, parentObj.execute, true);
 	//Write to memory location:
 	parentObj.CPUCore.write8(address, parentObj.getDelayedRegisterRead((parentObj.execute >> 12) & 0xF));
 }
 ARMInstructionSet.prototype.LDRBT = function (parentObj, operand2OP) {
+	debug_opcode("LDRBT");
 	//Perform word store calculations:
 	var address = operand2OP(parentObj, parentObj.execute, true);
 	//Read from memory location:
 	parentObj.guardRegisterWrite((parentObj.execute >> 12) & 0xF, parentObj.CPUCore.read8(address));
 }
 ARMInstructionSet.prototype.STMIA = function (parentObj, operand2OP) {
+	debug_opcode("STMIA");
 	//Only initialize the STMIA sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
@@ -703,10 +762,11 @@ ARMInstructionSet.prototype.STMIA = function (parentObj, operand2OP) {
 	}
 }
 ARMInstructionSet.prototype.STMIAW = function (parentObj, operand2OP) {
+	debug_opcode("STMIAW");
 	//Only initialize the STMIA sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Push register(s) into memory:
@@ -718,20 +778,21 @@ ARMInstructionSet.prototype.STMIAW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0x7] = currentAddress;
+		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 ARMInstructionSet.prototype.STMDA = function (parentObj, operand2OP) {
+	debug_opcode("STMDA");
 	//Only initialize the STMDA sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Push register(s) into memory:
-		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+		for (var rListPosition = 0xF; rListPosition > -1; --rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Push a register into memory:
 				parentObj.IOCore.memoryWrite32(currentAddress, operand2OP(parentObj, rListPosition));
@@ -743,14 +804,15 @@ ARMInstructionSet.prototype.STMDA = function (parentObj, operand2OP) {
 	}
 }
 ARMInstructionSet.prototype.STMDAW = function (parentObj, operand2OP) {
+	debug_opcode("STMDAW");
 	//Only initialize the STMDA sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Push register(s) into memory:
-		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+		for (var rListPosition = 0xF; rListPosition > -1; --rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Push a register into memory:
 				parentObj.IOCore.memoryWrite32(currentAddress, operand2OP(parentObj, rListPosition));
@@ -758,16 +820,17 @@ ARMInstructionSet.prototype.STMDAW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0x7] = currentAddress;
+		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 ARMInstructionSet.prototype.STMIB = function (parentObj, operand2OP) {
+	debug_opcode("STMIB");
 	//Only initialize the STMIB sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Push register(s) into memory:
@@ -783,10 +846,11 @@ ARMInstructionSet.prototype.STMIB = function (parentObj, operand2OP) {
 	}
 }
 ARMInstructionSet.prototype.STMIBW = function (parentObj, operand2OP) {
+	debug_opcode("STMIBW");
 	//Only initialize the STMIB sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Push register(s) into memory:
@@ -798,20 +862,21 @@ ARMInstructionSet.prototype.STMIBW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0x7] = currentAddress;
+		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 ARMInstructionSet.prototype.STMDB = function (parentObj, operand2OP) {
+	debug_opcode("STMDB");
 	//Only initialize the STMDB sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Push register(s) into memory:
-		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+		for (var rListPosition = 0xF; rListPosition > -1; --rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Push a register into memory:
 				currentAddress = (currentAddress - 4) | 0;
@@ -823,31 +888,35 @@ ARMInstructionSet.prototype.STMDB = function (parentObj, operand2OP) {
 	}
 }
 ARMInstructionSet.prototype.STMDBW = function (parentObj, operand2OP) {
+	debug_opcode("STMDBW");
 	//Only initialize the STMDB sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Push register(s) into memory:
-		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+		for (var rListPosition = 0xF; rListPosition > -1; --rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Push a register into memory:
 				currentAddress = (currentAddress - 4) | 0;
 				parentObj.IOCore.memoryWrite32(currentAddress, operand2OP(parentObj, rListPosition));
+				debug_register(rListPosition, parentObj.registers[rListPosition]);
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0x7] = currentAddress;
+		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		debug_register((parentObj.execute >> 16) & 0xF, parentObj.registers[(parentObj.execute >> 16) & 0xF]);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 ARMInstructionSet.prototype.LDMIA = function (parentObj, operand2OP) {
+	debug_opcode("LDMIA");
 	//Only initialize the LDMIA sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Load register(s) from memory:
@@ -863,10 +932,11 @@ ARMInstructionSet.prototype.LDMIA = function (parentObj, operand2OP) {
 	}
 }
 ARMInstructionSet.prototype.LDMIAW = function (parentObj, operand2OP) {
+	debug_opcode("LDMIAW");
 	//Only initialize the LDMIA sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Load register(s) from memory:
@@ -875,23 +945,26 @@ ARMInstructionSet.prototype.LDMIAW = function (parentObj, operand2OP) {
 				//Load a register from memory:
 				operand2OP(parentObj, rListPosition, parentObj.IOCore.memoryRead32(currentAddress));
 				currentAddress = (currentAddress + 4) | 0;
+				debug_register(rListPosition, parentObj.registers[rListPosition]);
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0x7] = currentAddress;
+		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		debug_register((parentObj.execute >> 16) & 0xF, parentObj.registers[(parentObj.execute >> 16) & 0xF]);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 ARMInstructionSet.prototype.LDMDA = function (parentObj, operand2OP) {
+	debug_opcode("LDMDA");
 	//Only initialize the LDMDA sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Load register(s) from memory:
-		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+		for (var rListPosition = 0xF; rListPosition > -1; --rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Load a register from memory:
 				operand2OP(parentObj, rListPosition, parentObj.IOCore.memoryRead32(currentAddress));
@@ -903,14 +976,15 @@ ARMInstructionSet.prototype.LDMDA = function (parentObj, operand2OP) {
 	}
 }
 ARMInstructionSet.prototype.LDMDAW = function (parentObj, operand2OP) {
+	debug_opcode("LDMDAW");
 	//Only initialize the LDMDA sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Load register(s) from memory:
-		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+		for (var rListPosition = 0xF; rListPosition > -1; --rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Load a register from memory:
 				operand2OP(parentObj, rListPosition, parentObj.IOCore.memoryRead32(currentAddress));
@@ -918,16 +992,17 @@ ARMInstructionSet.prototype.LDMDAW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0x7] = currentAddress;
+		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 ARMInstructionSet.prototype.LDMIB = function (parentObj, operand2OP) {
+	debug_opcode("LDMIB");
 	//Only initialize the LDMIB sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Load register(s) from memory:
@@ -943,10 +1018,11 @@ ARMInstructionSet.prototype.LDMIB = function (parentObj, operand2OP) {
 	}
 }
 ARMInstructionSet.prototype.LDMIBW = function (parentObj, operand2OP) {
+	debug_opcode("LDMIBW");
 	//Only initialize the LDMIB sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Load register(s) from memory:
@@ -958,20 +1034,21 @@ ARMInstructionSet.prototype.LDMIBW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0x7] = currentAddress;
+		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 ARMInstructionSet.prototype.LDMDB = function (parentObj, operand2OP) {
+	debug_opcode("LDMDB");
 	//Only initialize the LDMDB sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Load register(s) from memory:
-		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+		for (var rListPosition = 0xF; rListPosition > -1; --rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Load a register from memory:
 				currentAddress = (currentAddress - 4) | 0;
@@ -983,14 +1060,15 @@ ARMInstructionSet.prototype.LDMDB = function (parentObj, operand2OP) {
 	}
 }
 ARMInstructionSet.prototype.LDMDBW = function (parentObj, operand2OP) {
+	debug_opcode("LDMDBW");
 	//Only initialize the LDMDB sequence if the register list is non-empty:
 	if ((parentObj.execute & 0xFFFF) > 0) {
 		//Get the base address:
-		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0x7];
+		var currentAddress = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 		//Updating the address bus away from PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 		//Load register(s) from memory:
-		for (var rListPosition = 0; rListPosition < 0x10; ++rListPosition) {
+		for (var rListPosition = 0xF; rListPosition > -1; --rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//Load a register from memory:
 				currentAddress = (currentAddress - 4) | 0;
@@ -998,12 +1076,13 @@ ARMInstructionSet.prototype.LDMDBW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0x7] = currentAddress;
+		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
 }
 ARMInstructionSet.prototype.SWP = function (parentObj, operand2OP) {
+	debug_opcode("SWP");
 	var base = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var data = parentObj.CPUCore.read32(base);
 	//Clock a cycle for the processing delaying the CPU:
@@ -1012,6 +1091,7 @@ ARMInstructionSet.prototype.SWP = function (parentObj, operand2OP) {
 	parentObj.guardRegisterWrite(parentObj.execute >> 12, data);
 }
 ARMInstructionSet.prototype.SWPB = function (parentObj, operand2OP) {
+	debug_opcode("SWPB");
 	var base = parentObj.registers[(parentObj.execute >> 16) & 0xF];
 	var data = parentObj.CPUCore.read8(base);
 	//Clock a cycle for the processing delaying the CPU:
@@ -1021,30 +1101,37 @@ ARMInstructionSet.prototype.SWPB = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.SWI = function (parentObj, operand2OP) {
 	//Software Interrupt:
+	debug_opcode("SWI");
 	parentObj.CPUCore.SWI((parentObj.registers[15] - 4) | 0);
 }
 ARMInstructionSet.prototype.CDP = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
+	debug_opcode("CDP - UNIMPLEMENTED");
 	parentObj.UNDEFINED();
 }
 ARMInstructionSet.prototype.LDC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
+	debug_opcode("LDC - UNIMPLEMENTED");
 	parentObj.UNDEFINED();
 }
 ARMInstructionSet.prototype.STC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
+	debug_opcode("STC - UNIMPLEMENTED");
 	parentObj.UNDEFINED();
 }
 ARMInstructionSet.prototype.MRC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
+	debug_opcode("MRC - UNIMPLEMENTED");
 	parentObj.UNDEFINED();
 }
 ARMInstructionSet.prototype.MCR = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
+	debug_opcode("MCR - UNIMPLEMENTED");
 	parentObj.UNDEFINED();
 }
 ARMInstructionSet.prototype.UNDEFINED = function (parentObj) {
 	//Undefined Exception:
+	debug_opcode("UNDEFINED");
 	parentObj.CPUCore.UNDEFINED((parentObj.registers[15] - 4) | 0);
 }
 ARMInstructionSet.prototype.lli = function (parentObj, operand) {

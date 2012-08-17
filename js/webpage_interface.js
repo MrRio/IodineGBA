@@ -111,10 +111,6 @@ function registerGUIEvents() {
 	addEvent("click", document.getElementById("record_pipeline"), function () {
 		debugging_pipeline = this.checked;
 	});
-	document.getElementById("record_branch").checked = true;
-	addEvent("click", document.getElementById("record_branch"), function () {
-		debugging_branch = this.checked;
-	});
 	document.getElementById("record_pc").checked = true;
 	addEvent("click", document.getElementById("record_pc"), function () {
 		debugging_pc = this.checked;

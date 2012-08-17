@@ -9,41 +9,46 @@ div#debug_log {
 	bottom: 0px;
 	overflow: scroll;
 }
+div#debug_log div {
+	position: relative;
+}
 div.THUMB {
 	background-color: rgb(0, 255, 0);
-	padding: 5px 10px;
+	padding: 5px 15px;
 }
 div.ARM {
 	background-color: rgb(0, 0, 255);
-	padding: 5px 10px;
+	padding: 5px 15px;
 }
 div.memoryWrite {
 	background-color: rgb(255, 0, 0);
-	padding: 5px 10px;
+	padding: 5px 15px;
 }
 div.memoryRead {
 	background-color: rgb(255, 0, 255);
-	padding: 5px 10px;
+	padding: 5px 15px;
+}
+div.debug_opcode {
+	background-color: rgb(100, 50, 0);
+	padding: 0px 15px;
 }
 div.pipeline {
 	background-color: rgb(50, 50, 50);
 	color: yellow;
 }
-div.branch {
-	background-color: rgb(255, 220, 220);
-	font-size: 18px;
-	color: red;
-}
 div.mode {
 	background-color: rgb(90, 50, 50);
 	font-size: 18px;
 	color: blue;
+	padding: 0px 15px;
 }
 div.exception {
 	background-color: rgb(50, 50, 90);
 	font-size: 18px;
 	color: red;
+	padding: 0px 15px;
 }
 div.register {
 	background-color: rgb(255, 255, 0);
+	padding: 0px 15px;
 }
