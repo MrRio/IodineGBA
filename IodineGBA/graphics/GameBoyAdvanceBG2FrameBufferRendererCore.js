@@ -45,7 +45,7 @@ GameBoyAdvanceBG2FrameBufferRenderer.prototype.selectMode = function (mode) {
 			this.fetchPixel = this.fetchMode5Pixel;
 	}
 }
-GameBoyAdvanceBG2FrameBufferRenderer.prototype.renderModeScanLine = function (line) {
+GameBoyAdvanceBG2FrameBufferRenderer.prototype.renderScanLine = function (line) {
 	if (this.gfx.BG2Mosaic) {
 		//Correct line number for mosaic:
 		this.shadowPB = this.pb;
