@@ -848,11 +848,12 @@ THUMBInstructionSet.prototype.BLoff = function (parentObj) {
 	//Update the link register to branch address:
 	parentObj.registers[14] = (parentObj.registers[14] + ((parentObj.execute & 0x7FF) << 1)) | 0;
 	//Copy LR to PC:
+	var oldPC = parentObj.registers[15];
 	parentObj.registers[15] = parentObj.registers[14];
 	//Flush Pipeline & Block PC Increment:
 	parentObj.resetPipeline();
 	//Set bit 0 of LR high:
-	parentObj.registers[14] |= 0x1;
+	parentObj.registers[14] = (oldPC - 0x2) | 0x1;
 }
 THUMBInstructionSet.prototype.UNDEFINED = function (parentObj) {
 	//Undefined Exception:
