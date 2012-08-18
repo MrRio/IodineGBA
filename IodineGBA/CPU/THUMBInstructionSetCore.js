@@ -823,12 +823,18 @@ THUMBInstructionSet.prototype.BEQ = function (parentObj) {
 	if (parentObj.CPUCore.CPSRZero) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BNE = function (parentObj) {
 	debug_opcode("BNE");
 	//Branch if Not Equal:
 	if (!parentObj.CPUCore.CPSRZero) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BCS = function (parentObj) {
@@ -837,12 +843,18 @@ THUMBInstructionSet.prototype.BCS = function (parentObj) {
 	if (parentObj.CPUCore.CPSRCarry) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BCC = function (parentObj) {
 	debug_opcode("BCC");
 	//Branch if Carry Clear:
 	if (!parentObj.CPUCore.CPSRCarry) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BMI = function (parentObj) {
@@ -851,12 +863,18 @@ THUMBInstructionSet.prototype.BMI = function (parentObj) {
 	if (parentObj.CPUCore.CPSRNegative) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BPL = function (parentObj) {
 	debug_opcode("BPL");
 	//Branch if Negative Clear:
 	if (!parentObj.CPUCore.CPSRNegative) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BVS = function (parentObj) {
@@ -865,12 +883,18 @@ THUMBInstructionSet.prototype.BVS = function (parentObj) {
 	if (parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BVC = function (parentObj) {
 	debug_opcode("BVC");
 	//Branch if Overflow Clear:
 	if (!parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BHI = function (parentObj) {
@@ -879,12 +903,18 @@ THUMBInstructionSet.prototype.BHI = function (parentObj) {
 	if (parentObj.CPUCore.CPSRCarry && !parentObj.CPUCore.CPSRZero) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BLS = function (parentObj) {
 	debug_opcode("BLS");
 	//Branch if Carry Clear or is Zero Set:
 	if (!parentObj.CPUCore.CPSRCarry || parentObj.CPUCore.CPSRZero) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BGE = function (parentObj) {
@@ -893,12 +923,18 @@ THUMBInstructionSet.prototype.BGE = function (parentObj) {
 	if (parentObj.CPUCore.CPSRNegative == parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BLT = function (parentObj) {
 	debug_opcode("BLT");
 	//Branch if Negative NOT equal to Overflow
 	if (parentObj.CPUCore.CPSRNegative != parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BGT = function (parentObj) {
@@ -907,12 +943,18 @@ THUMBInstructionSet.prototype.BGT = function (parentObj) {
 	if (!parentObj.CPUCore.CPSRZero && parentObj.CPUCore.CPSRNegative == parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BLE = function (parentObj) {
 	debug_opcode("BLE");
 	//Branch if Zero Set and Negative NOT equal to Overflow
 	if (parentObj.CPUCore.CPSRZero && parentObj.CPUCore.CPSRNegative != parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.SWI = function (parentObj) {
@@ -940,11 +982,12 @@ THUMBInstructionSet.prototype.BLoff = function (parentObj) {
 	//Update the link register to branch address:
 	parentObj.registers[14] = (parentObj.registers[14] + ((parentObj.execute & 0x7FF) << 1)) | 0;
 	//Copy LR to PC:
+	var oldPC = parentObj.registers[15];
 	parentObj.registers[15] = parentObj.registers[14];
 	//Flush Pipeline & Block PC Increment:
 	parentObj.resetPipeline();
 	//Set bit 0 of LR high:
-	parentObj.registers[14] |= 0x1;
+	parentObj.registers[14] = (oldPC - 0x2) | 0x1;
 }
 THUMBInstructionSet.prototype.UNDEFINED = function (parentObj) {
 	debug_opcode("UNDEFINED");

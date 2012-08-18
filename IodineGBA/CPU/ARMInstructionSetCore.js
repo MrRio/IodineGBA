@@ -59,6 +59,9 @@ ARMInstructionSet.prototype.executeARM = function (instruction) {
 		if (this.conditionCodeTest()) {
 			instruction[0](this, instruction[1]);
 		}
+		else {
+			debug_opcode("FAILED CONDITION TEST");
+		}
 	}
 	else {
 		//Tick the pipeline invalidation:

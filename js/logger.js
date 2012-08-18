@@ -109,6 +109,11 @@ function debug_exception(newMode) {
 		current_unit[1][1].push(["exception", "Exception into mode " + outputCleanse(newMode)]);
 	}
 }
+function debug_branch_not_taken() {
+	if (debugging_pipeline) {
+		current_unit[1][1].push(["not_taken", "THUMB branch not taken."]);
+	}
+}
 function debug_mode(newMode) {
 	if (debugging_mode) {
 		current_unit[1][1].push(["mode", "Entering mode " + outputCleanse(newMode)]);

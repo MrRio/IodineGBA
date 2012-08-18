@@ -36,6 +36,10 @@ div.pipeline {
 	background-color: rgb(50, 50, 50);
 	color: yellow;
 }
+div.not_taken {
+	background-color: rgb(80, 50, 80);
+	color: white;
+}
 div.mode {
 	background-color: rgb(90, 50, 50);
 	font-size: 18px;
