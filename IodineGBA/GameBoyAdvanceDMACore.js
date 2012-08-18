@@ -43,7 +43,7 @@ GameBoyAdvanceDMA.prototype.initialize = function () {
 	this.enabled = [0, 0, 0, 0];
 	this.pending = [0, this.DMA_REQUEST_TYPE.FIFO_A, this.DMA_REQUEST_TYPE.FIFO_B, 0];
 	this.source = [0, 0, 0, 0];
-	this.sourceSource = [0, 0, 0, 0];
+	this.sourceShadow = [0, 0, 0, 0];
 	this.destination = [0, 0, 0, 0];
 	this.destinationShadow = [0, 0, 0, 0];
 	this.wordCount = [0, 0, 0, 0];
@@ -74,7 +74,7 @@ GameBoyAdvanceDMA.prototype.writeDMADestination = function (dmaChannel, byteNumb
 	this.destination[dmaChannel] |= data << (byteNumber << 3);
 }
 GameBoyAdvanceDMA.prototype.writeDMAWordCount0 = function (dmaChannel, data) {
-	this.wordCountSource[dmaChannel] &= 0x3F00;
+	this.wordCount[dmaChannel] &= 0x3F00;
 	this.wordCount[dmaChannel] |= data;
 }
 GameBoyAdvanceDMA.prototype.writeDMAWordCount1 = function (dmaChannel, data) {
@@ -255,7 +255,7 @@ GameBoyAdvanceDMA.prototype.decrementWordCount = function (control, dmaChannel, 
 				break;
 			case 3:	//Reload
 				//Prohibited code, should not get here:
-				this.source[dmaChannel] = this.sourceSource[dmaChannel];
+				this.source[dmaChannel] = this.sourceShadow[dmaChannel];
 		}
 		//Update destination address:
 		switch (control[5]) {
