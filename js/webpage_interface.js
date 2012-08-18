@@ -111,17 +111,9 @@ function registerGUIEvents() {
 	addEvent("click", document.getElementById("record_pipeline"), function () {
 		debugging_pipeline = this.checked;
 	});
-	document.getElementById("record_pc").checked = true;
-	addEvent("click", document.getElementById("record_pc"), function () {
+	document.getElementById("record_register").checked = true;
+	addEvent("click", document.getElementById("record_register"), function () {
 		debugging_pc = this.checked;
-	});
-	document.getElementById("record_lr").checked = true;
-	addEvent("click", document.getElementById("record_lr"), function () {
-		debugging_lr = this.checked;
-	});
-	document.getElementById("record_sp").checked = true;
-	addEvent("click", document.getElementById("record_sp"), function () {
-		debugging_sp = this.checked;
 	});
 	document.getElementById("record_exception").checked = true;
 	addEvent("click", document.getElementById("record_exception"), function () {

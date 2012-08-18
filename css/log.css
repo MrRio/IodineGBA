@@ -52,7 +52,12 @@ div.exception {
 	color: red;
 	padding: 0px 15px;
 }
+div.high_reg {
+	background-color: rgb(220, 60, 0);
+	padding: 0px 15px;
+}
 div.register {
 	background-color: rgb(255, 255, 0);
 	padding: 0px 15px;
+	font-size: 8px;
 }

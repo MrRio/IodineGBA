@@ -67,9 +67,22 @@ THUMBInstructionSet.prototype.executeIteration = function () {
 	debug_start_unit("THUMB");
 	this.fetch = this.wait.CPUGetOpcode16(this.registers[15]);
 	//Execute Instruction:
-	debug_pc(this.registers[15]);
-	debug_lr(this.registers[14]);
-	debug_sp(this.registers[13]);
+	debug_register(15, this.registers[15]);
+	debug_register(14, this.registers[14]);
+	debug_register(13, this.registers[13]);
+	debug_register(12, this.registers[12]);
+	debug_register(11, this.registers[11]);
+	debug_register(10, this.registers[10]);
+	debug_register(9, this.registers[9]);
+	debug_register(8, this.registers[8]);
+	debug_register(7, this.registers[7]);
+	debug_register(6, this.registers[6]);
+	debug_register(5, this.registers[5]);
+	debug_register(4, this.registers[4]);
+	debug_register(3, this.registers[3]);
+	debug_register(2, this.registers[2]);
+	debug_register(1, this.registers[1]);
+	debug_register(0, this.registers[0]);
 	this.executeTHUMB();
 	//Increment The Program Counter:
 	this.registers[15] = (this.registers[15] + 2) | 0;
@@ -388,8 +401,8 @@ THUMBInstructionSet.prototype.TST = function (parentObj) {
 THUMBInstructionSet.prototype.NEG = function (parentObj) {
 	debug_opcode("NEG");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
-	parentObj.CPUCore.CPSRCarry = false;
-	parentObj.CPUCore.CPSROverflow = ((source ^ (-source)) < 0);
+	parentObj.CPUCore.CPSRCarry = (source == 0);
+	parentObj.CPUCore.CPSROverflow = ((source >>> 0) == 0x80000000);
 	//Perform Subtraction:
 	source = (-source) | 0;
 	parentObj.CPUCore.CPSRNegative = (source < 0);
@@ -401,10 +414,11 @@ THUMBInstructionSet.prototype.CMP = function (parentObj) {
 	debug_opcode("CMP");
 	//Compare two registers:
 	var destination = parentObj.registers[parentObj.execute & 0x7];
-	var dirtyResult = destination - parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var dirtyResult = destination - operand2;
 	var result = dirtyResult | 0;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.subV(destination, operand2, result);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
@@ -412,10 +426,11 @@ THUMBInstructionSet.prototype.CMN = function (parentObj) {
 	debug_opcode("CMN");
 	//Compare two registers:
 	var destination = parentObj.registers[parentObj.execute & 0x7];
-	var dirtyResult = destination + parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var dirtyResult = destination + operand2;
 	var result = dirtyResult | 0;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.addV(destination, operand2, result);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
@@ -501,10 +516,11 @@ THUMBInstructionSet.prototype.CMPH_LL = function (parentObj) {
 	debug_opcode("CMPH (LL)");
 	//Compare two registers:
 	var destination = parentObj.registers[parentObj.execute & 0x7];
-	var dirtyResult = destination - parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var dirtyResult = destination - operand2;
 	var result = dirtyResult | 0;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.subV(destination, operand2, result);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
@@ -512,10 +528,11 @@ THUMBInstructionSet.prototype.CMPH_LH = function (parentObj) {
 	debug_opcode("CMPH (LH)");
 	//Compare two registers:
 	var destination = parentObj.registers[parentObj.execute & 0x7];
-	var dirtyResult = destination - parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var operand2 = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var dirtyResult = destination - operand2;
 	var result = dirtyResult | 0;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.subV(destination, operand2, result);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
@@ -523,10 +540,11 @@ THUMBInstructionSet.prototype.CMPH_HL = function (parentObj) {
 	debug_opcode("CMPH (HL)");
 	//Compare two registers:
 	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
-	var dirtyResult = destination - parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var dirtyResult = destination - operand2;
 	var result = dirtyResult | 0;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.subV(destination, operand2, result);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
@@ -534,10 +552,11 @@ THUMBInstructionSet.prototype.CMPH_HH = function (parentObj) {
 	debug_opcode("CMPH (HH)");
 	//Compare two registers:
 	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
-	var dirtyResult = destination - parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var operand2 = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var dirtyResult = destination - operand2;
 	var result = dirtyResult | 0;
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.subV(destination, operand2, result);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
@@ -598,7 +617,7 @@ THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
 	debug_opcode("LDRPC");
 	//PC-Relative Load
-	var result = parentObj.CPUCore.read32(parentObj.registers[15] + ((parentObj.execute & 0xFF) << 2));
+	var result = parentObj.CPUCore.read32((parentObj.registers[15] & -4) + ((parentObj.execute & 0xFF) << 2));
 	parentObj.registers[(parentObj.execute >> 8) & 0x7] = result;
 }
 THUMBInstructionSet.prototype.STRreg = function (parentObj) {
@@ -747,10 +766,8 @@ THUMBInstructionSet.prototype.POP = function (parentObj) {
 		for (var rListPosition = 0; rListPosition < 8; ++rListPosition) {
 			if ((parentObj.execute & (1 << rListPosition)) != 0) {
 				//POP stack into a register:
-				debug_register(rListPosition, parentObj.registers[rListPosition]);
 				parentObj.registers[rListPosition] = parentObj.IOCore.memoryRead32(parentObj.registers[13]);
 				parentObj.registers[13] = (parentObj.registers[13] + 4) | 0;
-				debug_register(rListPosition, parentObj.registers[rListPosition]);
 			}
 		}
 		//Updating the address bus back to PC fetch:

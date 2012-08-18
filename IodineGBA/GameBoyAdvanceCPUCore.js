@@ -83,20 +83,31 @@ GameBoyAdvanceCPU.prototype.triggerIRQ = function () {
 GameBoyAdvanceCPU.prototype.getCurrentFetchValue = function () {
 	return this.instructionHandle.fetch;
 }
+GameBoyAdvanceCPU.prototype.enterException = function (isExternal) {
+	if (!isExternal) {
+		this.instructionHandle.resetPipeline();
+	}
+	this.instructionHandle = this.ARM;
+	this.instructionHandle.pipelineInvalid = 0x3;
+	this.IOCore.wait.NonSequentialBroadcast();
+	this.InTHUMB = false;
+}
 GameBoyAdvanceCPU.prototype.enterARM = function () {
 	this.instructionHandle = this.ARM;
 	this.instructionHandle.resetPipeline();
-	this.inTHUMB = false;
+	this.InTHUMB = false;
 }
 GameBoyAdvanceCPU.prototype.enterTHUMB = function () {
 	this.instructionHandle = this.THUMB;
 	this.instructionHandle.resetPipeline();
-	this.inTHUMB = true;
+	this.InTHUMB = true;
+}
+GameBoyAdvanceCPU.prototype.setTHUMB = function (thumbStatus) {
+	this.InTHUMB = thumbStatus;
+	this.instructionHandle = (this.InTHUMB) ? this.THUMB : this.ARM;
 }
 GameBoyAdvanceCPU.prototype.FIQ = function (LR) {
 	if (!this.FIQDisabled) {
-		//Exception always enter ARM mode:
-		this.enterARM();
 		//Switch Register Banks:
 		this.switchRegisterBank(0x11);
 		//Save link register:
@@ -104,20 +115,18 @@ GameBoyAdvanceCPU.prototype.FIQ = function (LR) {
 		//FIQ exception vector:
 		this.registers[15] = 0x1C;
 		//Protect the CPSR:
-		this.CPSRtoSPSR();
-		//Mode bits are set to FIQ:
-		this.MODEBits = 0x11;
+		this.CPSRtoSPSR(0x11);
 		//Disable IRQ:
 		this.IRQDisabled = true;
 		//Disable FIQ:
 		this.FIQDisabled = true;
+		//Exception always enter ARM mode:
+		this.enterException(false);
 		debug_exception(this.MODEBits);
 	}
 }
 GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
 	if (!this.IRQDisabled) {
-		//Exception always enter ARM mode:
-		this.enterARM();
 		//Switch Register Banks:
 		this.switchRegisterBank(0x12);
 		//Save link register:
@@ -125,17 +134,15 @@ GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
 		//IRQ exception vector:
 		this.registers[15] = 0x18;
 		//Protect the CPSR:
-		this.CPSRtoSPSR();
-		//Mode bits are set to IRQ:
-		this.MODEBits = 0x12;
+		this.CPSRtoSPSR(0x12);
 		//Disable IRQ:
 		this.IRQDisabled = true;
+		//Exception always enter ARM mode:
+		this.enterException(true);
 		debug_exception(this.MODEBits);
 	}
 }
 GameBoyAdvanceCPU.prototype.SWI = function (LR) {
-	//Exception always enter ARM mode:
-	this.enterARM();
 	//Switch Register Banks:
 	this.switchRegisterBank(0x13);
 	//Save link register:
@@ -144,15 +151,14 @@ GameBoyAdvanceCPU.prototype.SWI = function (LR) {
 	this.registers[15] = 0x8;
 	//Mode bits are set to SVC:
 	//Protect the CPSR:
-	this.CPSRtoSPSR();
-	this.MODEBits = 0x13;
+	this.CPSRtoSPSR(0x13);
 	//Disable IRQ:
 	this.IRQDisabled = true;
+	//Exception always enter ARM mode:
+	this.enterException(false);
 	debug_exception(this.MODEBits);
 }
 GameBoyAdvanceCPU.prototype.UNDEFINED = function (LR) {
-	//Exception always enter ARM mode:
-	this.enterARM();
 	//Switch Register Banks:
 	this.switchRegisterBank(0x1B);
 	//Save link register:
@@ -160,11 +166,11 @@ GameBoyAdvanceCPU.prototype.UNDEFINED = function (LR) {
 	//Undefined exception vector:
 	this.registers[15] = 0x4;
 	//Protect the CPSR:
-	this.CPSRtoSPSR();
-	//Mode bits are set to UNDEFINED:
-	this.MODEBits = 0x1B;
+	this.CPSRtoSPSR(0x1B);
 	//Disable IRQ:
 	this.IRQDisabled = true;
+	//Exception always enter ARM mode:
+	this.enterException(false);
 	debug_exception(this.MODEBits);
 }
 GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
@@ -194,13 +200,14 @@ GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	this.CPSRCarry = spsr[3];
 	this.IRQDisabled = spsr[4];
 	this.FIQDisabled = spsr[5];
-	this.InTHUMB = spsr[6];
+	this.setTHUMB(spsr[6]);
+	this.switchRegisterBank(spsr[7]);
 	this.MODEBits = spsr[7];
 	debug_exception(this.MODEBits);
 }
-GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function () {
+GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function (newMode) {
 	//Used for leaving an exception and returning to the previous state:
-	switch (this.MODEBits) {
+	switch (newMode) {
 		case 0x10:	//User
 		case 0x1F:	//System
 			return;
@@ -219,16 +226,16 @@ GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function () {
 		case 0x1B:	//Undefined
 			var spsr = this.SPSRUND;
 	}
-	spsr = [
-		this.CPSRNegative,
-		this.CPSRZero,
-		this.CPSROverflow,
-		this.CPSRCarry,
-		this.IRQDisabled,
-		this.FIQDisabled,
-		this.InTHUMB,
-		this.MODEBits
-	];
+	spsr[0] = this.CPSRNegative;
+	spsr[1] = this.CPSRZero;
+	spsr[2] = this.CPSROverflow;
+	spsr[3] = this.CPSRCarry;
+	spsr[4] = this.IRQDisabled;
+	spsr[5] = this.FIQDisabled;
+	spsr[6] = this.InTHUMB;
+	spsr[7] = this.MODEBits;
+	debug_spsr(spsr);
+	this.MODEBits = newMode;
 }
 GameBoyAdvanceCPU.prototype.switchRegisterBank = function (newMode) {
 	switch (this.MODEBits) {
@@ -432,6 +439,14 @@ GameBoyAdvanceCPU.prototype.performUMLA64 = function (rs, rd, mlaHigh, mlaLow) {
 	var highMul = (rs >> 16) * rd;
 	//Cut off bits above bit 31 and return with proper sign:
 	this.mul64ResultLow = ((highMul << 16) + lowMul + mlaLow) | 0;
+}
+GameBoyAdvanceCPU.prototype.subV = function (operand1, operand2, destination) {
+	//Calculate the overflow flag on a sub operation:
+	this.CPSROverflow = ((operand1 ^ operand2 ^ destination) < 0);
+}
+GameBoyAdvanceCPU.prototype.addV = function (operand1, operand2, destination) {
+	//Calculate the overflow flag on an add operation:
+	this.CPSROverflow = (((operand1 & 0x80000000) == (operand2 & 0x80000000)) && (operand1 ^ operand2 ^ destination) < 0);
 }
 GameBoyAdvanceCPU.prototype.write32 = function (address, data) {
 	//Updating the address bus away from PC fetch:

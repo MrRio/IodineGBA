@@ -43,9 +43,22 @@ ARMInstructionSet.prototype.executeIteration = function () {
 	debug_start_unit("ARM");
 	this.fetch = this.wait.CPUGetOpcode32(this.registers[15]);
 	//Execute Conditional Instruction:
-	debug_pc(this.registers[15]);
-	debug_lr(this.registers[14]);
-	debug_sp(this.registers[13]);
+	debug_register(15, this.registers[15]);
+	debug_register(14, this.registers[14]);
+	debug_register(13, this.registers[13]);
+	debug_register(12, this.registers[12]);
+	debug_register(11, this.registers[11]);
+	debug_register(10, this.registers[10]);
+	debug_register(9, this.registers[9]);
+	debug_register(8, this.registers[8]);
+	debug_register(7, this.registers[7]);
+	debug_register(6, this.registers[6]);
+	debug_register(5, this.registers[5]);
+	debug_register(4, this.registers[4]);
+	debug_register(3, this.registers[3]);
+	debug_register(2, this.registers[2]);
+	debug_register(1, this.registers[1]);
+	debug_register(0, this.registers[0]);
 	this.executeARM(this.instructionMap[(this.execute >> 20) & 0xFF][(this.execute >> 4) & 0xF]);
 	//Increment The Program Counter:
 	this.registers[15] = (this.registers[15] + 4) | 0;
@@ -904,12 +917,10 @@ ARMInstructionSet.prototype.STMDBW = function (parentObj, operand2OP) {
 				//Push a register into memory:
 				currentAddress = (currentAddress - 4) | 0;
 				parentObj.IOCore.memoryWrite32(currentAddress, operand2OP(parentObj, rListPosition));
-				debug_register(rListPosition, parentObj.registers[rListPosition]);
 			}
 		}
 		//Store the updated base address back into register:
 		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
-		debug_register((parentObj.execute >> 16) & 0xF, parentObj.registers[(parentObj.execute >> 16) & 0xF]);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -948,12 +959,10 @@ ARMInstructionSet.prototype.LDMIAW = function (parentObj, operand2OP) {
 				//Load a register from memory:
 				operand2OP(parentObj, rListPosition, parentObj.IOCore.memoryRead32(currentAddress));
 				currentAddress = (currentAddress + 4) | 0;
-				debug_register(rListPosition, parentObj.registers[rListPosition]);
 			}
 		}
 		//Store the updated base address back into register:
 		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
-		debug_register((parentObj.execute >> 16) & 0xF, parentObj.registers[(parentObj.execute >> 16) & 0xF]);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -1412,7 +1421,7 @@ ARMInstructionSet.prototype.rcs = function (parentObj, operand) {
 		default:
 			parentObj.CPUCore.IRQDisabled = ((operand & 0x80) != 0);
 			parentObj.CPUCore.FIQDisabled = ((operand & 0x40) != 0);
-			parentObj.CPUCore.InTHUMB = ((operand & 0x20) != 0);
+			parentObj.CPUCore.setTHUMB((operand & 0x20) != 0);
 			parentObj.CPUCore.switchRegisterBank(operand & 0x1F);
 			parentObj.CPUCore.MODEBits = operand & 0x1F;
 			debug_mode(parentObj.CPUCore.MODEBits);
@@ -1493,7 +1502,7 @@ ARMInstructionSet.prototype.ic = function (parentObj, operand) {
 		default:
 			parentObj.CPUCore.IRQDisabled = ((operand & 0x80) != 0);
 			parentObj.CPUCore.FIQDisabled = ((operand & 0x40) != 0);
-			parentObj.CPUCore.InTHUMB = ((operand & 0x20) != 0);
+			parentObj.CPUCore.setTHUMB((operand & 0x20) != 0);
 			parentObj.CPUCore.switchRegisterBank(operand & 0x1F);
 			parentObj.CPUCore.MODEBits = operand & 0x1F;
 			debug_mode(parentObj.CPUCore.MODEBits);
