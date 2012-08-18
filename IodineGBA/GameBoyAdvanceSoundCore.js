@@ -1271,7 +1271,7 @@ GameBoyAdvanceSound.prototype.readSOUNDBIAS0 = function () {
 	//NR62:
 	return this.nr62;
 }
-GameBoyAdvanceSound.prototype.writeSOUNDBIAS0 = function (data) {
+GameBoyAdvanceSound.prototype.writeSOUNDBIAS1 = function (data) {
 	//NR63:
 	this.audioJIT();
 	this.mixerSoundBIAS &= 0xFF;
