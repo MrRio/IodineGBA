@@ -1110,29 +1110,29 @@ ARMInstructionSet.prototype.SWI = function (parentObj, operand2OP) {
 ARMInstructionSet.prototype.CDP = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
 	debug_opcode("CDP - UNIMPLEMENTED");
-	parentObj.UNDEFINED();
+	parentObj.UNDEFINED(parentObj, null);
 }
 ARMInstructionSet.prototype.LDC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
 	debug_opcode("LDC - UNIMPLEMENTED");
-	parentObj.UNDEFINED();
+	parentObj.UNDEFINED(parentObj, null);
 }
 ARMInstructionSet.prototype.STC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
 	debug_opcode("STC - UNIMPLEMENTED");
-	parentObj.UNDEFINED();
+	parentObj.UNDEFINED(parentObj, null);
 }
 ARMInstructionSet.prototype.MRC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
 	debug_opcode("MRC - UNIMPLEMENTED");
-	parentObj.UNDEFINED();
+	parentObj.UNDEFINED(parentObj, null);
 }
 ARMInstructionSet.prototype.MCR = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
 	debug_opcode("MCR - UNIMPLEMENTED");
-	parentObj.UNDEFINED();
+	parentObj.UNDEFINED(parentObj, null);
 }
-ARMInstructionSet.prototype.UNDEFINED = function (parentObj) {
+ARMInstructionSet.prototype.UNDEFINED = function (parentObj, operand2OP) {
 	//Undefined Exception:
 	debug_opcode("UNDEFINED");
 	parentObj.CPUCore.UNDEFINED((parentObj.registers[15] - 4) | 0);
