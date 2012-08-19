@@ -359,21 +359,23 @@ THUMBInstructionSet.prototype.NEG = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMP = function (parentObj) {
 	//Compare two registers:
-	var destination = parentObj.registers[parentObj.execute & 0x7];
-	var dirtyResult = destination - parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var operand1 = parentObj.registers[parentObj.execute & 0x7];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var dirtyResult = operand1 - operand2;
 	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSROverflow = (((operand1 & 0x7FFFFFFF) - (operand2 & 0x7FFFFFFF)) < 0);
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 THUMBInstructionSet.prototype.CMN = function (parentObj) {
 	//Compare two registers:
-	var destination = parentObj.registers[parentObj.execute & 0x7];
-	var dirtyResult = destination + parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var operand1 = parentObj.registers[parentObj.execute & 0x7];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var dirtyResult = operand1 + operand2;
 	var result = dirtyResult | 0;
-	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
+	parentObj.CPUCore.CPSROverflow = (((operand1 & 0x7FFFFFFF) + (operand2 & 0x7FFFFFFF)) > 0x7FFFFFFF);
+	parentObj.CPUCore.CPSRCarry = (result != dirtyResult);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
@@ -449,41 +451,45 @@ THUMBInstructionSet.prototype.ADDH_HH = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMPH_LL = function (parentObj) {
 	//Compare two registers:
-	var destination = parentObj.registers[parentObj.execute & 0x7];
-	var dirtyResult = destination - parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var operand1 = parentObj.registers[parentObj.execute & 0x7];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var dirtyResult = operand1 - operand2;
 	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSROverflow = (((operand1 & 0x7FFFFFFF) - (operand2 & 0x7FFFFFFF)) < 0);
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 THUMBInstructionSet.prototype.CMPH_LH = function (parentObj) {
 	//Compare two registers:
-	var destination = parentObj.registers[parentObj.execute & 0x7];
-	var dirtyResult = destination - parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var operand1 = parentObj.registers[parentObj.execute & 0x7];
+	var operand2 = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var dirtyResult = operand1 - operand2;
 	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSROverflow = (((operand1 & 0x7FFFFFFF) - (operand2 & 0x7FFFFFFF)) < 0);
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 THUMBInstructionSet.prototype.CMPH_HL = function (parentObj) {
 	//Compare two registers:
-	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
-	var dirtyResult = destination - parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var operand1 = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
+	var dirtyResult = operand1 - operand2;
 	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSROverflow = (((operand1 & 0x7FFFFFFF) - (operand2 & 0x7FFFFFFF)) < 0);
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 THUMBInstructionSet.prototype.CMPH_HH = function (parentObj) {
 	//Compare two registers:
-	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
-	var dirtyResult = destination - parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var operand1 = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
+	var operand2 = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
+	var dirtyResult = operand1 - operand2;
 	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSROverflow = (((operand1 & 0x7FFFFFFF) - (operand2 & 0x7FFFFFFF)) < 0);
 	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
-	parentObj.CPUCore.CPSROverflow = ((destination ^ result) < 0);
 	parentObj.CPUCore.CPSRNegative = (result < 0);
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
