@@ -194,9 +194,6 @@ GameBoyAdvanceCPU.prototype.switchMode = function (newMode) {
 GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function () {
 	//Used for leaving an exception and returning to the previous state:
 	switch (this.MODEBits) {
-		case 0x10:	//User
-		case 0x1F:	//System
-			return;
 		case 0x11:	//FIQ
 			var spsr = this.SPSRFIQ;
 			break;
@@ -211,6 +208,8 @@ GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function () {
 			break;
 		case 0x1B:	//Undefined
 			var spsr = this.SPSRUND;
+		default:	//Any other mode does not have access here.
+			return;
 	}
 	spsr[0] = this.CPSRNegative;
 	spsr[1] = this.CPSRZero;
