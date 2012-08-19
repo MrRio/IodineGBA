@@ -294,30 +294,30 @@ THUMBInstructionSet.prototype.ASR = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.ADC = function (parentObj) {
-	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
-	var destination = parentObj.registers[parentObj.execute & 0x7] + ((parentObj.CPUCore.CPSRCarry) ? 1 : 0);
+	var operand1 = parentObj.registers[parentObj.execute & 0x7];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	//Perform Addition:
-	var dirtyResult = source + destination;
-	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) != dirtyResult);
-	dirtyResult |= 0;
-	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
-	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
-	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	var dirtyResult = operand1 + operand2 + ((parentObj.CPUCore.CPSRCarry) ? 1 : 0);
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSROverflow = (((operand1 & 0x7FFFFFFF) + (operand2 & 0x7FFFFFFF) + ((parentObj.CPUCore.CPSRCarry) ? 1 : 0)) > 0x7FFFFFFF);
+	parentObj.CPUCore.CPSRCarry = (result != dirtyResult);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
 	//Update destination register:
-	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
+	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.SBC = function (parentObj) {
-	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
-	var offset = parentObj.registers[parentObj.execute & 0x7];
+	var operand1 = parentObj.registers[parentObj.execute & 0x7];
+	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	//Perform Subtraction:
-	var dirtyResult = source - offset - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1);
-	parentObj.CPUCore.CPSRCarry = ((dirtyResult | 0) == dirtyResult);
-	dirtyResult |= 0;
-	parentObj.CPUCore.CPSROverflow = ((source ^ dirtyResult) < 0);
-	parentObj.CPUCore.CPSRNegative = (dirtyResult < 0);
-	parentObj.CPUCore.CPSRZero = (dirtyResult == 0);
+	var dirtyResult = operand1 - operand2 - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1);
+	var result = dirtyResult | 0;
+	parentObj.CPUCore.CPSROverflow = (((operand1 & 0x7FFFFFFF) - (operand2 & 0x7FFFFFFF) - ((parentObj.CPUCore.CPSRCarry) ? 0 : 1)) < 0);
+	parentObj.CPUCore.CPSRCarry = (result == dirtyResult);
+	parentObj.CPUCore.CPSRNegative = (result < 0);
+	parentObj.CPUCore.CPSRZero = (result == 0);
 	//Update destination register:
-	parentObj.registers[parentObj.execute & 0x7] = dirtyResult;
+	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.ROR = function (parentObj) {
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
