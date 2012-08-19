@@ -25,18 +25,7 @@ ARMInstructionSet.prototype.initialize = function () {
 	this.fetch = 0;
 	this.decode = 0;
 	this.execute = 0;
-	this.pipelineInvalid = 0x3;
 	this.compileInstructionMap();
-}
-ARMInstructionSet.prototype.resetPipeline = function () {
-	this.pipelineInvalid = 0x3;
-	//Next PC fetch has to update the address bus:
-	this.wait.NonSequentialBroadcast();
-	//Make sure we don't increment before our fetch:
-	this.registers[15] = (this.registers[15] - 4) | 0;
-}
-ARMInstructionSet.prototype.getIRQLR = function () {
-	return (this.registers[15] - 8) | 0;
 }
 ARMInstructionSet.prototype.executeIteration = function () {
 	//Push the new fetch access:
@@ -50,15 +39,12 @@ ARMInstructionSet.prototype.executeIteration = function () {
 	this.decode = this.fetch;
 }
 ARMInstructionSet.prototype.executeARM = function (instruction) {
-	if (this.pipelineInvalid == 0) {
+	//Don't execute if the pipeline is still invalid:
+	if (this.CPUCore.pipelineInvalid == 0) {
 		//Check the condition code:
 		if (this.conditionCodeTest()) {
 			instruction[0](this, instruction[1]);
 		}
-	}
-	else {
-		//Tick the pipeline invalidation:
-		this.pipelineInvalid >>= 1;
 	}
 }
 ARMInstructionSet.prototype.conditionCodeTest = function () {
@@ -101,12 +87,34 @@ ARMInstructionSet.prototype.conditionCodeTest = function () {
 }
 ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
 	address &= 0xF;
-	//Guard high register writing, as it may cause a branch:
-	this.registers[address] = data;
 	if (address == 15) {
 		//We performed a branch:
-		this.resetPipeline();
+		this.CPUCore.branch(data);
 	}
+	else {
+		this.registers[address] = data;
+	}
+}
+ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
+	address &= 0xF;
+	if (address == 15) {
+		//We performed a branch:
+		this.CPUCore.branch(data);
+		//Restore SPSR to CPSR:
+		this.CPUCore.SPSRtoCPSR();
+	}
+	else {
+		this.registers[address] = data;
+	}
+}
+ARMInstructionSet.prototype.getDelayedRegisterRead = function (registerSelected) {
+	//Get the register data (After PC is updated during function execution):
+	var register = this.registers[registerSelected];
+	if (registerSelected == 15) {
+		//Adjust PC for it being incremented before end of instr:
+		register = (register + 4) | 0;
+	}
+	return register;
 }
 ARMInstructionSet.prototype.guardMultiRegisterWrite = function (parentObj, address, data) {
 	parentObj.guardRegisterWrite(address, data);
@@ -195,52 +203,30 @@ ARMInstructionSet.prototype.guardMultiRegisterReadSpecial = function (parentObj,
 			}
 	}
 }
-ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
-	address &= 0xF;
-	//Guard high register writing, as it may cause a branch:
-	this.registers[address] = data;
-	if (address == 15) {
-		//We performed a branch:
-		this.resetPipeline();
-		//Restore SPSR to CPSR:
-		this.CPUCore.SPSRtoCPSR();
-	}
-}
-ARMInstructionSet.prototype.getDelayedRegisterRead = function (registerSelected) {
-	//Get the register data (After PC is updated during function execution):
-	var register = this.registers[registerSelected];
-	if (registerSelected == 15) {
-		//Adjust PC for it being incremented before end of instr:
-		register = (register + 4) | 0;
-	}
-	return register;
+THUMBInstructionSet.prototype.getLR = function () {
+	return (this.registers[15] - 4) | 0;
 }
 ARMInstructionSet.prototype.BX = function (parentObj) {
 	//Branch & eXchange:
 	var address = parentObj.registers[parentObj.execute & 0xF];
 	if ((address & 0x1) == 0) {
 		//Stay in ARM mode:
-		address &= -4;
-		parentObj.registers[15] = address;
-		parentObj.resetPipeline();
+		parentObj.CPUCore.branch(address & -4);
 	}
 	else {
 		//Enter THUMB mode:
-		address &= -2;
-		parentObj.registers[15] = (address - 2) | 0;
+		parentObj.CPUCore.branch(address & -2);
 		parentObj.CPUCore.enterTHUMB();
 	}
 }
 ARMInstructionSet.prototype.B = function (parentObj) {
 	//Branch:
-	parentObj.registers[15] = (parentObj.registers[15] + ((parentObj.execute << 8) >> 6)) | 0;
-	parentObj.resetPipeline();
+	parentObj.CPUCore.branch((parentObj.registers[15] + ((parentObj.execute << 8) >> 6)) | 0);
 }
 ARMInstructionSet.prototype.BL = function (parentObj) {
 	//Branch with Link:
 	parentObj.registers[14] = (parentObj.registers[15] - 4) & -4;
-	parentObj.registers[15] = (parentObj.registers[15] + ((parentObj.execute << 8) >> 6)) | 0;
-	parentObj.resetPipeline();
+	parentObj.CPUCore.branch((parentObj.registers[15] + ((parentObj.execute << 8) >> 6)) | 0);
 }
 ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {
 	var operand1 = parentObj.registers[(parentObj.execute >> 16) & 0xF];
@@ -713,7 +699,7 @@ ARMInstructionSet.prototype.STMIAW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		parentObj.guardRegisterWrite((parentObj.execute >> 16) & 0xF, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -753,7 +739,7 @@ ARMInstructionSet.prototype.STMDAW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		parentObj.guardRegisterWrite((parentObj.execute >> 16) & 0xF, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -793,7 +779,7 @@ ARMInstructionSet.prototype.STMIBW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		parentObj.guardRegisterWrite((parentObj.execute >> 16) & 0xF, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -833,7 +819,7 @@ ARMInstructionSet.prototype.STMDBW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		parentObj.guardRegisterWrite((parentObj.execute >> 16) & 0xF, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -873,7 +859,7 @@ ARMInstructionSet.prototype.LDMIAW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		parentObj.guardRegisterWrite((parentObj.execute >> 16) & 0xF, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -913,7 +899,7 @@ ARMInstructionSet.prototype.LDMDAW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		parentObj.guardRegisterWrite((parentObj.execute >> 16) & 0xF, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -953,7 +939,7 @@ ARMInstructionSet.prototype.LDMIBW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		parentObj.guardRegisterWrite((parentObj.execute >> 16) & 0xF, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -993,7 +979,7 @@ ARMInstructionSet.prototype.LDMDBW = function (parentObj, operand2OP) {
 			}
 		}
 		//Store the updated base address back into register:
-		parentObj.registers[(parentObj.execute >> 16) & 0xF] = currentAddress;
+		parentObj.guardRegisterWrite((parentObj.execute >> 16) & 0xF, currentAddress);
 		//Updating the address bus back to PC fetch:
 		parentObj.wait.NonSequentialBroadcast();
 	}
@@ -1016,31 +1002,31 @@ ARMInstructionSet.prototype.SWPB = function (parentObj, operand2OP) {
 }
 ARMInstructionSet.prototype.SWI = function (parentObj, operand2OP) {
 	//Software Interrupt:
-	parentObj.CPUCore.SWI((parentObj.registers[15] - 4) | 0);
+	parentObj.CPUCore.SWI();
 }
 ARMInstructionSet.prototype.CDP = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
-	parentObj.UNDEFINED(parentObj, null);
+	parentObj.CPUCore.UNDEFINED();
 }
 ARMInstructionSet.prototype.LDC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
-	parentObj.UNDEFINED(parentObj, null);
+	parentObj.CPUCore.UNDEFINED();
 }
 ARMInstructionSet.prototype.STC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
-	parentObj.UNDEFINED(parentObj, null);
+	parentObj.CPUCore.UNDEFINED();
 }
 ARMInstructionSet.prototype.MRC = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
-	parentObj.UNDEFINED(parentObj, null);
+	parentObj.CPUCore.UNDEFINED();
 }
 ARMInstructionSet.prototype.MCR = function (parentObj, operand2OP) {
 	//No co-processor on GBA, but we really should do the bail properly:
-	parentObj.UNDEFINED(parentObj, null);
+	parentObj.CPUCore.UNDEFINED();
 }
 ARMInstructionSet.prototype.UNDEFINED = function (parentObj, operand2OP) {
 	//Undefined Exception:
-	parentObj.CPUCore.UNDEFINED((parentObj.registers[15] - 4) | 0);
+	parentObj.CPUCore.UNDEFINED();
 }
 ARMInstructionSet.prototype.lli = function (parentObj, operand) {
 	var registerSelected = operand & 0xF;
@@ -1317,9 +1303,8 @@ ARMInstructionSet.prototype.rcs = function (parentObj, operand) {
 		default:
 			parentObj.CPUCore.IRQDisabled = ((operand & 0x80) != 0);
 			parentObj.CPUCore.FIQDisabled = ((operand & 0x40) != 0);
-			parentObj.CPUCore.InTHUMB = ((operand & 0x20) != 0);
+			parentObj.CPUCore.THUMBBitModify((operand & 0x20) != 0);
 			parentObj.CPUCore.switchRegisterBank(operand & 0x1F);
-			parentObj.CPUCore.MODEBits = operand & 0x1F;
 	}
 }
 ARMInstructionSet.prototype.rs = function (parentObj) {
@@ -1397,9 +1382,8 @@ ARMInstructionSet.prototype.ic = function (parentObj, operand) {
 		default:
 			parentObj.CPUCore.IRQDisabled = ((operand & 0x80) != 0);
 			parentObj.CPUCore.FIQDisabled = ((operand & 0x40) != 0);
-			parentObj.CPUCore.InTHUMB = ((operand & 0x20) != 0);
+			parentObj.CPUCore.THUMBBitModify((operand & 0x20) != 0);
 			parentObj.CPUCore.switchRegisterBank(operand & 0x1F);
-			parentObj.CPUCore.MODEBits = operand & 0x1F;
 	}
 }
 ARMInstructionSet.prototype.is = function (parentObj, operand) {

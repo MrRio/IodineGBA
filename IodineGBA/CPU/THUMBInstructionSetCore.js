@@ -25,62 +25,50 @@ THUMBInstructionSet.prototype.initialize = function () {
 	this.fetch = 0;
 	this.decode = 0;
 	this.execute = 0;
-	this.pipelineInvalid = 0x3;
 	this.compileInstructionMap();
-}
-THUMBInstructionSet.prototype.resetPipeline = function () {
-	this.pipelineInvalid = 0x3;
-	//Next PC fetch has to update the address bus:
-	this.wait.NonSequentialBroadcast();
-	//Make sure we don't increment before our fetch:
-	this.registers[15] = (this.registers[15] - 2) | 0;
 }
 THUMBInstructionSet.prototype.guardHighRegisterWrite = function (data) {
 	var address = 0x8 | (this.execute & 0x7);
-	//Guard high register writing, as it may cause a branch:
-	this.registers[address] = data;
 	if (address == 15) {
 		//We performed a branch:
-		this.resetPipeline();
+		this.CPUCore.branch(data);
+	}
+	else {
+		//Regular Data Write:
+		this.registers[address] = data;
 	}
 }
 THUMBInstructionSet.prototype.writePC = function (data) {
 	//We performed a branch:
 	//Update the program counter to branch address:
-	this.registers[15] = data & -2;
-	//Flush Pipeline & Block PC Increment:
-	this.resetPipeline();
+	this.CPUCore.branch(data & -2);
 }
 THUMBInstructionSet.prototype.offsetPC = function (data) {
 	//We performed a branch:
 	//Update the program counter to branch address:
-	this.registers[15] = (this.registers[15] + ((data << 24) >> 23)) | 0;
-	//Flush Pipeline & Block PC Increment:
-	this.resetPipeline();
+	this.CPUCore.branch((this.registers[15] + ((data << 24) >> 23)) | 0);
 }
-THUMBInstructionSet.prototype.getIRQLR = function () {
-	return (this.registers[15] - 4) | 0;
+THUMBInstructionSet.prototype.getLR = function () {
+	return (this.registers[15] - 2) | 0;
 }
 THUMBInstructionSet.prototype.executeIteration = function () {
 	//Push the new fetch access:
 	this.fetch = this.wait.CPUGetOpcode16(this.registers[15]);
 	//Execute Instruction:
 	this.executeTHUMB();
-	//Increment The Program Counter:
-	this.registers[15] = (this.registers[15] + 2) | 0;
 	//Update the pipelining state:
 	this.execute = this.decode;
 	this.decode = this.fetch;
 }
 THUMBInstructionSet.prototype.executeTHUMB = function () {
-	if (this.pipelineInvalid == 0) {
+	if (this.CPUCore.pipelineInvalid == 0) {
 		//No condition code:
 		this.instructionMap[this.execute >> 6](this);
 	}
-	else {
-		//Tick the pipeline invalidation:
-		this.pipelineInvalid >>= 1;
-	}
+}
+THUMBInstructionSet.prototype.incrementProgramCounter = function () {
+	//Increment The Program Counter:
+	this.registers[15] = (this.registers[15] + 2) | 0;
 }
 THUMBInstructionSet.prototype.LSLimm = function (parentObj) {
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
@@ -521,14 +509,13 @@ THUMBInstructionSet.prototype.BX_L = function (parentObj) {
 	if ((address & 0x1) == 0) {
 		//Enter ARM mode:
 		address &= -4;
-		parentObj.registers[15] = (address + 2) | 0;
+		parentObj.CPUCore.branch(address);
 		parentObj.CPUCore.enterARM();
 	}
 	else {
 		//Stay in THUMB mode:
 		address &= -2;
-		parentObj.registers[15] = address;
-		parentObj.resetPipeline();
+		parentObj.CPUCore.branch(address);
 	}
 }
 THUMBInstructionSet.prototype.BX_H = function (parentObj) {
@@ -537,14 +524,13 @@ THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 	if ((address & 0x1) == 0) {
 		//Enter ARM mode:
 		address &= -4;
-		parentObj.registers[15] = (address + 2) | 0;
+		parentObj.CPUCore.branch(address);
 		parentObj.CPUCore.enterARM();
 	}
 	else {
 		//Stay in THUMB mode:
 		address &= -2;
-		parentObj.registers[15] = address;
-		parentObj.resetPipeline();
+		parentObj.CPUCore.branch(address);
 	}
 }
 THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
@@ -829,14 +815,12 @@ THUMBInstructionSet.prototype.BLE = function (parentObj) {
 }
 THUMBInstructionSet.prototype.SWI = function (parentObj) {
 	//Software Interrupt:
-	parentObj.CPUCore.SWI((parentObj.registers[15] - 2) | 0);
+	parentObj.CPUCore.SWI();
 }
 THUMBInstructionSet.prototype.B = function (parentObj) {
 	//Unconditional Branch:
 	//Update the program counter to branch address:
-	parentObj.registers[15] = (parentObj.registers[15] + ((parentObj.execute << 21) >> 20)) | 0;
-	//Flush Pipeline & Block PC Increment:
-	parentObj.resetPipeline();
+	parentObj.CPUCore.branch((parentObj.registers[15] + ((parentObj.execute << 21) >> 20)) | 0);
 }
 THUMBInstructionSet.prototype.BLsetup = function (parentObj) {
 	//Brank with Link (High offset)
@@ -849,15 +833,14 @@ THUMBInstructionSet.prototype.BLoff = function (parentObj) {
 	parentObj.registers[14] = (parentObj.registers[14] + ((parentObj.execute & 0x7FF) << 1)) | 0;
 	//Copy LR to PC:
 	var oldPC = parentObj.registers[15];
-	parentObj.registers[15] = parentObj.registers[14];
 	//Flush Pipeline & Block PC Increment:
-	parentObj.resetPipeline();
+	parentObj.CPUCore.branch(parentObj.registers[14]);
 	//Set bit 0 of LR high:
 	parentObj.registers[14] = (oldPC - 0x2) | 0x1;
 }
 THUMBInstructionSet.prototype.UNDEFINED = function (parentObj) {
 	//Undefined Exception:
-	parentObj.CPUCore.UNDEFINED((parentObj.registers[15] - 2) | 0);
+	parentObj.CPUCore.UNDEFINED();
 }
 THUMBInstructionSet.prototype.compileInstructionMap = function () {
 	this.instructionMap = [];
