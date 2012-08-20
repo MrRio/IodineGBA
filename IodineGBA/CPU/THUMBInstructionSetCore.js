@@ -818,7 +818,7 @@ THUMBInstructionSet.prototype.BGT = function (parentObj) {
 }
 THUMBInstructionSet.prototype.BLE = function (parentObj) {
 	//Branch if Zero Set and Negative NOT equal to Overflow
-	if (parentObj.CPUCore.CPSRZero && parentObj.CPUCore.CPSRNegative != parentObj.CPUCore.CPSROverflow) {
+	if (parentObj.CPUCore.CPSRZero || parentObj.CPUCore.CPSRNegative != parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
 	}
 }
