@@ -103,7 +103,7 @@ GameBoyAdvanceDMA.prototype.writeDMAControl1 = function (dmaChannel, data) {
 	control[1] = (data >> 4) & 0x3;
 	control[0] = ((data & 0x40) == 0x40);
 	if (data > 0x7F) {
-		this.enabled[dmaChannel] = this.DMA_ENABLE_TYPE[dmaChannel][this.control[1]];
+		this.enabled[dmaChannel] = this.DMA_ENABLE_TYPE[dmaChannel][control[1]];
 		this.enableDMAChannel(dmaChannel);
 	}
 	else {
@@ -123,8 +123,8 @@ GameBoyAdvanceDMA.prototype.readDMAControl1 = function (dmaChannel) {
 }
 GameBoyAdvanceDMA.prototype.enableDMAChannel = function (dmaChannel) {
 	//Emulate the DMA preprocessing that occurs on DMA enabling:
-	var control = this.control;
-	var controlShadow = this.control[dmaChannel];
+	var control = this.control[dmaChannel];
+	var controlShadow = this.controlShadow[dmaChannel];
 	var sourceShadow = this.source[dmaChannel];
 	var destinationShadow = this.destination[dmaChannel];
 	var wordCountShadow = this.wordCount[dmaChannel];
@@ -194,7 +194,7 @@ GameBoyAdvanceDMA.prototype.requestGamePakDMA = function () {
 		this.IOCore.systemStatus |= 0x1;
 	}
 }
-GameBoyAdvanceDMA.prototype.process = function () {
+GameBoyAdvanceDMA.prototype.perform = function () {
 	//Solve for the highest priority DMA to process:
 	for (var dmaPriority = 0; dmaPriority < 4; ++dmaPriority) {
 		this.currentMatch = this.enabled[dmaPriority] & this.pending[dmaPriority];
