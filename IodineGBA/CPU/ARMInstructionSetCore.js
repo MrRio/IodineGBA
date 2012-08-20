@@ -44,21 +44,6 @@ ARMInstructionSet.prototype.executeARM = function (instruction) {
 	if (this.CPUCore.pipelineInvalid == 0) {
 		//Check the condition code:
 		if (this.conditionCodeTest()) {
-			debug_register(14, this.registers[14]);
-			debug_register(13, this.registers[13]);
-			debug_register(12, this.registers[12]);
-			debug_register(11, this.registers[11]);
-			debug_register(10, this.registers[10]);
-			debug_register(9, this.registers[9]);
-			debug_register(8, this.registers[8]);
-			debug_register(7, this.registers[7]);
-			debug_register(6, this.registers[6]);
-			debug_register(5, this.registers[5]);
-			debug_register(4, this.registers[4]);
-			debug_register(3, this.registers[3]);
-			debug_register(2, this.registers[2]);
-			debug_register(1, this.registers[1]);
-			debug_register(0, this.registers[0]);
 			instruction[0](this, instruction[1]);
 		}
 		else {
@@ -120,6 +105,7 @@ ARMInstructionSet.prototype.guardRegisterWrite = function (address, data) {
 	}
 	else {
 		this.registers[address] = data;
+		debug_register(address, data);
 	}
 }
 ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
@@ -132,6 +118,7 @@ ARMInstructionSet.prototype.guardRegisterWriteCPSR = function (address, data) {
 	}
 	else {
 		this.registers[address] = data;
+		debug_register(address, data);
 	}
 }
 ARMInstructionSet.prototype.getDelayedRegisterRead = function (registerSelected) {
@@ -151,7 +138,7 @@ ARMInstructionSet.prototype.guardMultiRegisterRead = function (parentObj, addres
 }
 ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data, userMode) {
 	address &= 0xF;
-	if (userMode) {
+	if (!userMode) {
 		this.guardRegisterWrite(address, data);
 	}
 	else {
@@ -166,6 +153,7 @@ ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data,
 				}
 				else {
 					//User-Mode Register Write Inside Non-User-Mode:
+					debug_mregister(address, data);
 					this.CPUCore.registersUSR[address] = data;
 				}
 				break;
@@ -175,6 +163,7 @@ ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data,
 				}
 				else {
 					//User-Mode Register Write Inside Non-User-Mode:
+					debug_mregister(address, data);
 					this.CPUCore.registersUSR[address] = data;
 				}
 		}
@@ -192,6 +181,7 @@ ARMInstructionSet.prototype.guardMultiRegisterWriteSpecial = function (parentObj
 			}
 			else {
 				//User-Mode Register Write Inside Non-User-Mode:
+				debug_mregister(address, data);
 				parentObj.CPUCore.registersUSR[address] = data;
 			}
 			break;
@@ -201,6 +191,7 @@ ARMInstructionSet.prototype.guardMultiRegisterWriteSpecial = function (parentObj
 			}
 			else {
 				//User-Mode Register Write Inside Non-User-Mode:
+				debug_mregister(address, data);
 				parentObj.CPUCore.registersUSR[address] = data;
 			}
 	}
@@ -256,6 +247,7 @@ ARMInstructionSet.prototype.BL = function (parentObj) {
 	debug_opcode("BL");
 	//Branch with Link:
 	parentObj.registers[14] = (parentObj.registers[15] - 4) & -4;
+	debug_register(14, parentObj.registers[14]);
 	parentObj.CPUCore.branch((parentObj.registers[15] + ((parentObj.execute << 8) >> 6)) | 0);
 }
 ARMInstructionSet.prototype.AND = function (parentObj, operand2OP) {

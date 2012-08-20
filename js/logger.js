@@ -125,6 +125,11 @@ function debug_register(register, data) {
 	}
 	current_unit[1][1].push([type, register + outputCleanse(data)]);
 }
+function debug_mregister(register, data) {
+	var type = "register";
+	register = "(USER) r[" + outputCleanse(register) + "]= ";
+	current_unit[1][1].push([type, register + outputCleanse(data)]);
+}
 function debug_exception(newMode) {
 	current_unit[1][1].push(["exception", "Exception into mode " + outputCleanse(newMode)]);
 }

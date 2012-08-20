@@ -129,6 +129,7 @@ GameBoyAdvanceCPU.prototype.IRQ = function () {
 		this.switchMode(0x12);
 		//Save link register:
 		this.registers[14] = this.getLR();
+		debug_register(14, this.registers[14]);
 		//IRQ exception vector:
 		this.branch(0x18);
 		//Disable IRQ:
@@ -142,6 +143,7 @@ GameBoyAdvanceCPU.prototype.SWI = function () {
 	this.switchMode(0x13);
 	//Save link register:
 	this.registers[14] = this.getLR();
+	debug_register(14, this.registers[14]);
 	//SWI exception vector:
 	this.branch(0x8);
 	//Disable IRQ:
@@ -154,6 +156,7 @@ GameBoyAdvanceCPU.prototype.UNDEFINED = function () {
 	this.switchMode(0x1B);
 	//Save link register:
 	this.registers[14] = this.getLR();
+	debug_register(14, this.registers[14]);
 	//SWI exception vector:
 	this.branch(0x4);
 	//Disable IRQ:
