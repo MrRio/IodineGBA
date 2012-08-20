@@ -16,6 +16,7 @@
  */
 function GameBoyAdvanceCPU(IOCore) {
 	this.IOCore = IOCore;
+	this.wait = this.IOCore.wait;
 	this.mul64ResultHigh = 0;	//Scratch MUL64.
 	this.mul64ResultLow = 0;	//Scratch MUL64.
 	this.initialize();
@@ -66,16 +67,34 @@ GameBoyAdvanceCPU.prototype.initializeRegisters = function () {
 	this.SPSRABT = [false, false, false, false, true, true, false, 0x13];	//Abort
 	this.SPSRUND = [false, false, false, false, true, true, false, 0x13];	//Undefined
 	this.triggeredIRQ = false;		//Pending IRQ found.
+	this.pipelineInvalid = 0x4;		//Mark pipeline as invalid.
 }
 GameBoyAdvanceCPU.prototype.executeIteration = function () {
 	//Check for pending IRQ:
 	if (this.triggeredIRQ) {
+		//Clear our Pending IRQ acknowledge:
 		this.triggeredIRQ = false;
-		this.IRQ(this.instructionHandle.getIRQLR());
+		//Branch for IRQ now:
+		this.IRQ(this.instructionHandle.getLR());
 	}
+	//Tick the pipeline and bubble out invalidity:
+	this.pipelineInvalid >>= 1;
 	//Tick the pipeline of the selected instruction set:
 	this.instructionHandle.executeIteration();
+	//Increment the program counter if we didn't just branch:
+	if (this.pipelineInvalid < 0x4) {
+		this.instructionHandle.incrementProgramCounter();
+	}
 	debug_end_unit();
+}
+GameBoyAdvanceCPU.prototype.branch = function (branchTo) {
+	//Branch to new address:
+	this.registers[15] = branchTo;
+	//Mark pipeline as invalid:
+	this.pipelineInvalid = 0x4;
+	//Next PC fetch has to update the address bus:
+	this.wait.NonSequentialBroadcast();
+	debug_branch(branchTo);
 }
 GameBoyAdvanceCPU.prototype.triggerIRQ = function () {
 	this.triggeredIRQ = !this.IRQDisabled;
@@ -83,95 +102,62 @@ GameBoyAdvanceCPU.prototype.triggerIRQ = function () {
 GameBoyAdvanceCPU.prototype.getCurrentFetchValue = function () {
 	return this.instructionHandle.fetch;
 }
-GameBoyAdvanceCPU.prototype.enterException = function (isExternal) {
-	if (!isExternal) {
-		this.instructionHandle.resetPipeline();
-	}
-	this.instructionHandle = this.ARM;
-	this.instructionHandle.pipelineInvalid = 0x3;
-	this.IOCore.wait.NonSequentialBroadcast();
-	this.InTHUMB = false;
-}
 GameBoyAdvanceCPU.prototype.enterARM = function () {
-	this.instructionHandle = this.ARM;
-	this.instructionHandle.resetPipeline();
-	this.InTHUMB = false;
+	this.THUMBBitModify(false);
 }
 GameBoyAdvanceCPU.prototype.enterTHUMB = function () {
-	this.instructionHandle = this.THUMB;
-	this.instructionHandle.resetPipeline();
-	this.InTHUMB = true;
+	this.THUMBBitModify(true);
 }
-GameBoyAdvanceCPU.prototype.setTHUMB = function (thumbStatus) {
-	this.InTHUMB = thumbStatus;
-	this.instructionHandle = (this.InTHUMB) ? this.THUMB : this.ARM;
+GameBoyAdvanceCPU.prototype.getLR = function () {
+	//Get the previous instruction address:
+	return this.instructionHandle.getLR();
 }
-GameBoyAdvanceCPU.prototype.FIQ = function (LR) {
-	if (!this.FIQDisabled) {
-		//Switch Register Banks:
-		this.switchRegisterBank(0x11);
-		//Save link register:
-		this.registers[14] = LR;
-		//FIQ exception vector:
-		this.registers[15] = 0x1C;
-		//Protect the CPSR:
-		this.CPSRtoSPSR(0x11);
-		//Disable IRQ:
-		this.IRQDisabled = true;
-		//Disable FIQ:
-		this.FIQDisabled = true;
-		//Exception always enter ARM mode:
-		this.enterException(false);
-		debug_exception(this.MODEBits);
+GameBoyAdvanceCPU.prototype.THUMBBitModify = function (isThumb) {
+	this.inTHUMB = isThumb;
+	if (isThumb) {
+		this.instructionHandle = this.THUMB;
+	}
+	else {
+		this.instructionHandle = this.ARM;
 	}
 }
-GameBoyAdvanceCPU.prototype.IRQ = function (LR) {
+GameBoyAdvanceCPU.prototype.IRQ = function () {
 	if (!this.IRQDisabled) {
-		//Switch Register Banks:
-		this.switchRegisterBank(0x12);
+		//Exception always enter ARM mode:
+		this.enterARM();
+		//Mode bits are set to IRQ:
+		this.switchMode(0x12);
 		//Save link register:
-		this.registers[14] = LR;
+		this.registers[14] = this.getLR();
 		//IRQ exception vector:
-		this.registers[15] = 0x18;
-		//Protect the CPSR:
-		this.CPSRtoSPSR(0x12);
+		this.branch(0x18);
 		//Disable IRQ:
 		this.IRQDisabled = true;
-		//Exception always enter ARM mode:
-		this.enterException(true);
-		debug_exception(this.MODEBits);
 	}
 }
-GameBoyAdvanceCPU.prototype.SWI = function (LR) {
-	//Switch Register Banks:
-	this.switchRegisterBank(0x13);
+GameBoyAdvanceCPU.prototype.SWI = function () {
+	//Exception always enter ARM mode:
+	this.enterARM();
+	//Mode bits are set to SWI:
+	this.switchMode(0x13);
 	//Save link register:
-	this.registers[14] = LR;
-	//SWI enters the SVC vector:
-	this.registers[15] = 0x8;
-	//Mode bits are set to SVC:
-	//Protect the CPSR:
-	this.CPSRtoSPSR(0x13);
+	this.registers[14] = this.getLR();
+	//SWI exception vector:
+	this.branch(0x8);
 	//Disable IRQ:
 	this.IRQDisabled = true;
-	//Exception always enter ARM mode:
-	this.enterException(false);
-	debug_exception(this.MODEBits);
 }
-GameBoyAdvanceCPU.prototype.UNDEFINED = function (LR) {
-	//Switch Register Banks:
-	this.switchRegisterBank(0x1B);
+GameBoyAdvanceCPU.prototype.UNDEFINED = function () {
+	//Exception always enter ARM mode:
+	this.enterARM();
+	//Mode bits are set to SWI:
+	this.switchMode(0x1B);
 	//Save link register:
-	this.registers[14] = LR;
-	//Undefined exception vector:
-	this.registers[15] = 0x4;
-	//Protect the CPSR:
-	this.CPSRtoSPSR(0x1B);
+	this.registers[14] = this.getLR();
+	//SWI exception vector:
+	this.branch(0x4);
 	//Disable IRQ:
 	this.IRQDisabled = true;
-	//Exception always enter ARM mode:
-	this.enterException(false);
-	debug_exception(this.MODEBits);
 }
 GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	//Used for leaving an exception and returning to the previous state:
@@ -200,17 +186,16 @@ GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	this.CPSRCarry = spsr[3];
 	this.IRQDisabled = spsr[4];
 	this.FIQDisabled = spsr[5];
-	this.setTHUMB(spsr[6]);
+	this.THUMBBitModify(spsr[6]);
 	this.switchRegisterBank(spsr[7]);
-	this.MODEBits = spsr[7];
-	debug_exception(this.MODEBits);
 }
-GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function (newMode) {
+GameBoyAdvanceCPU.prototype.switchMode = function (newMode) {
+	this.CPSRtoSPSR();
+	this.switchRegisterBank(newMode);
+}
+GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function () {
 	//Used for leaving an exception and returning to the previous state:
-	switch (newMode) {
-		case 0x10:	//User
-		case 0x1F:	//System
-			return;
+	switch (this.MODEBits) {
 		case 0x11:	//FIQ
 			var spsr = this.SPSRFIQ;
 			break;
@@ -225,6 +210,8 @@ GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function (newMode) {
 			break;
 		case 0x1B:	//Undefined
 			var spsr = this.SPSRUND;
+		default:	//Any other mode does not have access here.
+			return;
 	}
 	spsr[0] = this.CPSRNegative;
 	spsr[1] = this.CPSRZero;
@@ -235,7 +222,6 @@ GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function (newMode) {
 	spsr[6] = this.InTHUMB;
 	spsr[7] = this.MODEBits;
 	debug_spsr(spsr);
-	this.MODEBits = newMode;
 }
 GameBoyAdvanceCPU.prototype.switchRegisterBank = function (newMode) {
 	switch (this.MODEBits) {
@@ -300,6 +286,8 @@ GameBoyAdvanceCPU.prototype.switchRegisterBank = function (newMode) {
 			this.registers[13] = this.registersUND[0];
 			this.registers[14] = this.registersUND[1];
 	}
+	this.MODEBits = newMode;
+	debug_exception(this.MODEBits);
 }
 GameBoyAdvanceCPU.prototype.performMUL32 = function (rs, rd, MLAClocks) {
 	//Predict the internal cycle time:
@@ -439,14 +427,6 @@ GameBoyAdvanceCPU.prototype.performUMLA64 = function (rs, rd, mlaHigh, mlaLow) {
 	var highMul = (rs >> 16) * rd;
 	//Cut off bits above bit 31 and return with proper sign:
 	this.mul64ResultLow = ((highMul << 16) + lowMul + mlaLow) | 0;
-}
-GameBoyAdvanceCPU.prototype.subV = function (operand1, operand2, destination) {
-	//Calculate the overflow flag on a sub operation:
-	this.CPSROverflow = ((operand1 ^ operand2 ^ destination) < 0);
-}
-GameBoyAdvanceCPU.prototype.addV = function (operand1, operand2, destination) {
-	//Calculate the overflow flag on an add operation:
-	this.CPSROverflow = (((operand1 & 0x80000000) == (operand2 & 0x80000000)) && (operand1 ^ operand2 ^ destination) < 0);
 }
 GameBoyAdvanceCPU.prototype.write32 = function (address, data) {
 	//Updating the address bus away from PC fetch:

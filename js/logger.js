@@ -78,6 +78,7 @@ function debug_check_log_approval(name) {
 			return debugging_exception;
 		case "pipeline":
 		case "not_taken":
+		case "branch":
 			return debugging_pipeline;
 		case "mode":
 			return debugging_mode;
@@ -97,6 +98,9 @@ function debug_opcode(opcode) {
 }
 function debug_pipeline() {
 	current_unit[1][1].push(["pipeline", "Pipeline Flush"]);
+}
+function debug_branch(address) {
+	current_unit[1][1].push(["pipeline", "Branch To: " + outputCleanse(address)]);
 }
 function debug_register(register, data) {
 	var type = "register";
