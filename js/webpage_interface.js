@@ -113,7 +113,7 @@ function registerGUIEvents() {
 	});
 	document.getElementById("record_register").checked = true;
 	addEvent("click", document.getElementById("record_register"), function () {
-		debugging_pc = this.checked;
+		debugging_register = this.checked;
 	});
 	document.getElementById("record_exception").checked = true;
 	addEvent("click", document.getElementById("record_exception"), function () {

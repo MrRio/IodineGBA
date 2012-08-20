@@ -72,7 +72,6 @@ function debug_check_log_approval(name) {
 		case "memoryWrite":
 			return debugging_memoryWrite;
 		case "register":
-		case "high_reg":
 			return debugging_register;
 		case "exception":
 			return debugging_exception;
@@ -82,6 +81,10 @@ function debug_check_log_approval(name) {
 			return debugging_pipeline;
 		case "mode":
 			return debugging_mode;
+		case "high_reg":
+			return true;
+		default:
+			return false;
 	}
 }
 function debug_start_unit(unitName) {

@@ -93,6 +93,7 @@ THUMBInstructionSet.prototype.incrementProgramCounter = function () {
 	this.registers[15] = (this.registers[15] + 2) | 0;
 }
 THUMBInstructionSet.prototype.LSLimm = function (parentObj) {
+	debug_opcode("LSLimm");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var offset = (parentObj.execute >> 6) & 0x1F;
 	if (offset > 0) {
@@ -111,6 +112,7 @@ THUMBInstructionSet.prototype.LSLimm = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.LSRimm = function (parentObj) {
+	debug_opcode("LSRimm");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var offset = (parentObj.execute >> 6) & 0x1F;
 	if (offset > 0) {
@@ -129,6 +131,7 @@ THUMBInstructionSet.prototype.LSRimm = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.ASRimm = function (parentObj) {
+	debug_opcode("ASRimm");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var offset = (parentObj.execute >> 6) & 0x1F;
 	if (offset > 0) {
@@ -147,6 +150,7 @@ THUMBInstructionSet.prototype.ASRimm = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.ADDreg = function (parentObj) {
+	debug_opcode("ADDreg");
 	var operand1 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var operand2 = parentObj.registers[(parentObj.execute >> 6) & 0x7];
 	//Perform Addition:
@@ -160,6 +164,7 @@ THUMBInstructionSet.prototype.ADDreg = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.SUBreg = function (parentObj) {
+	debug_opcode("SUBreg");
 	var operand1 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var operand2 = parentObj.registers[(parentObj.execute >> 6) & 0x7];
 	//Perform Subtraction:
@@ -173,6 +178,7 @@ THUMBInstructionSet.prototype.SUBreg = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.ADDimm3 = function (parentObj) {
+	debug_opcode("ADDimm3");
 	var operand1 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var operand2 = (parentObj.execute >> 6) & 0x7;
 	//Perform Addition:
@@ -186,6 +192,7 @@ THUMBInstructionSet.prototype.ADDimm3 = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.SUBimm3 = function (parentObj) {
+	debug_opcode("SUBimm3");
 	var operand1 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var operand2 = (parentObj.execute >> 6) & 0x7;
 	//Perform Subtraction:
@@ -200,6 +207,7 @@ THUMBInstructionSet.prototype.SUBimm3 = function (parentObj) {
 }
 THUMBInstructionSet.prototype.MOVimm8 = function (parentObj) {
 	//Get the 8-bit value to move into the register:
+	debug_opcode("MOVimm8");
 	var result = parentObj.execute & 0xFF;
 	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (result < 0);
@@ -209,6 +217,7 @@ THUMBInstructionSet.prototype.MOVimm8 = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMPimm8 = function (parentObj) {
 	//Compare an 8-bit immediate value with a register:
+	debug_opcode("CMPimm8");
 	var operand1 = parentObj.registers[(parentObj.execute >> 8) & 0x7];
 	var operand2 = parentObj.execute & 0xFF;
 	var dirtyResult = operand1 - operand2;
@@ -220,6 +229,7 @@ THUMBInstructionSet.prototype.CMPimm8 = function (parentObj) {
 }
 THUMBInstructionSet.prototype.ADDimm8 = function (parentObj) {
 	//Add an 8-bit immediate value with a register:
+	debug_opcode("ADDimm8");
 	var operand1 = parentObj.registers[(parentObj.execute >> 8) & 0x7];
 	var operand2 = parentObj.execute & 0xFF;
 	var dirtyResult = operand1 + operand2;
@@ -232,6 +242,7 @@ THUMBInstructionSet.prototype.ADDimm8 = function (parentObj) {
 }
 THUMBInstructionSet.prototype.SUBimm8 = function (parentObj) {
 	//Subtract an 8-bit immediate value from a register:
+	debug_opcode("SUBimm8");
 	var operand1 = parentObj.registers[(parentObj.execute >> 8) & 0x7];
 	var operand2 = parentObj.execute & 0xFF;
 	var dirtyResult = operand1 - operand2;
@@ -243,6 +254,7 @@ THUMBInstructionSet.prototype.SUBimm8 = function (parentObj) {
 	parentObj.registers[(parentObj.execute >> 8) & 0x7] = result;
 }
 THUMBInstructionSet.prototype.AND = function (parentObj) {
+	debug_opcode("AND");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform bitwise AND:
@@ -254,6 +266,7 @@ THUMBInstructionSet.prototype.AND = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.EOR = function (parentObj) {
+	debug_opcode("EOR");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform bitwise EOR:
@@ -265,6 +278,7 @@ THUMBInstructionSet.prototype.EOR = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.LSL = function (parentObj) {
+	debug_opcode("LSL");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7] & 0x1F;
 	if (destination > 0) {
@@ -283,6 +297,7 @@ THUMBInstructionSet.prototype.LSL = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.LSR = function (parentObj) {
+	debug_opcode("LSR");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7] & 0x1F;
 	if (destination > 0) {
@@ -301,6 +316,7 @@ THUMBInstructionSet.prototype.LSR = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.ASR = function (parentObj) {
+	debug_opcode("ASR");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7] & 0x1F;
 	if (destination > 0) {
@@ -319,6 +335,7 @@ THUMBInstructionSet.prototype.ASR = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.ADC = function (parentObj) {
+	debug_opcode("ADC");
 	var operand1 = parentObj.registers[parentObj.execute & 0x7];
 	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	//Perform Addition:
@@ -332,6 +349,7 @@ THUMBInstructionSet.prototype.ADC = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.SBC = function (parentObj) {
+	debug_opcode("SBC");
 	var operand1 = parentObj.registers[parentObj.execute & 0x7];
 	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	//Perform Subtraction:
@@ -345,6 +363,7 @@ THUMBInstructionSet.prototype.SBC = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.ROR = function (parentObj) {
+	debug_opcode("ROR");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7] & 0x1F;
 	if (destination > 0) {
@@ -363,6 +382,7 @@ THUMBInstructionSet.prototype.ROR = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.TST = function (parentObj) {
+	debug_opcode("TST");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform bitwise AND:
@@ -372,6 +392,7 @@ THUMBInstructionSet.prototype.TST = function (parentObj) {
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 THUMBInstructionSet.prototype.NEG = function (parentObj) {
+	debug_opcode("NEG");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSROverflow = ((source ^ (-source)) < 0);
@@ -384,6 +405,7 @@ THUMBInstructionSet.prototype.NEG = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMP = function (parentObj) {
 	//Compare two registers:
+	debug_opcode("CMP");
 	var operand1 = parentObj.registers[parentObj.execute & 0x7];
 	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var dirtyResult = operand1 - operand2;
@@ -395,6 +417,7 @@ THUMBInstructionSet.prototype.CMP = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMN = function (parentObj) {
 	//Compare two registers:
+	debug_opcode("CMN");
 	var operand1 = parentObj.registers[parentObj.execute & 0x7];
 	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var dirtyResult = operand1 + operand2;
@@ -405,6 +428,7 @@ THUMBInstructionSet.prototype.CMN = function (parentObj) {
 	parentObj.CPUCore.CPSRZero = (result == 0);
 }
 THUMBInstructionSet.prototype.ORR = function (parentObj) {
+	debug_opcode("ORR");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform bitwise ORR:
@@ -416,6 +440,7 @@ THUMBInstructionSet.prototype.ORR = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.MUL = function (parentObj) {
+	debug_opcode("MUL");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform MUL32:
@@ -427,6 +452,7 @@ THUMBInstructionSet.prototype.MUL = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = result;
 }
 THUMBInstructionSet.prototype.BIC = function (parentObj) {
+	debug_opcode("BIC");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform bitwise AND with a bitwise NOT on source:
@@ -439,6 +465,7 @@ THUMBInstructionSet.prototype.BIC = function (parentObj) {
 }
 THUMBInstructionSet.prototype.MVN = function (parentObj) {
 	//Perform bitwise NOT on source:
+	debug_opcode("MVN");
 	var source = ~parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	parentObj.CPUCore.CPSRCarry = false;
 	parentObj.CPUCore.CPSRNegative = (source < 0);
@@ -447,6 +474,7 @@ THUMBInstructionSet.prototype.MVN = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = source;
 }
 THUMBInstructionSet.prototype.ADDH_LL = function (parentObj) {
+	debug_opcode("ADDH (LL)");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform Addition:
@@ -454,6 +482,7 @@ THUMBInstructionSet.prototype.ADDH_LL = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = (source + destination) | 0;
 }
 THUMBInstructionSet.prototype.ADDH_LH = function (parentObj) {
+	debug_opcode("ADDH (LH)");
 	var source = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 	var destination = parentObj.registers[parentObj.execute & 0x7];
 	//Perform Addition:
@@ -461,6 +490,7 @@ THUMBInstructionSet.prototype.ADDH_LH = function (parentObj) {
 	parentObj.registers[parentObj.execute & 0x7] = (source + destination) | 0;
 }
 THUMBInstructionSet.prototype.ADDH_HL = function (parentObj) {
+	debug_opcode("ADDH (HL)");
 	var source = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
 	//Perform Addition:
@@ -468,6 +498,7 @@ THUMBInstructionSet.prototype.ADDH_HL = function (parentObj) {
 	parentObj.guardHighRegisterWrite((source + destination) | 0);
 }
 THUMBInstructionSet.prototype.ADDH_HH = function (parentObj) {
+	debug_opcode("ADDH (HH)");
 	var source = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 	var destination = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
 	//Perform Addition:
@@ -476,6 +507,7 @@ THUMBInstructionSet.prototype.ADDH_HH = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMPH_LL = function (parentObj) {
 	//Compare two registers:
+	debug_opcode("CMPH (LL)");
 	var operand1 = parentObj.registers[parentObj.execute & 0x7];
 	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var dirtyResult = operand1 - operand2;
@@ -487,6 +519,7 @@ THUMBInstructionSet.prototype.CMPH_LL = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMPH_LH = function (parentObj) {
 	//Compare two registers:
+	debug_opcode("CMPH (LH)");
 	var operand1 = parentObj.registers[parentObj.execute & 0x7];
 	var operand2 = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 	var dirtyResult = operand1 - operand2;
@@ -498,6 +531,7 @@ THUMBInstructionSet.prototype.CMPH_LH = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMPH_HL = function (parentObj) {
 	//Compare two registers:
+	debug_opcode("CMPH (HL)");
 	var operand1 = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
 	var operand2 = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	var dirtyResult = operand1 - operand2;
@@ -509,6 +543,7 @@ THUMBInstructionSet.prototype.CMPH_HL = function (parentObj) {
 }
 THUMBInstructionSet.prototype.CMPH_HH = function (parentObj) {
 	//Compare two registers:
+	debug_opcode("CMPH (HH)");
 	var operand1 = parentObj.registers[0x8 | (parentObj.execute & 0x7)];
 	var operand2 = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 	var dirtyResult = operand1 - operand2;
@@ -520,22 +555,27 @@ THUMBInstructionSet.prototype.CMPH_HH = function (parentObj) {
 }
 THUMBInstructionSet.prototype.MOVH_LL = function (parentObj) {
 	//Move a register to another register:
+	debug_opcode("MOVH (LL)");
 	parentObj.registers[parentObj.execute & 0x7] = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 }
 THUMBInstructionSet.prototype.MOVH_LH = function (parentObj) {
 	//Move a register to another register:
+	debug_opcode("MOVH (LH)");
 	parentObj.registers[parentObj.execute & 0x7] = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 }
 THUMBInstructionSet.prototype.MOVH_HL = function (parentObj) {
 	//Move a register to another register:
+	debug_opcode("MOVH (HL)");
 	parentObj.guardHighRegisterWrite(parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
 THUMBInstructionSet.prototype.MOVH_HH = function (parentObj) {
 	//Move a register to another register:
+	debug_opcode("MOVH (HH)");
 	parentObj.guardHighRegisterWrite(parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)]);
 }
 THUMBInstructionSet.prototype.BX_L = function (parentObj) {
 	//Branch & eXchange:
+	debug_opcode("BX (L)");
 	var address = parentObj.registers[(parentObj.execute >> 3) & 0x7];
 	if ((address & 0x1) == 0) {
 		//Enter ARM mode:
@@ -551,6 +591,7 @@ THUMBInstructionSet.prototype.BX_L = function (parentObj) {
 }
 THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 	//Branch & eXchange:
+	debug_opcode("BX (H)");
 	var address = parentObj.registers[0x8 | ((parentObj.execute >> 3) & 0x7)];
 	if ((address & 0x1) == 0) {
 		//Enter ARM mode:
@@ -566,51 +607,63 @@ THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 }
 THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
 	//PC-Relative Load
+	debug_opcode("LDRPC");
 	var result = parentObj.CPUCore.read32(parentObj.registers[15] + ((parentObj.execute & 0xFF) << 2));
 	parentObj.registers[(parentObj.execute >> 8) & 0x7] = result;
 }
 THUMBInstructionSet.prototype.STRreg = function (parentObj) {
 	//Store Word From Register
+	debug_opcode("STRreg");
 	parentObj.CPUCore.write32(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
 }
 THUMBInstructionSet.prototype.STRHreg = function (parentObj) {
 	//Store Hald-Word From Register
+	debug_opcode("STRHreg");
 	parentObj.CPUCore.write16(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
 }
 THUMBInstructionSet.prototype.STRBreg = function (parentObj) {
 	//Store Byte From Register
+	debug_opcode("STRBreg");
 	parentObj.CPUCore.write8(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRSBreg = function (parentObj) {
 	//Load Signed Byte Into Register
+	debug_opcode("LDRSBreg");
 	parentObj.registers[parentObj.execute & 0x7] = (parentObj.CPUCore.read8(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]) << 24) >> 24;
 }
 THUMBInstructionSet.prototype.LDRreg = function (parentObj) {
 	//Load Word Into Register
+	debug_opcode("LDRreg");
 	parentObj.registers[parentObj.execute & 0x7] = parentObj.CPUCore.read32(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRHreg = function (parentObj) {
 	//Load Half-Word Into Register
+	debug_opcode("LDRHreg");
 	parentObj.registers[parentObj.execute & 0x7] = parentObj.CPUCore.read16(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRBreg = function (parentObj) {
 	//Load Byte Into Register
+	debug_opcode("LDRBreg");
 	parentObj.registers[parentObj.execute & 0x7] = parentObj.CPUCore.read8(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRSHreg = function (parentObj) {
 	//Load Signed Half-Word Into Register
+	debug_opcode("LDRSHreg");
 	parentObj.registers[parentObj.execute & 0x7] = (parentObj.CPUCore.read16(parentObj.registers[(parentObj.execute >> 6) & 0x7] + parentObj.registers[(parentObj.execute >> 3) & 0x7]) << 16) >> 16;
 }
 THUMBInstructionSet.prototype.STRimm5 = function (parentObj) {
 	//Store Word From Register
+	debug_opcode("STRimm5");
 	parentObj.CPUCore.write32((((parentObj.execute >> 6) & 0x1F) << 2) + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRimm5 = function (parentObj) {
 	//Load Word Into Register
+	debug_opcode("LDRimm5");
 	parentObj.registers[parentObj.execute & 0x7] = parentObj.CPUCore.read32((((parentObj.execute >> 6) & 0x1F) << 2) + parentObj.registers[(parentObj.execute >> 3) & 0x7]);
 }
 THUMBInstructionSet.prototype.STRBimm5 = function (parentObj) {
 	//Store Byte From Register
+	debug_opcode("STRBimm5");
 	parentObj.CPUCore.write8(((parentObj.execute >> 6) & 0x1F) + parentObj.registers[(parentObj.execute >> 3) & 0x7], parentObj.registers[parentObj.execute & 0x7]);
 }
 THUMBInstructionSet.prototype.LDRBimm5 = function (parentObj) {
@@ -779,12 +832,18 @@ THUMBInstructionSet.prototype.BEQ = function (parentObj) {
 	if (parentObj.CPUCore.CPSRZero) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BNE = function (parentObj) {
 	debug_opcode("BNE");
 	//Branch if Not Equal:
 	if (!parentObj.CPUCore.CPSRZero) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BCS = function (parentObj) {
@@ -793,12 +852,18 @@ THUMBInstructionSet.prototype.BCS = function (parentObj) {
 	if (parentObj.CPUCore.CPSRCarry) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BCC = function (parentObj) {
 	debug_opcode("BCC");
 	//Branch if Carry Clear:
 	if (!parentObj.CPUCore.CPSRCarry) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BMI = function (parentObj) {
@@ -807,12 +872,18 @@ THUMBInstructionSet.prototype.BMI = function (parentObj) {
 	if (parentObj.CPUCore.CPSRNegative) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BPL = function (parentObj) {
 	debug_opcode("BPL");
 	//Branch if Negative Clear:
 	if (!parentObj.CPUCore.CPSRNegative) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BVS = function (parentObj) {
@@ -821,12 +892,18 @@ THUMBInstructionSet.prototype.BVS = function (parentObj) {
 	if (parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BVC = function (parentObj) {
 	debug_opcode("BVC");
 	//Branch if Overflow Clear:
 	if (!parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BHI = function (parentObj) {
@@ -835,12 +912,18 @@ THUMBInstructionSet.prototype.BHI = function (parentObj) {
 	if (parentObj.CPUCore.CPSRCarry && !parentObj.CPUCore.CPSRZero) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BLS = function (parentObj) {
 	debug_opcode("BLS");
 	//Branch if Carry Clear or is Zero Set:
 	if (!parentObj.CPUCore.CPSRCarry || parentObj.CPUCore.CPSRZero) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BGE = function (parentObj) {
@@ -849,12 +932,18 @@ THUMBInstructionSet.prototype.BGE = function (parentObj) {
 	if (parentObj.CPUCore.CPSRNegative == parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BLT = function (parentObj) {
 	debug_opcode("BLT");
 	//Branch if Negative NOT equal to Overflow
 	if (parentObj.CPUCore.CPSRNegative != parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.BGT = function (parentObj) {
@@ -863,12 +952,18 @@ THUMBInstructionSet.prototype.BGT = function (parentObj) {
 	if (!parentObj.CPUCore.CPSRZero && parentObj.CPUCore.CPSRNegative == parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
 	}
+	else {
+		debug_branch_not_taken();
+	}
 }
 THUMBInstructionSet.prototype.BLE = function (parentObj) {
 	debug_opcode("BLE");
 	//Branch if Zero Set and Negative NOT equal to Overflow
 	if (parentObj.CPUCore.CPSRZero || parentObj.CPUCore.CPSRNegative != parentObj.CPUCore.CPSROverflow) {
 		parentObj.offsetPC(parentObj.execute);
+	}
+	else {
+		debug_branch_not_taken();
 	}
 }
 THUMBInstructionSet.prototype.SWI = function (parentObj) {
