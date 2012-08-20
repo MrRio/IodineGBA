@@ -126,7 +126,7 @@ ARMInstructionSet.prototype.guardMultiRegisterRead = function (parentObj, addres
 }
 ARMInstructionSet.prototype.guardRegisterWriteSpecial = function (address, data, userMode) {
 	address &= 0xF;
-	if (userMode) {
+	if (!userMode) {
 		this.guardRegisterWrite(address, data);
 	}
 	else {
