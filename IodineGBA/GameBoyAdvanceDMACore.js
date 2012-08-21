@@ -74,7 +74,7 @@ GameBoyAdvanceDMA.prototype.writeDMADestination = function (dmaChannel, byteNumb
 	this.destination[dmaChannel] |= data << (byteNumber << 3);
 }
 GameBoyAdvanceDMA.prototype.writeDMAWordCount0 = function (dmaChannel, data) {
-	this.wordCount[dmaChannel] &= 0x3F00;
+	this.wordCount[dmaChannel] &= 0xFF00;
 	this.wordCount[dmaChannel] |= data;
 }
 GameBoyAdvanceDMA.prototype.writeDMAWordCount1 = function (dmaChannel, data) {
