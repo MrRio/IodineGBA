@@ -1387,8 +1387,7 @@ ARMInstructionSet.prototype.rc = function (parentObj) {
 		((parentObj.CPUCore.CPSROverflow) ? 0x10000000 : 0) |
 		((parentObj.CPUCore.IRQDisabled) ? 0x80 : 0) |
 		((parentObj.CPUCore.FIQDisabled) ? 0x40 : 0) |
-		((parentObj.CPUCore.InTHUMB) ? 0x20 : 0) |
-		parentObj.CPUCore.MODEBits
+		0x20 | parentObj.CPUCore.MODEBits
 	);
 }
 ARMInstructionSet.prototype.rcs = function (parentObj, operand) {
