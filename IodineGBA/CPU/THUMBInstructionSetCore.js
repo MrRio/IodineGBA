@@ -652,7 +652,7 @@ THUMBInstructionSet.prototype.BX_H = function (parentObj) {
 THUMBInstructionSet.prototype.LDRPC = function (parentObj) {
 	//PC-Relative Load
 	debug_opcode("LDRPC");
-	var result = parentObj.CPUCore.read32(parentObj.registers[15] + ((parentObj.execute & 0xFF) << 2));
+	var result = parentObj.CPUCore.read32((parentObj.registers[15] & -3) + ((parentObj.execute & 0xFF) << 2));
 	var address = (parentObj.execute >> 8) & 0x7;
 	parentObj.registers[address] = result;
 	debug_register(address, result);

@@ -113,7 +113,7 @@ GameBoyAdvanceCPU.prototype.getLR = function () {
 	return this.instructionHandle.getLR();
 }
 GameBoyAdvanceCPU.prototype.THUMBBitModify = function (isThumb) {
-	this.inTHUMB = isThumb;
+	this.InTHUMB = isThumb;
 	if (isThumb) {
 		this.instructionHandle = this.THUMB;
 	}
