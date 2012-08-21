@@ -932,7 +932,7 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//40000BAh - DMA0CNT_H - DMA 0 Control (R/W)
 	this.writeIO[0xBA] = function (parentObj, data) {
-		parentObj.dma.writeDMAControl0(0, data & 0x3F);
+		parentObj.dma.writeDMAControl0(0, data);
 	}
 	//40000BBh - DMA0CNT_H - DMA 0 Control (R/W)
 	this.writeIO[0xBB] = function (parentObj, data) {
@@ -980,7 +980,7 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//40000C6h - DMA1CNT_H - DMA 1 Control (R/W)
 	this.writeIO[0xC6] = function (parentObj, data) {
-		parentObj.dma.writeDMAControl0(1, data & 0x3F);
+		parentObj.dma.writeDMAControl0(1, data);
 	}
 	//40000C7h - DMA1CNT_H - DMA 1 Control (R/W)
 	this.writeIO[0xC7] = function (parentObj, data) {
@@ -1028,7 +1028,7 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//40000D2h - DMA2CNT_H - DMA 2 Control (R/W)
 	this.writeIO[0xD2] = function (parentObj, data) {
-		parentObj.dma.writeDMAControl0(2, data & 0x3F);
+		parentObj.dma.writeDMAControl0(2, data);
 	}
 	//40000D3h - DMA2CNT_H - DMA 2 Control (R/W)
 	this.writeIO[0xD3] = function (parentObj, data) {
@@ -1076,7 +1076,7 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	}
 	//40000DEh - DMA3CNT_H - DMA 3 Control (R/W)
 	this.writeIO[0xDE] = function (parentObj, data) {
-		parentObj.dma.writeDMAControl0(3, data & 0x3F);
+		parentObj.dma.writeDMAControl0(3, data);
 	}
 	//40000DFh - DMA3CNT_H - DMA 3 Control (R/W)
 	this.writeIO[0xDF] = function (parentObj, data) {
