@@ -1066,13 +1066,13 @@ GameBoyAdvanceIO.prototype.compileIOWriteDispatch = function () {
 	this.writeIO[0xDB] = function (parentObj, data) {
 		parentObj.dma.writeDMADestination(3, 3, data & 0xF);
 	}
-	//40000DCh - DMA3CNT_L - DMA 3 Word Count (W) (14 bit, 1..4000h)
+	//40000DCh - DMA3CNT_L - DMA 3 Word Count (W) (16 bit, 1..10000h)
 	this.writeIO[0xDC] = function (parentObj, data) {
 		parentObj.dma.writeDMAWordCount0(3, data);
 	}
-	//40000DDh - DMA3CNT_L - DMA 3 Word Count (W) (14 bit, 1..4000h)
+	//40000DDh - DMA3CNT_L - DMA 3 Word Count (W) (16 bit, 1..10000h)
 	this.writeIO[0xDD] = function (parentObj, data) {
-		parentObj.dma.writeDMAWordCount1(3, data & 0x3F);
+		parentObj.dma.writeDMAWordCount1(3, data);
 	}
 	//40000DEh - DMA3CNT_H - DMA 3 Control (R/W)
 	this.writeIO[0xDE] = function (parentObj, data) {
