@@ -193,12 +193,12 @@ GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	this.switchRegisterBank(spsr[7]);
 }
 GameBoyAdvanceCPU.prototype.switchMode = function (newMode) {
+	this.CPSRtoSPSR(newMode);
 	this.switchRegisterBank(newMode);
-	this.CPSRtoSPSR();
 }
-GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function () {
+GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function (newMode) {
 	//Used for leaving an exception and returning to the previous state:
-	switch (this.MODEBits) {
+	switch (newMode) {
 		case 0x11:	//FIQ
 			var spsr = this.SPSRFIQ;
 			break;
