@@ -111,7 +111,7 @@ GameBoyAdvanceCPU.prototype.getLR = function () {
 	return this.instructionHandle.getLR();
 }
 GameBoyAdvanceCPU.prototype.THUMBBitModify = function (isThumb) {
-	this.inTHUMB = isThumb;
+	this.InTHUMB = isThumb;
 	if (isThumb) {
 		this.instructionHandle = this.THUMB;
 	}
@@ -121,8 +121,6 @@ GameBoyAdvanceCPU.prototype.THUMBBitModify = function (isThumb) {
 }
 GameBoyAdvanceCPU.prototype.IRQ = function () {
 	if (!this.IRQDisabled) {
-		//Exception always enter ARM mode:
-		this.enterARM();
 		//Mode bits are set to IRQ:
 		this.switchMode(0x12);
 		//Save link register:
@@ -131,11 +129,11 @@ GameBoyAdvanceCPU.prototype.IRQ = function () {
 		this.branch(0x18);
 		//Disable IRQ:
 		this.IRQDisabled = true;
+		//Exception always enter ARM mode:
+		this.enterARM();
 	}
 }
 GameBoyAdvanceCPU.prototype.SWI = function () {
-	//Exception always enter ARM mode:
-	this.enterARM();
 	//Mode bits are set to SWI:
 	this.switchMode(0x13);
 	//Save link register:
@@ -144,10 +142,10 @@ GameBoyAdvanceCPU.prototype.SWI = function () {
 	this.branch(0x8);
 	//Disable IRQ:
 	this.IRQDisabled = true;
-}
-GameBoyAdvanceCPU.prototype.UNDEFINED = function () {
 	//Exception always enter ARM mode:
 	this.enterARM();
+}
+GameBoyAdvanceCPU.prototype.UNDEFINED = function () {
 	//Mode bits are set to SWI:
 	this.switchMode(0x1B);
 	//Save link register:
@@ -156,6 +154,8 @@ GameBoyAdvanceCPU.prototype.UNDEFINED = function () {
 	this.branch(0x4);
 	//Disable IRQ:
 	this.IRQDisabled = true;
+	//Exception always enter ARM mode:
+	this.enterARM();
 }
 GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	//Used for leaving an exception and returning to the previous state:
@@ -188,8 +188,8 @@ GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	this.switchRegisterBank(spsr[7]);
 }
 GameBoyAdvanceCPU.prototype.switchMode = function (newMode) {
-	this.CPSRtoSPSR();
 	this.switchRegisterBank(newMode);
+	this.CPSRtoSPSR();
 }
 GameBoyAdvanceCPU.prototype.CPSRtoSPSR = function () {
 	//Used for leaving an exception and returning to the previous state:
