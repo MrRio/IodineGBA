@@ -139,6 +139,9 @@ function debug_branch_not_taken() {
 function debug_spsr(spsr) {
 	current_unit[1][1].push(["mode", "CPSR->SPSR spill: " + spsr]);
 }
+function debug_irq_unit(flagName, flag) {
+	current_unit[1][1].push(["mode", flagName + ": " + outputCleanse(flag)]);
+}
 function debug_mode(newMode) {
 	current_unit[1][1].push(["mode", "Entering mode " + outputCleanse(newMode)]);
 }

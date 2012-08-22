@@ -31,6 +31,10 @@ GameBoyAdvanceIRQ.prototype.IRQMatch = function () {
 GameBoyAdvanceIRQ.prototype.checkForIRQFire = function () {
 	//Tell the CPU core when the emulated hardware is triggering an IRQ:
 	this.IOCore.cpu.triggerIRQ((this.interruptsEnabled & this.interruptsRequested) != 0 && this.IME);
+	debug_irq_unit("IE", this.interruptsEnabled);
+	debug_irq_unit("IF", this.interruptsRequested);
+	debug_irq_unit("IME", this.IME ? 1 : 0);
+	debug_irq_unit("TRIGGER", ((this.interruptsEnabled & this.interruptsRequested) != 0 && this.IME) ? 1 : 0);
 }
 GameBoyAdvanceIRQ.prototype.requestIRQ = function (irqLineToSet) {
 	this.interruptsRequested |= irqLineToSet;

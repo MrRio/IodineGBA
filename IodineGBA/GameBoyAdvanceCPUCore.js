@@ -101,8 +101,8 @@ GameBoyAdvanceCPU.prototype.checkPendingIRQ = function () {
 		}
 	}
 }
-GameBoyAdvanceCPU.prototype.triggerIRQ = function () {
-	this.triggeredIRQ = !this.IRQDisabled;
+GameBoyAdvanceCPU.prototype.triggerIRQ = function (didFire) {
+	this.triggeredIRQ = didFire && !this.IRQDisabled;
 }
 GameBoyAdvanceCPU.prototype.getCurrentFetchValue = function () {
 	return this.instructionHandle.fetch;
