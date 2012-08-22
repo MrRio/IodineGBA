@@ -71,12 +71,7 @@ GameBoyAdvanceCPU.prototype.initializeRegisters = function () {
 }
 GameBoyAdvanceCPU.prototype.executeIteration = function () {
 	//Check for pending IRQ:
-	if (this.triggeredIRQ) {
-		//Clear our Pending IRQ acknowledge:
-		this.triggeredIRQ = false;
-		//Branch for IRQ now:
-		this.IRQ(this.instructionHandle.getLR());
-	}
+	this.checkPendingIRQ();
 	//Tick the pipeline and bubble out invalidity:
 	this.pipelineInvalid >>= 1;
 	//Tick the pipeline of the selected instruction set:
@@ -95,6 +90,16 @@ GameBoyAdvanceCPU.prototype.branch = function (branchTo) {
 	//Next PC fetch has to update the address bus:
 	this.wait.NonSequentialBroadcast();
 	debug_branch(branchTo);
+}
+GameBoyAdvanceCPU.prototype.checkPendingIRQ = function () {
+	if (!this.IRQDisabled) {
+		if (this.triggeredIRQ) {
+			//Clear our Pending IRQ acknowledge:
+			this.IOCore.irq.checkForIRQFire();
+			//Branch for IRQ now:
+			this.IRQ(this.instructionHandle.getLR());
+		}
+	}
 }
 GameBoyAdvanceCPU.prototype.triggerIRQ = function () {
 	this.triggeredIRQ = !this.IRQDisabled;
