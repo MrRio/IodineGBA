@@ -252,6 +252,7 @@ GameBoyAdvanceGraphics.prototype.clockLCDState = function () {
 				break;
 			case 161:
 				this.IOCore.dma.gfxDisplaySyncKillRequest();		//Display Sync. DMA stop.
+				++this.currentScanLine;								//Increment to the next scan line.
 				break;
 			case 226:
 				this.inVBlank = false;								//Un-mark VBlank.
