@@ -151,12 +151,8 @@ GameBoyAdvanceEmulator.prototype.keyUp = function (keyReleased) {
 }
 GameBoyAdvanceEmulator.prototype.attachCanvas = function (canvas) {
 	this.canvas = canvas;
-	if (this.initializeCanvasTarget()) {
-		this.graphicsFound = true;
-	}
-	else {
-		this.graphicsFound = false;
-	}
+	this.graphicsFound = true;
+	this.graphicsFound = this.initializeCanvasTarget();
 }
 GameBoyAdvanceEmulator.prototype.recomputeDimension = function () {
 	//Cache some dimension info:
@@ -227,7 +223,7 @@ GameBoyAdvanceEmulator.prototype.prepareFrame = function () {
 	this.drewFrame = true;
 }
 GameBoyAdvanceEmulator.prototype.requestDraw = function () {
-	if (this.drewFrame && this.isCanvasEnabled) {
+	if (this.drewFrame && this.graphicsFound) {
 		//We actually updated the graphics internally, so copy out:
 		var canvasData = this.canvasBuffer.data;
 		var bufferIndex = 0;
@@ -240,20 +236,18 @@ GameBoyAdvanceEmulator.prototype.requestDraw = function () {
 	}
 }
 GameBoyAdvanceEmulator.prototype.graphicsBlit = function () {
-	if (this.isCanvasEnabled) {
-		if (this.canvasLastWidth != this.canvas.clientWidth || this.canvasLastHeight != this.canvas.clientHeight) {
-			this.recomputeDimension();
-		}
-		if (this.offscreenWidth == this.onscreenWidth && this.offscreenHeight == this.onscreenHeight) {
-			//Canvas does not need to scale, draw directly to final:
-			this.drawContextOnscreen.putImageData(this.canvasBuffer, 0, 0);
-		}
-		else {
-			//Canvas needs to scale, draw to offscreen first:
-			this.drawContextOffscreen.putImageData(this.canvasBuffer, 0, 0);
-			//Scale offscreen canvas image onto the final:
-			this.drawContextOnscreen.drawImage(this.canvasOffscreen, 0, 0, this.onscreenWidth, this.onscreenHeight);
-		}
+	if (this.canvasLastWidth != this.canvas.clientWidth || this.canvasLastHeight != this.canvas.clientHeight) {
+		this.recomputeDimension();
+	}
+	if (this.offscreenWidth == this.onscreenWidth && this.offscreenHeight == this.onscreenHeight) {
+		//Canvas does not need to scale, draw directly to final:
+		this.drawContextOnscreen.putImageData(this.canvasBuffer, 0, 0);
+	}
+	else {
+		//Canvas needs to scale, draw to offscreen first:
+		this.drawContextOffscreen.putImageData(this.canvasBuffer, 0, 0);
+		//Scale offscreen canvas image onto the final:
+		this.drawContextOnscreen.drawImage(this.canvasOffscreen, 0, 0, this.onscreenWidth, this.onscreenHeight);
 	}
 }
 GameBoyAdvanceEmulator.prototype.enableAudio = function () {

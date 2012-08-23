@@ -336,23 +336,10 @@ GameBoyAdvanceGraphics.prototype.updateVBlankStart = function () {
 		//Make sure our gfx are up-to-date:
 		this.graphicsJITVBlank();
 		//Draw the frame:
-		this.prepareFrame();
+		this.emulatorCore.prepareFrame();
 	}
 	this.bg2MatrixRenderer.resetReferenceCounters();
 	this.bg3MatrixRenderer.resetReferenceCounters();
-}
-GameBoyAdvanceGraphics.prototype.prepareFrame = function () {
-	//Copy the internal frame buffer to the output buffer:
-	var frameBuffer = this.frameBuffer;
-	var swizzledFrame = this.emulatorCore.swizzledFrame;
-	var bufferIndex = 0;
-	for (var canvasIndex = 0; canvasIndex < 115200;) {
-		swizzledFrame[canvasIndex++] = (frameBuffer[bufferIndex++] & 0x1F) << 3;			//Red
-		swizzledFrame[canvasIndex++] = ((frameBuffer[bufferIndex] >> 5) & 0x1F) << 3;		//Green
-		swizzledFrame[canvasIndex++] = ((frameBuffer[bufferIndex] >> 10) & 0x1F) << 3;		//Blue
-	}
-	//Notify core that the graphics buffer has been updated:
-	this.emulatorCore.drewFrame = true;
 }
 GameBoyAdvanceGraphics.prototype.graphicsJIT = function () {
 	this.totalLinesPassed = 0;			//Mark frame for ensuring a JIT pass for the next framebuffer output.
