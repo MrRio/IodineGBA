@@ -131,6 +131,14 @@ function registerGUIEvents() {
 		update_log_end();
 		event.preventDefault();
 	});
+	addEvent("click", document.getElementById("record_back"), function (event) {
+		update_log_decrement();
+		event.preventDefault();
+	});
+	addEvent("click", document.getElementById("record_next"), function (event) {
+		update_log_decrement();
+		event.preventDefault();
+	});
 }
 function attachBIOS(BIOS) {
 	Iodine.attachBIOS(new Uint8Array(BIOS));

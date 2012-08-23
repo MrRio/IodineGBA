@@ -17,6 +17,9 @@ button, select {
 	float: left;
 	clear: both;
 }
+div#log_control button {
+	clear: none;
+}
 div#control_panel {
 	position: absolute;
 	left: 0px;

@@ -1,6 +1,7 @@
 var logged = [];
 var current_unit = null;
 var display_amount = 1000;
+var debugging_log_offset = 0;
 var debugging_enabled = true;
 var debugging_memoryRead = true;
 var debugging_memoryWrite = true;
@@ -9,14 +10,15 @@ var debugging_branch = true;
 var debugging_register = true;
 var debugging_exception = true;
 var debugging_mode = true;
-function update_log_start() {
-	var length = Math.min(logged.length, display_amount);
+function update_log() {
+	var from = debugging_log_offset;
+	var to = Math.min(logged.length, display_amount + from);
 	var log_handle = document.getElementById("debug_log");
 	while (log_handle.hasChildNodes()) {
 		log_handle.removeChild(log_handle.lastChild);
 	}
-	for (var to = 0; to < length; ++to) {
-		var unit = logged[to];
+	for (; from < to; ++from) {
+		var unit = logged[from];
 		var unit_handle = document.createElement("div");
 		unit_handle.setAttribute("class", unit[0]);
 		unit_handle.appendChild(document.createTextNode(unit[0]));
@@ -38,32 +40,21 @@ function update_log_start() {
 		log_handle.appendChild(unit_handle);
 	}
 }
+function update_log_start() {
+	debugging_log_offset = 0;
+	update_log();
+}
 function update_log_end() {
-	var length = logged.length;
-	var log_handle = document.getElementById("debug_log");
-	while (log_handle.hasChildNodes()) {
-		log_handle.removeChild(log_handle.lastChild);
-	}
-	for (var to = Math.max(length - display_amount, 0); to < length; ++to) {
-		var unit = logged[to];
-		var unit_handle = document.createElement("div");
-		unit_handle.setAttribute("class", unit[0]);
-		unit_handle.appendChild(document.createTextNode(unit[0]));
-		var sub_unit = unit[1];
-		var unit2 = sub_unit[1];
-		var sub_length = unit2.length;
-		var unit2_handle = document.createElement("div");
-		unit2_handle.setAttribute("class", "debug_opcode");
-		unit2_handle.appendChild(document.createTextNode(sub_unit[0]));
-		for (var sub_index = 0; sub_index < sub_length; ++sub_index) {
-			var sub_handle = document.createElement("div");
-			sub_handle.setAttribute("class", unit2[sub_index][0]);
-			sub_handle.appendChild(document.createTextNode(unit2[sub_index][1]));
-			unit2_handle.appendChild(sub_handle);
-		}
-		unit_handle.appendChild(unit2_handle);
-		log_handle.appendChild(unit_handle);
-	}
+	debugging_log_offset = logged.length - display_amount;
+	update_log();
+}
+function update_log_increment() {
+	debugging_log_offset = Math.min(debugging_log_offset + display_amount, logged.length);
+	update_log();
+}
+function update_log_decrement() {
+	debugging_log_offset = Math.max(debugging_log_offset - display_amount, 0);
+	update_log();
 }
 function debug_check_log_approval(name) {
 	switch (name) {
