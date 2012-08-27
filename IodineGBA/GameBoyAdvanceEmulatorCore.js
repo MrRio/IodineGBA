@@ -20,7 +20,6 @@ function GameBoyAdvanceEmulator() {
 	this.graphicsFound = false;				//Do we have graphics output sink found yet?
 	this.audioFound = false;				//Do we have audio output sink found yet?
 	this.romFound = false;					//Do we have a ROM loaded in?
-	this.biosFound = false;					//Do we have the BIOS ROM loaded in?
 	this.faultFound = false;				//Did we run into a fatal error?
 	this.paused = true;						//Are we paused?
 	this.audioVolume = 1;					//Starting audio volume.
@@ -28,6 +27,7 @@ function GameBoyAdvanceEmulator() {
 	this.audioBufferSize = 30;				//Audio buffer maximum span amount over x interpreter iterations.
 	this.offscreenWidth = 240;				//Width of the GBA screen.
 	this.offscreenHeight = 160;				//Height of the GBA screen.
+	this.BIOS = [];							//Initialize BIOS as not existing.
 	//Cache some frame buffer lengths:
 	this.offscreenRGBCount = this.offscreenWidth * this.offscreenHeight * 3;
 	this.offscreenRGBACount = this.offscreenWidth * this.offscreenHeight * 4;
@@ -78,7 +78,7 @@ GameBoyAdvanceEmulator.prototype.startTimer = function () {
 GameBoyAdvanceEmulator.prototype.timerCallback = function () {
 	//Check to see if web view is not hidden, if hidden don't run due to JS timers being inaccurate on page hide:
 	if (!document.hidden && !document.msHidden && !document.mozHidden && !document.webkitHidden) {
-		if (!this.faultFound && this.romFound && this.biosFound) {		//Any error pending or no ROM loaded is a show-stopper!
+		if (!this.faultFound && this.romFound) {						//Any error pending or no ROM loaded is a show-stopper!
 			this.iterationStartSequence();								//Run start of iteration stuff.
 			this.IOCore.iterate();										//Step through the emulation core loop.
 			this.iterationEndSequence();								//Run end of iteration stuff.
@@ -101,18 +101,12 @@ GameBoyAdvanceEmulator.prototype.iterationEndSequence = function () {
 GameBoyAdvanceEmulator.prototype.attachROM = function (ROM) {
 	this.stop();
 	this.ROM = ROM;
-	if (this.biosFound) {
-		this.initializeCore();
-	}
+	this.initializeCore();
 	this.romFound = true;
 }
 GameBoyAdvanceEmulator.prototype.attachBIOS = function (BIOS) {
 	this.statusClear();
 	this.BIOS = BIOS;
-	if (this.romFound) {
-		this.initializeCore();
-	}
-	this.biosFound = true;
 }
 GameBoyAdvanceEmulator.prototype.save = function () {
 	//Nothing yet...
@@ -140,12 +134,12 @@ GameBoyAdvanceEmulator.prototype.initializeCore = function () {
 	this.IOCore = new GameBoyAdvanceIO(this);
 }
 GameBoyAdvanceEmulator.prototype.keyDown = function (keyPressed) {
-	if (!this.paused && this.romFound && this.biosFound) {
+	if (!this.paused) {
 		this.IOCore.joypad.keyPress(keyPressed);
 	}
 }
 GameBoyAdvanceEmulator.prototype.keyUp = function (keyReleased) {
-	if (!this.paused && this.romFound && this.biosFound) {
+	if (!this.paused) {
 		this.IOCore.joypad.keyRelease(keyReleased);
 	}
 }

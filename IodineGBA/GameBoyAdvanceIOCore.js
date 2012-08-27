@@ -2177,10 +2177,11 @@ GameBoyAdvanceIO.prototype.handleStop = function () {
 }
 GameBoyAdvanceIO.prototype.loadBIOS = function () {
 	//Ensure BIOS is of correct length:
-	if (this.emulatorCore.BIOS.length != 0x4000) {
-		throw(new Error("Invalid BIOS length."));
+	if (this.emulatorCore.BIOS.length == 0x4000) {
+		this.BIOSFound = true;
+		this.BIOS = this.emulatorCore.BIOS;
 	}
 	else {
-		this.BIOS = this.emulatorCore.BIOS;
+		this.BIOSFound = false;
 	}
 }

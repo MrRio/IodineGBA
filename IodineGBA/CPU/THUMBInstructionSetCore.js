@@ -31,7 +31,7 @@ THUMBInstructionSet.prototype.guardHighRegisterWrite = function (data) {
 	var address = 0x8 | (this.execute & 0x7);
 	if (address == 15) {
 		//We performed a branch:
-		this.CPUCore.branch(data);
+		this.CPUCore.branch(data & -2);
 	}
 	else {
 		//Regular Data Write:
@@ -43,6 +43,8 @@ THUMBInstructionSet.prototype.writePC = function (data) {
 	//We performed a branch:
 	//Update the program counter to branch address:
 	this.CPUCore.branch(data & -2);
+	//Restore SPSR to CPSR:
+	this.CPUCore.SPSRtoCPSR();
 }
 THUMBInstructionSet.prototype.offsetPC = function (data) {
 	//We performed a branch:
@@ -51,6 +53,9 @@ THUMBInstructionSet.prototype.offsetPC = function (data) {
 }
 THUMBInstructionSet.prototype.getLR = function () {
 	return (this.registers[15] - 2) | 0;
+}
+THUMBInstructionSet.prototype.getIRQLR = function () {
+	return this.registers[15];
 }
 THUMBInstructionSet.prototype.executeIteration = function () {
 	debug_start_unit("THUMB");

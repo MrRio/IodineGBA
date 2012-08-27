@@ -136,7 +136,7 @@ function registerGUIEvents() {
 		event.preventDefault();
 	});
 	addEvent("click", document.getElementById("record_next"), function (event) {
-		update_log_decrement();
+		update_log_increment();
 		event.preventDefault();
 	});
 }
