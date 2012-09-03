@@ -101,10 +101,10 @@ GameBoyAdvanceCPU.prototype.branch = function (branchTo) {
 		switch (branchTo) {
 			//IRQ mode exit handling:
 			case 0x130:
-				/*TODO:
-				ldmfd r13!,r0-r3,r12,r14 ;restore registers from SP_irq
-				subs r15,r14,4h ;return from IRQ (PC=LR-4, CPSR=SPSR)
-				*/
+				this.ARM.execute = 0xE8BD500F;
+				this.ARM.LDMIAW(this, this.ARM.guardMultiRegisterWrite);
+				this.ARM.execute = 0xE25EF004;
+				this.ARM.SUBS(this, this.ARM.imm);
 				break;
 			default:
 				throw(new Error("Could not handle branch to: " + branchTo.toString(16)));
