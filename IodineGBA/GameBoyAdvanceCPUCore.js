@@ -51,6 +51,12 @@ GameBoyAdvanceCPU.prototype.initializeRegisters = function () {
 	this.registersIRQ = [0,0];
 	//Undefined mode registers (R13-R14):
 	this.registersUND = [0,0];
+	//Pre-initialize stack pointers if no BIOS loaded:
+	if (!this.IOCore.BIOSFound) {
+		this.registersSVC[0] = 0x3007FE0;
+		this.registersIRQ[0] = 0x3007FA0;
+		this.registers[13] = 0x3007F00;
+	}
 	//CPSR Register:
 	this.CPSRNegative = false;		//N Bit
 	this.CPSRZero = false;			//Z Bit
@@ -82,12 +88,28 @@ GameBoyAdvanceCPU.prototype.executeIteration = function () {
 	}
 }
 GameBoyAdvanceCPU.prototype.branch = function (branchTo) {
-	//Branch to new address:
-	this.registers[15] = branchTo;
-	//Mark pipeline as invalid:
-	this.pipelineInvalid = 0x4;
-	//Next PC fetch has to update the address bus:
-	this.wait.NonSequentialBroadcast();
+	if (branchTo > 0x3FFF || this.IOCore.BIOSFound) {
+		//Branch to new address:
+		this.registers[15] = branchTo;
+		//Mark pipeline as invalid:
+		this.pipelineInvalid = 0x4;
+		//Next PC fetch has to update the address bus:
+		this.wait.NonSequentialBroadcast();
+	}
+	else {
+		//We're branching into BIOS, handle specially:
+		switch (branchTo) {
+			//IRQ mode exit handling:
+			case 0x130:
+				/*TODO:
+				ldmfd r13!,r0-r3,r12,r14 ;restore registers from SP_irq
+				subs r15,r14,4h ;return from IRQ (PC=LR-4, CPSR=SPSR)
+				*/
+				break;
+			default:
+				throw(new Error("Could not handle branch to: " + branchTo.toString(16)));
+		}
+	}
 }
 GameBoyAdvanceCPU.prototype.checkPendingIRQ = function () {
 	if (!this.IRQDisabled) {
@@ -129,38 +151,59 @@ GameBoyAdvanceCPU.prototype.IRQ = function () {
 		//Mode bits are set to IRQ:
 		this.switchMode(0x12);
 		//Save link register:
+		this.registers[14] = this.instructionHandle.getIRQLR();
+		//Disable IRQ:
+		this.IRQDisabled = true;
+		if (this.IOCore.BIOSFound) {
+			//IRQ exception vector:
+			this.branch(0x18);
+			//Exception always enter ARM mode:
+			this.enterARM();
+		}
+		else {
+			//Exception always enter ARM mode:
+			this.enterARM();
+			this.ARM.execute = 0xE92D500F;
+			this.ARM.STMDBW(this, this.ARM.guardMultiRegisterRead);
+			this.registers[0] = 0x4000000;
+			//Save link register:
+			this.registers[14] = 0x130;
+			//Skip BIOS ROM processing:
+			this.branch(0x3FFFFFC);
+		}
+	}
+}
+GameBoyAdvanceCPU.prototype.SWI = function () {
+	if (this.IOCore.BIOSFound) {
+		//Mode bits are set to SWI:
+		this.switchMode(0x13);
+		//Save link register:
 		this.registers[14] = this.getLR();
-		//IRQ exception vector:
-		this.branch(0x18);
+		//SWI exception vector:
+		this.branch(0x8);
 		//Disable IRQ:
 		this.IRQDisabled = true;
 		//Exception always enter ARM mode:
 		this.enterARM();
 	}
-}
-GameBoyAdvanceCPU.prototype.SWI = function () {
-	//Mode bits are set to SWI:
-	this.switchMode(0x13);
-	//Save link register:
-	this.registers[14] = this.getLR();
-	//SWI exception vector:
-	this.branch(0x8);
-	//Disable IRQ:
-	this.IRQDisabled = true;
-	//Exception always enter ARM mode:
-	this.enterARM();
+	else {
+		//TODO
+	}
 }
 GameBoyAdvanceCPU.prototype.UNDEFINED = function () {
-	//Mode bits are set to SWI:
-	this.switchMode(0x1B);
-	//Save link register:
-	this.registers[14] = this.getLR();
-	//SWI exception vector:
-	this.branch(0x4);
-	//Disable IRQ:
-	this.IRQDisabled = true;
-	//Exception always enter ARM mode:
-	this.enterARM();
+	//Only process undefined instruction if BIOS loaded:
+	if (this.IOCore.BIOSFound) {
+		//Mode bits are set to SWI:
+		this.switchMode(0x1B);
+		//Save link register:
+		this.registers[14] = this.getLR();
+		//SWI exception vector:
+		this.branch(0x4);
+		//Disable IRQ:
+		this.IRQDisabled = true;
+		//Exception always enter ARM mode:
+		this.enterARM();
+	}
 }
 GameBoyAdvanceCPU.prototype.SPSRtoCPSR = function () {
 	//Used for leaving an exception and returning to the previous state:

@@ -208,6 +208,9 @@ ARMInstructionSet.prototype.guardMultiRegisterReadSpecial = function (parentObj,
 ARMInstructionSet.prototype.getLR = function () {
 	return (this.registers[15] - 4) | 0;
 }
+ARMInstructionSet.prototype.getIRQLR = function () {
+	return this.getLR();
+}
 ARMInstructionSet.prototype.BX = function (parentObj) {
 	//Branch & eXchange:
 	var address = parentObj.registers[parentObj.execute & 0xF];
